@@ -1,0 +1,83 @@
+
+Various external tools are used by the toolkit. If you want to use them, please find them and respect their license.
+
+============================================================
+
+colea
+http://ecs.utdallas.edu/loizou/speech/colea.htm
+
+
+COLEA: A Matlab Software Tool for Speech Analysis 
+by Philip Loizou
+
+
+The MATLAB program is distributed as freeware and is intended 
+for non-commercial purposes only.
+
+
+============================================================
+
+columbia_ee_dtw 
+http://www.ee.columbia.edu/ln/labrosa/matlab/dtw/
+
+
+Dynamic Time Warp (DTW) in Matlab by Dan Ellis
+
+
+If you find this code useful and wish to reference it in your 
+publications, you can make a reference directly to this web 
+page, e.g. something like:
+
+D. Ellis (2003). Dynamic Time Warp (DTW) in Matlab
+    Web resource, available: 
+http://www.ee.columbia.edu/~dpwe/resources/matlab/dtw/.
+
+The code originated with our project on aligning MIDI 
+descriptions to music audio recordings,
+
+R. Turetsky and D. Ellis (2003): Ground-Truth Transcriptions of 
+Real Music from Force-Aligned MIDI Syntheses,
+4th International Symposium on Music Information Retrieval 
+ISMIR-03, pp. 135-141, Baltimore, October 2003.
+
+Copyright
+
+This software is released under GPL. See the COPYRIGHT file.
+Last updated: $Date: 2012/09/05 10:19:14 $
+
+  
+============================================================
+
+
+
+RegressionToolbox
+
+
+============================================================
+
+
+
+STRAIGHTV40_003
+http://www.wakayama-u.ac.jp/~kawahara/STRAIGHTadv/index_e.html
+
+STRAIGHT, a speech analysis, modification and synthesis system
+by Hideki Kawahara, Professor, Wakayama University 
+
+
+
+============================================================
+
+voicebox
+http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html
+
+VOICEBOX: Speech Processing Toolbox for MATLAB
+
+VOICEBOX is a speech processing toolbox consists of MATLAB 
+routines that are maintained by and mostly written by Mike 
+Brookes, Department of Electrical & Electronic Engineering, 
+Imperial College, Exhibition Road, London SW7 2BT, UK. Several 
+of the routines require MATLAB V6.5 or above and require 
+(normally slight) modification to work with earlier veresions.
+
+The routines are available as a zip archive and are made 
+available under the terms of the GNU Public License.
