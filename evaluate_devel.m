@@ -3,6 +3,7 @@
 %
 
 local_conf
+matlabpool
 
 if exist('devel/2009_EH2_objective_results_sim', 'file') == 0;
     [ sim_averagedist, b2009_EH2_sim_distlist, sim_runtime ] = obj_evaluation(BLIZZARD2009_RESULTDIR, 'devel/2009_EH2_sim.ref.scp','devel/2009_EH2_sim.test.scp');
@@ -14,4 +15,4 @@ if exist('devel/2009_EH2_objective_results_nat', 'file') == 0;
     save('devel/2009_EH2_objective_results_nat','b2009_EH2_nat_distlist','-ascii');
 end
 
-evaluate_wilcinson()
+evaluate_wilcoxon()

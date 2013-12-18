@@ -5,8 +5,8 @@
 simref_2009_EH2=load('blizzard_tests/2009_simrefEH2.ascii');
 natref_2009_EH2=load('blizzard_tests/2009_natrefEH2.ascii');
 
-sims=load('devel/objective_results_sim');
-nats=load('devel/objective_results_nat');
+sims=load('devel/2009_EH2_objective_results_sim');
+%nats=load('devel/2009_EH2_objective_results_nat');
 
 listeningsims=load('blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
 listeningnats=load('blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');

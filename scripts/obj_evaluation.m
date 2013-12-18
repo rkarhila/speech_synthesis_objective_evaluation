@@ -47,7 +47,9 @@ tic
 
 % Loop over file pairs:
 
-for i=1:length(testfilelist)
+
+
+parfor i=1:length(testfilelist)
     
     
     fs = 16000;
@@ -108,10 +110,10 @@ for i=1:length(testfilelist)
                 mapmethod);
             %distmap=(distmap-min(distmap(:)))/(max(distmap(:)-min(distmap(:))));
             distmaps{y}=distmap;
-            save(mapname, 'distmap', '-ascii');
+            parsave(mapname, distmap);
             if (length(reff0))>0
-                save(reff0name, 'reff0', '-ascii');
-                save(testf0name, 'testf0', '-ascii');
+                parsave(reff0name, reff0);
+                parsave(testf0name, testf0);
             end
         end
     end

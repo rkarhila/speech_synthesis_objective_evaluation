@@ -1,6 +1,6 @@
 
 
-EVALHOME='/data/users/rkarhila/speech_synthesis_objective_evaluation'
+EVALHOME='/data/users/rkarhila/speech_synthesis_objective_evaluation';
 
 addpath ([ EVALHOME, '/scripts'])
 addpath ([ EVALHOME, '/include/columbia_ee_dtw'])
@@ -31,5 +31,5 @@ LOCAL_FEATDIRY ='/akulabra/projects/T40511/synthesis/blizzard_eval/features/';
 
 
 % This is not used for anything yet:
-BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
+BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/';
 

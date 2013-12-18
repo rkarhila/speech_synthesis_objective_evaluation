@@ -278,7 +278,7 @@ switch ds_type
             audio_short = hamwin.*test_audio(framestart:framestart+frame_length-1);
 
             feas =sqrt(abs(fft(audio_short,fft_dim)));
-            feas_test(i,:)=dct(M*feas);
+            feas_test(i,:)=dct(log(M*feas+1));
         end
 
         feas_ref=zeros(nr_frames_ref,mel_dim);
@@ -290,7 +290,7 @@ switch ds_type
 
             feas =sqrt(abs(fft(audio_short,fft_dim)));
 
-            feas_ref(i,:)=dct(M*feas);
+            feas_ref(i,:)=dct(log(M*feas+1));
 
 
         end
@@ -323,7 +323,7 @@ switch ds_type
         testf0=f0raw;
 
          for i=1:nr_frames_test
-              feas_test(i,:)=dct(M*n3sgram(:,i));
+              feas_test(i,:)=dct(log(M*n3sgram(:,i)+1));
          end
 
 
@@ -334,7 +334,7 @@ switch ds_type
         
         for i=1:nr_frames_ref
             
-            feas_ref(i,:)=dct(M*n3sgram2(:,i));
+            feas_ref(i,:)=dct(log(M*n3sgram2(:,i)+1));
 
         end
         
