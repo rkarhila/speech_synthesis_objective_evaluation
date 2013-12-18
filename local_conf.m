@@ -22,7 +22,7 @@ end
 
 %Save copies of distance maps for DTW testing
 CACHE_DISTMAPS = 1;
-LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps2/';
+LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps3/';
 
 
 % This is not used for anything yet:

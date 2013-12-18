@@ -7,8 +7,8 @@ mapdirectory=LOCAL_MAPDIR;
 monitoring=0;
 figuring=0;
 
-spec_method='straight'; % fft or straight
-distance_measure = 'fwsnrseg'; % fwsnrseg or mcd or llr
+%spec_method='straight'; % fft or straight
+%distance_measure = 'fwsnrseg'; % fwsnrseg or mcd or llr
 
 % So, we have list of reference files and a list of test files.
 % Let's assume that they all exist and behave well
@@ -19,25 +19,23 @@ reffilelist = textread(reference_sent_list,'%s' );
 testfilelist = textread(test_sent_list,'%s' );
 
 
-mapmethods={'fft-snr','straight-snr','fft-mcd', 'straight-mcd','llr'};
+%mapmethods={'fft-snr','straight-snr','fft-mcd', 'straight-mcd','llr'};
 mapmethods={'straight-snr','fft-mcd', 'straight-mcd','llr'};
-mapf0measures={'rmsd','voicingdiff'}
+mapf0measures={'rmsd','voicingdiff'};
 
-globalf0measures={'rmse','diffvar'}
+globalf0measures={'rmse','diffvar'};
 
 testcount=length(mapmethods)*...
-    (length(mapmethods)+length(mapf0measures))+length(globalf0measures)
+    (length(mapmethods)+length(mapf0measures))+length(globalf0measures);
 
 distlist=zeros(length(testfilelist),testcount);
 
 if ne(length(testfilelist), length(testfilelist))
-    disp(['Filelists are different size, this won`t end well']);
+    disp('Filelists are different size, this won`t end well');
     
 end
 
 n=length(testfilelist);
-Length=n;
-Count=0;
 
 if monitoring==1;
     WaitBar = waitbar(0,'Initializing waitbar...');
@@ -84,7 +82,8 @@ for i=1:length(testfilelist)
     
     
     [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
-    speakercode=regexprep( regexprep(testpath,'.*blizzard_wavs_and_scores[a-z0-9_-]+',''), '[^a-zA-Z0-9-_]', '_');
+    %speakercode=regexprep( regexprep(testpath,'.*blizzard_wavs_and_scores[a-z0-9_-]+',''), '[^a-zA-Z0-9-_]', '_');
+    speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
     disp(testfilename);
     
     
@@ -92,7 +91,7 @@ for i=1:length(testfilelist)
         figure(1)
     end
     
-    distmaps={};
+    distmaps=cell(length(mapmethods));
     
     
     testf0name=[mapdirectory,speakercode,testfilename,'_testf0.map'];
@@ -106,7 +105,7 @@ for i=1:length(testfilelist)
             distmaps{y}=load(mapname, '-ascii');
         else
             [distmap,reff0,testf0]=make_dist_map(test_audio, ref_audio, ...
-                spec_method, mapmethod);
+                mapmethod);
             %distmap=(distmap-min(distmap(:)))/(max(distmap(:)-min(distmap(:))));
             distmaps{y}=distmap;
             save(mapname, 'distmap', '-ascii');
@@ -137,7 +136,7 @@ for i=1:length(testfilelist)
 
     
     for z=1:length(mapmethods)
-        mapmethod=mapmethods{z};
+        %mapmethod=mapmethods{z};
         
        [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
             dpfast(distmaps{z},step_matrix,1);      

@@ -1,8 +1,6 @@
-function [ distmap , reff0,testf0 ]=make_dist_map(test_audio,ref_audio,spec_method,ds_type)
+function [ distmap , reff0,testf0 ]=make_dist_map(test_audio,ref_audio,ds_type)
 
 local_conf
-spec_method='straight'; % fft or straight
-% ds_type = 'fft-snr' %'fwsnrseg' % fwsnrseg or mcd or llr
 
 
 reff0=[];
@@ -46,7 +44,6 @@ fft_dim=spectrum_dim/2+1;
 M = melbankm(mel_dim, spectrum_dim, fs, 0, 0.5, 'u');
 condition_num=1;
 gamma1=0.2;
-do_norm=1;
 
 
 % MCEP-D
