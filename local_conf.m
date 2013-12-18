@@ -1,8 +1,11 @@
 
-addpath scripts
-addpath include/columbia_ee_dtw
-addpath include/voicebox
-addpath include/colea
+
+EVALHOME='/data/users/rkarhila/speech_synthesis_objective_evaluation'
+
+addpath ([ EVALHOME, '/scripts'])
+addpath ([ EVALHOME, '/include/columbia_ee_dtw'])
+addpath ([ EVALHOME, '/include/voicebox'])
+addpath ([ EVALHOME, '/include/colea'])
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
 

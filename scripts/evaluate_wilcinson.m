@@ -1,80 +1,25 @@
 
 
 
-simrefEH1 = [   
-         0     0     1     0     0     0     0     1     0     0     1     1     0     0     1     1     1
-         0     0     1     0     0     0     0     1     0     0     0     1     0     0     1     1     1
-         1     1     0     1     1     1     1     1     1     0     0     1     0     0     1     1     0
-         0     0     1     0     0     0     0     1     0     0     0     1     0     0     1     1     1
-         0     0     1     0     0     0     0     1     0     0     0     1     0     0     1     1     1
-         0     0     1     0     0     0     0     1     0     1     1     1     1     0     1     1     1
-         0     0     1     0     0     0     0     1     0     0     0     1     0     0     1     1     1
-         1     1     1     1     1     1     1     0     1     1     1     1     1     1     0     1     1
-         0     0     1     0     0     0     0     1     0     0     1     1     0     0     1     1     1
-         0     0     0     0     0     1     0     1     0     0     0     1     0     0     1     1     0
-         1     0     0     0     0     1     0     1     1     0     0     1     0     0     1     1     0
-         1     1     1     1     1     1     1     1     1     1     1     0     1     1     1     0     0
-         0     0     0     0     0     1     0     1     0     0     0     1     0     0     1     1     1
-         0     0     0     0     0     0     0     1     0     0     0     1     0     0     1     1     1
-         1     1     1     1     1     1     1     0     1     1     1     1     1     1     0     1     1
-         1     1     1     1     1     1     1     1     1     1     1     0     1     1     1     0     0
-         1     1     0     1     1     1     1     1     1     0     0     0     1     1     1     0     0];
-
-simrefEH2 = [	0	0	0	1	1	0	0	0	0	1	1	1	0	0	0	1	1	1
-    0	0	0	1	0	0	0	0	0	1	0	1	0	0	0	1	1	1
-    0	0	0	1	0	1	0	1	1	1	0	1	0	0	1	1	1	1
-    1	1	1	0	1	1	1	1	1	0	1	0	1	1	1	0	0	1
-    1	0	0	1	0	1	0	1	1	1	0	1	0	0	1	1	1	0
-    0	0	1	1	1	0	1	0	0	1	1	1	0	1	0	1	1	1
-    0	0	0	1	0	1	0	1	0	1	0	1	0	0	1	1	1	0
-    0	0	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-    0	0	1	1	1	0	0	0	0	1	1	1	0	1	0	1	1	1
-    1	1	1	0	1	1	1	1	1	0	1	0	1	1	1	0	1	1
-    1	0	0	1	0	1	0	1	1	1	0	1	0	0	1	1	1	0
-    1	1	1	0	1	1	1	1	1	0	1	0	1	1	1	0	0	0
-    0	0	0	1	0	0	0	1	0	1	0	1	0	0	1	1	1	1
-    0	0	0	1	0	1	0	1	1	1	0	1	0	0	1	1	1	0
-    0	0	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-    1	1	1	0	1	1	1	1	1	0	1	0	1	1	1	0	0	1
-    1	1	1	0	1	1	1	1	1	1	1	0	1	1	1	0	0	0
-    1	1	1	1	0	1	0	1	1	1	0	0	1	0	1	1	0	0];
-
-natrefEH2 = [ 0	0	0	1	0	0	0	1	0	1	1	1	0	1	1	1	1	1
-	0	0	1	1	1	0	1	0	0	1	1	1	1	1	1	1	1	1
-	0	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	1	1	1	0	1	1	1	1	1	0	1	1	1	1	1	1	0	1
-	0	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	0	0	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-	0	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	1	0	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-	0	0	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-	1	1	1	0	1	1	1	1	1	0	1	1	1	1	1	0	0	1
-	1	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	1	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	0	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	1	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0
-	1	1	1	1	1	0	1	0	0	1	1	1	1	1	0	1	1	1
-	1	1	0	1	0	1	0	1	1	0	0	0	0	0	1	0	1	0
-	1	1	1	0	1	1	1	1	1	0	1	1	1	1	1	1	0	1
-	1	1	0	1	0	1	0	1	1	1	0	0	0	0	1	0	1	0];
-
-simref_2009_EH1=load('blizzard/2009_simrefEH1.ascii');
-simref_2009_EH2=load('blizzard/2009_simrefEH2.ascii');
-natref_2009_EH2=load('blizzard/2009_natrefEH2.ascii');
+%simref_2009_EH1=load('blizzard_tests/2009_simrefEH1.ascii');
+simref_2009_EH2=load('blizzard_tests/2009_simrefEH2.ascii');
+natref_2009_EH2=load('blizzard_tests/2009_natrefEH2.ascii');
 
 sims=load('devel/objective_results_sim');
 nats=load('devel/objective_results_nat');
 
-listeningsims=load('devel/subjective_eval_sim_means_only_num.txt');
-listeningnats=load('devel/subjective_eval_nat_means_only_num.txt');
+listeningsims=load('blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
+listeningnats=load('blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');
 
-listeningscores=listeningnats;
-refmat=natrefEH2;
-refscores=nats;
+listeningscores=listeningsims;
+refmat=simref_2009_EH2;
+
+refscores=sims;
 
 invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 
 systems = 'BCDEHIJKLMOPQRSTUW';
+
 syscount=length(systems);
 featcount=size(refscores,2);
 

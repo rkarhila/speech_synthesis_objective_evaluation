@@ -1,13 +1,8 @@
-function [ averagedist, distlist, runtime ]=obj_evaluation(reference_sent_list, ...
+function [ averagedist, distlist, runtime ]=obj_evaluation(filepath, reference_sent_list, ...
     test_sent_list)
 
-addpath include/columbia_ee_dtw
-addpath include/voicebox
-addpath include/colea
-addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
-
-
-mapdirectory='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps2/'
+local_conf
+mapdirectory=LOCAL_MAPDIR;
 
 monitoring=0;
 figuring=0;
@@ -62,8 +57,8 @@ for i=1:length(testfilelist)
     step_matrix=[1 1 1;1 0 1;0 1 1;1 2 2;2 1 2];
     %step_matrix=[1 1 1.0;0 1 1.0;1 0 1.0];
     
-    [ ref_audio , fs1, bits1 ] = wavread(reffilelist{i});
-    [ test_audio , fs2, bits2 ] = wavread(testfilelist{i});
+    [ ref_audio , fs1, bits1 ] = wavread([filepath,reffilelist{i}]);
+    [ test_audio , fs2, bits2 ] = wavread([filepath,testfilelist{i}]);
     
     if ne(fs1, fs2)
         disp(['Different sampling frequency, this won`t end ' ...

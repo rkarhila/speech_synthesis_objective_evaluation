@@ -1,5 +1,6 @@
 function [ distmap , reff0,testf0 ]=make_dist_map(test_audio,ref_audio,spec_method,ds_type)
 
+local_conf
 spec_method='straight'; % fft or straight
 % ds_type = 'fft-snr' %'fwsnrseg' % fwsnrseg or mcd or llr
 
@@ -164,10 +165,10 @@ switch ds_type
 
     case 'straight-snr'
         
-        prm.F0frameUpdateInterval=10;     
-        prm.F0searchUpperBound=450;            
-        prm.F0searchLowerBound=40;             
-        prm.spectralUpdateInterval=10;    
+        %prm.F0frameUpdateInterval=10;     
+        %prm.F0searchUpperBound=450;            
+        %prm.F0searchLowerBound=40;             
+        %prm.spectralUpdateInterval=10;    
 
         feas_test=zeros(nr_frames_test,mel_dim);
         % insert straight analysis here:
@@ -312,10 +313,10 @@ switch ds_type
 
         
     case 'straight-mcd'
-        prm.F0frameUpdateInterval=10;     
-        prm.F0searchUpperBound=450;            
-        prm.F0searchLowerBound=40;             
-        prm.spectralUpdateInterval=10;    
+        %prm.F0frameUpdateInterval=10;     
+        %prm.F0searchUpperBound=450;            
+        %prm.F0searchLowerBound=40;             
+        %prm.spectralUpdateInterval=10;    
 
         feas_test=zeros(nr_frames_test,mel_dim);
 
