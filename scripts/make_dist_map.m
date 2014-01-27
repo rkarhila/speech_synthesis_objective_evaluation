@@ -360,7 +360,7 @@ switch ds_type
         end
         if min(distmap(:))<0
             disp('Trouble: Contains negative numbers; Adding minimum value to map');
-            distmap=distmap+min(distmap(:))
+            distmap=distmap+abs(min(distmap(:)));
         end
                         
 end

@@ -1,10 +1,10 @@
 clear all
 
-ob_scores_sim=load('devel/objective_results_sim');
-ob_scores_nat=load('devel/objective_results_nat');
+ob_scores_sim=load('../devel/objective_results_sim');
+ob_scores_nat=load('../devel/objective_results_nat');
 
-sub_scores_sim=load('devel/subjective_eval_sim_means.numbers.txt');
-sub_scores_nat=load('devel/subjective_eval_nat_means.numbers.txt');
+sub_scores_sim=load('../devel/subjective_eval_sim_means_only_num.txt');
+sub_scores_nat=load('../devel/subjective_eval_nat_means_only_num.txt');
 
 [cor_sim, p_sim] = corr(sub_scores_sim,ob_scores_sim);
 [cor_nat, p_nat] = corr(sub_scores_nat,ob_scores_nat);
