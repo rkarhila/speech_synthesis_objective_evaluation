@@ -59,6 +59,12 @@ for s1=1:length(systems)
     end
 end
 
+confmatr=zeros(featcount,3,3);
+% classes in confusion matrix:
+% 1 - system A better
+% 2 - system B better
+% 3 - No difference
+
 
 % plot with different p-values:
 plotfeat=3
@@ -66,6 +72,8 @@ clf;
 for pval=[0.01, 0.05]
     %results=zeros(featcount,13);
     results=zeros(featcount,6);
+    confmatr=zeros(3,3,featcount);
+
     for feat = 1:featcount        
         pmat=zeros(syscount,syscount);pmat(bigp{feat}<pval)=1;pmat=pmat.*invdiag;
    
@@ -123,6 +131,18 @@ for pval=[0.01, 0.05]
         f1score=2*(precision*recall)/(precision+recall);
         missing=sum(sum( (pmat==0) .* (refmat==1)      ));
         
+        confmatr(1,1,feat) = sum(sum( (sign(machinebetters{feat})==  1) .* (sign(betters)==  1) .* (pmat==  1)  .* (refmat==  1) ));
+        confmatr(1,2,feat) = sum(sum( (sign(machinebetters{feat})== -1) .* (sign(betters)==  1) .* (pmat==  1)  .* (refmat==  1) ));
+        confmatr(1,3,feat) = sum(sum( (sign(betters)==  1) .* (pmat==  0)  .* (refmat==  1) ));
+    
+        confmatr(2,1,feat) = sum(sum( (sign(machinebetters{feat})==  1) .* (sign(betters)== -1) .* (pmat==  1)  .* (refmat==  1) ));
+        confmatr(2,2,feat) = sum(sum( (sign(machinebetters{feat})== -1) .* (sign(betters)== -1) .* (pmat==  1)  .* (refmat==  1) ));
+        confmatr(2,3,feat) = sum(sum( (sign(betters)== -1) .* (pmat==  0)  .* (refmat==  1) ));
+        
+        confmatr(3,1,feat) = sum(sum( (sign(betters)==  1) .*  (pmat==1)  .* (refmat==0) ));
+        confmatr(3,2,feat) = sum(sum( (sign(betters)==  1) .*  (pmat==1)  .* (refmat==0) ));
+        confmatr(3,3,feat) = sum(sum( (pmat== 0 )  .* (refmat== 0) ));
+       
         %disp([num2str(pval),', ',num2str(feat),': error: ',num2str(sum(abs(pmat(:)-refmat(:))))]);
         
         %results(feat,:)=[pval feat critical_errorssum bad_errorssum missing_errorssum minor_errorssum false_negativesum false_positivesum correctsum accuracy precision recall f1score];
@@ -131,7 +151,7 @@ for pval=[0.01, 0.05]
 %        if feat == plotfeat
 
             clf
-            subplot(1,3,1)
+            subplot(1,4,1)
             
             hold on
             for s1=1:length(systems)
@@ -153,7 +173,7 @@ for pval=[0.01, 0.05]
             end            
             
             
-            subplot(1,3,2)
+            subplot(1,4,2)
             hold on
             for s1=1:length(systems)
                 for s2=s1:length(systems)
@@ -188,7 +208,7 @@ for pval=[0.01, 0.05]
                 plot([length(systems)+1,0], [s1,s1], 'linestyle', ':');
             end
             
-            subplot(1,3,3)
+            subplot(1,4,3)
             hold on
             %imagesc(1-(abs(pmat-refmat)))
             
@@ -237,6 +257,12 @@ for pval=[0.01, 0.05]
                 plot([length(systems)+1,0], [s1,s1], 'linestyle', ':');
             end
             
+            subplot(1,4,4)
+            c=confmatr(:,:,feat);
+            lab={'A->B', 'A->C','B->A','B->C','C->A','C->B'};
+            ct=sum(c,2);
+            radarplot( [c(1,2)/ct(1),c(1,3)/ct(1),c(2,1)/ct(2),c(2,3)/ct(2),c(3,1)/ct(3),c(3,2)/ct(3) ; ones(1,6)/3  ],lab);
+            
         %end
         pause()
     end
@@ -245,6 +271,8 @@ for pval=[0.01, 0.05]
      disp('      pval      feat   accuracy precision recall f1score ')
 
     disp(results)
+    
+    confmatr
 end
 
 
