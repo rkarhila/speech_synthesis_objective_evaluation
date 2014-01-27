@@ -1,4 +1,4 @@
-function [ distmap , reff0,testf0 ]=make_dist_map(test_audio,ref_audio,ds_type)
+function [ distmap , reff0,testf0 ]=make_nn_dist_map(train_audio, test_audio,ref_audio,ds_type)
 
 local_conf
 

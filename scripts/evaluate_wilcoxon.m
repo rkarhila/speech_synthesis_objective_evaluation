@@ -66,7 +66,7 @@ clf;
 for pval=[0.01, 0.05]
     %results=zeros(featcount,13);
     results=zeros(featcount,6);
-    for feat = 1:26        
+    for feat = 1:featcount        
         pmat=zeros(syscount,syscount);pmat(bigp{feat}<pval)=1;pmat=pmat.*invdiag;
    
         
