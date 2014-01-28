@@ -75,10 +75,12 @@ for pval=[0.01, 0.05]
     confmatr=zeros(3,3,featcount);
 
     for feat = 1:featcount        
-        pmat=zeros(syscount,syscount);pmat(bigp{feat}<pval)=1;pmat=pmat.*invdiag;
+        pmat=zeros(syscount,syscount);
+        pmat(bigp{feat}<pval)=1;
+        pmat=(pmat.*invdiag);
    
         
-        directionmatch = sign(machinebetters{feat}).*sign(betters) ;
+        directionmatch = triu(sign(machinebetters{feat}).*sign(betters)) ;
         
         significant_dirs=directionmatch.*pmat;
         criticalmatch=directionmatch.*refmat;
@@ -119,30 +121,30 @@ for pval=[0.01, 0.05]
         
         % Correct significant:
         correctmatch= (directionmatch==1).* (pmat==1) .*  (refmat==1) ;
-        correctmiss=(directionmatch==1).* (pmat==0) .*  (refmat==0) ;
+        correctmiss= (directionmatch==1).* (pmat==0) .*  (refmat==0) ;
         correctsum=sum(correctmatch(:))+sum(correctmiss(:));
         % Correct insignificant:
         %correct_insig=sum(sum( (directionmatch==1).* (pmat==0) .*  (refmat==0) ));
 
         accuracy=correctsum/(correctsum+false_positivesum+false_negativesum+critical_errorssum+bad_errorssum +missing_errorssum+minor_errorssum );
         precision=sum(correctmatch(:))/(sum(correctmatch(:))+false_positivesum+bad_errorssum+critical_errorssum);
-        recall=sum(correctmatch(:))/sum(refmat(:));
+        recall=sum(correctmatch(:))/sum(sum(triu(refmat)));
         
         f1score=2*(precision*recall)/(precision+recall);
         missing=sum(sum( (pmat==0) .* (refmat==1)      ));
         
-        confmatr(1,1,feat) = sum(sum( (sign(machinebetters{feat})==  1) .* (sign(betters)==  1) .* (pmat==  1)  .* (refmat==  1) ));
-        confmatr(1,2,feat) = sum(sum( (sign(machinebetters{feat})== -1) .* (sign(betters)==  1) .* (pmat==  1)  .* (refmat==  1) ));
-        confmatr(1,3,feat) = sum(sum( (sign(betters)==  1) .* (pmat==  0)  .* (refmat==  1) ));
+        confmatr(1,1,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
+        confmatr(1,2,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
+        confmatr(1,3,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (pmat==  0)  )));
     
-        confmatr(2,1,feat) = sum(sum( (sign(machinebetters{feat})==  1) .* (sign(betters)== -1) .* (pmat==  1)  .* (refmat==  1) ));
-        confmatr(2,2,feat) = sum(sum( (sign(machinebetters{feat})== -1) .* (sign(betters)== -1) .* (pmat==  1)  .* (refmat==  1) ));
-        confmatr(2,3,feat) = sum(sum( (sign(betters)== -1) .* (pmat==  0)  .* (refmat==  1) ));
+        confmatr(2,1,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
+        confmatr(2,2,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
+        confmatr(2,3,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (pmat==  0)  )));
         
-        confmatr(3,1,feat) = sum(sum( (sign(betters)==  1) .*  (pmat==1)  .* (refmat==0) ));
-        confmatr(3,2,feat) = sum(sum( (sign(betters)==  1) .*  (pmat==1)  .* (refmat==0) ));
-        confmatr(3,3,feat) = sum(sum( (pmat== 0 )  .* (refmat== 0) ));
-       
+        confmatr(3,1,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  1) .*  (pmat==1)  )));
+        confmatr(3,2,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  -1) .*  (pmat==1) )));
+        confmatr(3,3,feat) = sum(sum( triu((refmat== 0) .* (pmat== 0 )  )));
+          
         %disp([num2str(pval),', ',num2str(feat),': error: ',num2str(sum(abs(pmat(:)-refmat(:))))]);
         
         %results(feat,:)=[pval feat critical_errorssum bad_errorssum missing_errorssum minor_errorssum false_negativesum false_positivesum correctsum accuracy precision recall f1score];
@@ -259,9 +261,11 @@ for pval=[0.01, 0.05]
             
             subplot(1,4,4)
             c=confmatr(:,:,feat);
-            lab={'A->B', 'A->C','B->A','B->C','C->A','C->B'};
-            ct=sum(c,2);
-            radarplot( [c(1,2)/ct(1),c(1,3)/ct(1),c(2,1)/ct(2),c(2,3)/ct(2),c(3,1)/ct(3),c(3,2)/ct(3) ; ones(1,6)/3  ],lab);
+            c
+            lab={'A->B','B->A', 'A->C','B->C','C->A','C->B'};
+            ct=sum(c,2)./3;
+            %radarplot( [c(1,2)/ct(1),  c(2,1)/ct(2),  c(1,3)/ct(1),  c(2,3)/ct(2),  c(3,1)/ct(3),  c(3,2)/ct(3) ; ones(1,6)/3  ],lab);
+            radarplot( [c(1,2),  c(2,1),  c(1,3),  c(2,3),  c(3,1),  c(3,2) ; ct(1),ct(2),ct(1),ct(2),ct(3),ct(3)  ],lab);
             
         %end
         pause()
@@ -272,7 +276,6 @@ for pval=[0.01, 0.05]
 
     disp(results)
     
-    confmatr
 end
 
 
