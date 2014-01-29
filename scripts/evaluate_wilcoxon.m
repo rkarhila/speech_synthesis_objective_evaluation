@@ -1,15 +1,15 @@
 
-
+addpath ../include/radarplot
 
 %simref_2009_EH1=load('blizzard_tests/2009_simrefEH1.ascii');
-simref_2009_EH2=load('blizzard_tests/2009_simrefEH2.ascii');
-natref_2009_EH2=load('blizzard_tests/2009_natrefEH2.ascii');
+simref_2009_EH2=load('../blizzard_tests/2009_simrefEH2.ascii');
+natref_2009_EH2=load('../blizzard_tests/2009_natrefEH2.ascii');
 
-sims=load('devel/2009_EH2_objective_results_sim');
+sims=load('../devel/2009_EH2_objective_results_sim');
 %nats=load('devel/2009_EH2_objective_results_nat');
 
-listeningsims=load('blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
-listeningnats=load('blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');
+listeningsims=load('../blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
+listeningnats=load('../blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');
 
 listeningscores=listeningsims;
 refmat=simref_2009_EH2;
