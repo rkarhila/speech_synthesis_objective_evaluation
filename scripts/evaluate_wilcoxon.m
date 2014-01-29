@@ -71,7 +71,7 @@ plotfeat=3
 clf;
 for pval=[0.01, 0.05]
     %results=zeros(featcount,13);
-    results=zeros(featcount,6);
+    results=zeros(featcount,7);
     confmatr=zeros(3,3,featcount);
 
     for feat = 1:featcount        
@@ -133,6 +133,8 @@ for pval=[0.01, 0.05]
         f1score=2*(precision*recall)/(precision+recall);
         missing=sum(sum( (pmat==0) .* (refmat==1)      ));
         
+        directionhit = sum(sum( triu(refmat==  1) .* (directionmatch==1) ) ) / sum(sum(triu(refmat==  1) ) ) ;
+        
         confmatr(1,1,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
         confmatr(1,2,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
         confmatr(1,3,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (pmat==  0)  )));
@@ -148,7 +150,7 @@ for pval=[0.01, 0.05]
         %disp([num2str(pval),', ',num2str(feat),': error: ',num2str(sum(abs(pmat(:)-refmat(:))))]);
         
         %results(feat,:)=[pval feat critical_errorssum bad_errorssum missing_errorssum minor_errorssum false_negativesum false_positivesum correctsum accuracy precision recall f1score];
-        results(feat,:)=[pval feat accuracy precision recall f1score];
+        results(feat,:)=[pval feat accuracy precision recall f1score directionhit];
         
 %        if feat == plotfeat
 
@@ -272,7 +274,7 @@ for pval=[0.01, 0.05]
     end
     %disp('      pval      feat   criterr   baderrors misserr  minor_err  falseneg    falsepos  corr1 ')
          %    0.0500    1.0000   98.0000   46.0000   38.0000   24.0000   22.0000   30.0000   32.0000
-     disp('      pval      feat   accuracy precision recall f1score ')
+     disp('      pval      feat   accuracy precision recall f1score   direction')
 
     disp(results)
     
