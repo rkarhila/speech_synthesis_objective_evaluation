@@ -81,7 +81,7 @@ for findex=1:length(test_filelist)
         for frame_index=1:nr_frames_test
             framestart=(frame_index-1)*step_length+1;
             audio_short = hamwin.*test_audio(framestart:framestart+frame_length-1);
-            spec_feas = sqrt(abs(fft(audio_short,fft_dim)));
+            spec_feas(:,frame_index) = sqrt(abs(fft(audio_short,fft_dim)));
         end
 
     end % spec method
