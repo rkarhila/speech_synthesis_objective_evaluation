@@ -1,4 +1,7 @@
 
+% This is a matlab file that contains system-dependent 
+% parameters.
+% Change to your settings and copy to local_conf.m
 
 EVALHOME='/data/users/rkarhila/speech_synthesis_objective_evaluation/';
 
