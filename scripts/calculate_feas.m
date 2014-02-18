@@ -76,7 +76,9 @@ if itsok~=1
             end
         case 'fft'
 
-            if (CACHE_FEATURES == 2)
+
+            if (CACHE_FEATURES == 2) % Let's not save fft results
+                                     % to disk, shall we?
 
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.fft-spec'];
 
@@ -94,6 +96,7 @@ if itsok~=1
                     parsave(stfilename, feas_test);
                 end
             else
+
 
                 feas_test=zeros(nr_frames_test,fft_dim);
                 for frame_index=1:nr_frames_test

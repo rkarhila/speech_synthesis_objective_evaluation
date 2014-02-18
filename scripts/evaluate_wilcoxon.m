@@ -5,8 +5,12 @@ addpath include/radarplot
 simref_2009_EH2=load('blizzard_tests/2009_simrefEH2.ascii');
 natref_2009_EH2=load('blizzard_tests/2009_natrefEH2.ascii');
 
+
 sims=load('devel/2009_EH2_objective_results_sim');
+
+%sims=load('../devel/2009_EH2_objective_results_sim');
 %nats=load('devel/2009_EH2_objective_results_nat');
+%sims=load('../devel/objective_results_gmm_sim');
 
 listeningsims=load('blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
 listeningnats=load('blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');
@@ -146,7 +150,7 @@ for pval=[0.01, 0.05]
         confmatr(3,1,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  1) .*  (pmat==1)  )));
         confmatr(3,2,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  -1) .*  (pmat==1) )));
         confmatr(3,3,feat) = sum(sum( triu((refmat== 0) .* (pmat== 0 )  )));
-          
+        
         %disp([num2str(pval),', ',num2str(feat),': error: ',num2str(sum(abs(pmat(:)-refmat(:))))]);
         
         %results(feat,:)=[pval feat critical_errorssum bad_errorssum missing_errorssum minor_errorssum false_negativesum false_positivesum correctsum accuracy precision recall f1score];
