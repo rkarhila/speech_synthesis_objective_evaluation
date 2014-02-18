@@ -3,7 +3,11 @@
 %
 
 local_conf
-matlabpool
+
+
+if (matlabpool('size') == 0)
+    matlabpool
+end
 
 if exist('devel/2009_EH2_objective_results_sim', 'file') == 0;
     [ sim_averagedist, b2009_EH2_sim_distlist, sim_runtime ] = obj_evaluation(BLIZZARD2009_RESULTDIR, 'devel/2009_EH2_sim.ref.scp','devel/2009_EH2_sim.test.scp');
