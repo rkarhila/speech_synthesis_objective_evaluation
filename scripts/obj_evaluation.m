@@ -1,5 +1,5 @@
 function [ averagedist, distlist, runtime ]=obj_evaluation(filepath, reference_sent_list, ...
-    test_sent_list)
+    test_sent_list, mapmethods)
 
 local_conf
 mapdirectory=LOCAL_MAPDIR;
@@ -20,7 +20,7 @@ testfilelist = textread(test_sent_list,'%s' );
 
 
 %mapmethods={'fft-snr','straight-snr','fft-mcd', 'straight-mcd','llr'};
-mapmethods={ {'fft','snr'},{'straight','snr'}, {'fft','mcd'}, {'straight','mcd'},{'llr','llr'}, {'fft','log-mel'},{'straight','log-mel'}};
+
 mapf0measures={};
 globalf0measures={};
 %mapf0measures={'rmsd','voicingdiff'};
