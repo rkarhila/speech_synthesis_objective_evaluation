@@ -19,6 +19,10 @@ if USE_STRAIGHT == 1
     prm.spectralUpdateInterval = 10;      
 end
 
+CACHE_FEATURES = 0;
+CACHE_STRAIGHT = 1;
+LOCAL_FEATDIR ='/akulabra/projects/T40511/synthesis/blizzard_eval/features/';
+
 
 %Save copies of distance maps for DTW testing
 CACHE_DISTMAPS = 1;
@@ -26,10 +30,21 @@ LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps3/';
 
 
 
-CACHE_FEATURES = 1;
-LOCAL_FEATDIR ='/akulabra/projects/T40511/synthesis/blizzard_eval/features/';
+
 
 
 
 BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/';
+
+
+fs = 16000;
+mel_dim = 21;
+frame_ms = 25;
+
+
+step_ms = 10 ; % 5 ms step
+frame_rate = ceil(1000/step_ms);
+
+
+spectrum_dim=1024;
 

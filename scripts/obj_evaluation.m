@@ -1,5 +1,5 @@
 function [ averagedist, distlist, runtime ]=obj_evaluation(filepath, reference_sent_list, ...
-    test_sent_list)
+    test_sent_list, mapmethods)
 
 local_conf
 mapdirectory=LOCAL_MAPDIR;
@@ -20,10 +20,12 @@ testfilelist = textread(test_sent_list,'%s' );
 
 
 %mapmethods={'fft-snr','straight-snr','fft-mcd', 'straight-mcd','llr'};
-mapmethods={'straight-snr','fft-mcd', 'straight-mcd','llr'};
-mapf0measures={'rmsd','voicingdiff'};
 
-globalf0measures={'rmse','diffvar'};
+mapf0measures={};
+globalf0measures={};
+%mapf0measures={'rmsd','voicingdiff'};
+%globalf0measures={'rmse','diffvar'};
+
 
 testcount=length(mapmethods)*...
     (length(mapmethods)+length(mapf0measures))+length(globalf0measures);
@@ -48,93 +50,46 @@ tic
 % Loop over file pairs:
 
 
-
 parfor i=1:length(testfilelist)
     
-    
-    fs = 16000;
-    
-    step_matrix=[1 1 1;1 0 1;0 1 1;1 2 2;2 1 2];
-    %step_matrix=[1 1 1.0;0 1 1.0;1 0 1.0];
-    
-    [ ref_audio , fs1, bits1 ] = wavread([filepath,reffilelist{i}]);
-    [ test_audio , fs2, bits2 ] = wavread([filepath,testfilelist{i}]);
-    
-    if ne(fs1, fs2)
-        disp(['Different sampling frequency, this won`t end ' ...
-            'well']);
-        
-    end
-    if ne(fs1, fs)
-        ref_audio=resample(ref_audio, fs, fs1);
-    end
-    if ne(fs2, fs)
-        test_audio=resample(test_audio, fs, fs1);
-    end
-    
-    if ne(bits1,bits2)
-        disp(['Different nr of bits. Doesn`t happen too often, but ' ...
-            'is it dangerous?']);
-    end
-    
-    
-    ref_audio=ref_audio*(1/max(ref_audio));
-    test_audio=test_audio*(1/max(test_audio));
-    
-    
-    
     [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
-    %speakercode=regexprep( regexprep(testpath,'.*blizzard_wavs_and_scores[a-z0-9_-]+',''), '[^a-zA-Z0-9-_]', '_');
     speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
     disp(testfilename);
     
-    
-    if (figuring == i)
-        figure(1)
-    end
-    
     distmaps=cell(length(mapmethods));
     
-    
-    testf0name=[mapdirectory,speakercode,testfilename,'_testf0.map'];
-    reff0name=[mapdirectory,speakercode,testfilename,'_reff0.map'];
+    %testf0name=[mapdirectory,speakercode,testfilename,'_testf0.map'];
+    %reff0name=[mapdirectory,speakercode,testfilename,'_reff0.map'];
     
     for y=1:length(mapmethods)
-        mapmethod=mapmethods{y};
+        spec_and_distmethod=mapmethods{y};
+        specmethod=spec_and_distmethod{1};
+        distmethod=spec_and_distmethod{2};
+        mapmethod=[specmethod,'_',distmethod];
+        
         mapname=[mapdirectory,speakercode,testfilename,'_',mapmethod,'_norm.map'];
         
         if exist(mapname, 'file')
             distmaps{y}=load(mapname, '-ascii');
         else
-            [distmap,reff0,testf0]=make_dist_map(test_audio, ref_audio, ...
-                mapmethod);
+            usevad=1;
+            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
+            test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,distmethod,usevad);
+            
+            [distmap]=make_dist_map(test_feat,ref_feat, ...
+                distmethod);
+            
             %distmap=(distmap-min(distmap(:)))/(max(distmap(:)-min(distmap(:))));
+            
             distmaps{y}=distmap;
             parsave(mapname, distmap);
-            if (length(reff0))>0
-                parsave(reff0name, reff0);
-                parsave(testf0name, testf0);
-            end
         end
     end
 
-    %maps{i}=distmaps
+    result=zeros(1,testcount);    
 
-    reff0=load(reff0name, '-ascii');
-    testf0=load(testf0name, '-ascii');
-
-    
-    result=zeros(1,testcount);
-
-    
-    meanf0diff=abs(mean(testf0(testf0>0)) - mean(reff0(reff0>0)));
-    stdf0diff=abs(std(testf0(testf0>0)) - std(reff0(reff0>0)) );
-    
-    
-    result(testcount-1)=meanf0diff;
-    result(testcount)=stdf0diff;
-
-    %methodpaths={};
+    step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
+    %step_matrix=[1 1 1.0;0 1 1.0;1 0 1.0];
 
     
     for z=1:length(mapmethods)
@@ -152,16 +107,12 @@ parfor i=1:length(testfilelist)
         step_length=fs*step_ms/1000;
 
 
-        limits=find(ref_audio>mean(abs(ref_audio))/5);
         %test_audio=test_audio(limits(1):limits(length(limits)));
 
         %disp([limits(1), limits(length(limits))]);
 
-        fullsentstart=floor(limits(1)/step_length);
-        fullsentend=ceil(limits(length(limits))/step_length);
-
-        fullsentpathp=pathp(pathp>fullsentstart & pathq < fullsentend);
-        fullsentpathq=pathq(pathp>fullsentstart & pathq < fullsentend);
+        fullsentpathp=pathp;
+        fullsentpathq=pathq;
 
         %disp([length(fullsentpathp),length(fullsentpathq)])
 
@@ -170,9 +121,16 @@ parfor i=1:length(testfilelist)
 
             
             thiscost3=0;
+
+%           Again, which way should it go?
+%            for j=1:length(fullsentpathp)
+%                thiscost3=thiscost3+distmaps{y}(fullsentpathp(j),fullsentpathq(j));
+%            end
+
             for j=1:length(fullsentpathp)
                 thiscost3=thiscost3+distmaps{y}(fullsentpathp(j),fullsentpathq(j));
             end
+
             thiscost3 = thiscost3/length(fullsentpathp);
             
 
@@ -181,28 +139,7 @@ parfor i=1:length(testfilelist)
 %            result((z-1)*length(mapmethods)^3+y*length(mapmethods))=thiscost3;
             
         end
-
-        thiscost3=0;
-        framecounter=0;
-        voicingdiffcount=0;
-        for j=1:length(fullsentpathp)
-            % For debugging, obviously:
-            %fprintf('%0.1f\t%0.1f\t%0.1f\n', [testf0(fullsentpathp(j)),reff0(fullsentpathq(j)), min(1, min(testf0(fullsentpathp(j)), reff0(fullsentpathq(j)))) * (testf0(fullsentpathp(j)) - reff0(fullsentpathq(j)))^2] );
-
-            if testf0(fullsentpathp(j))> 0 && reff0(fullsentpathq(j)) > 0
-                thiscost3=thiscost3+( testf0(fullsentpathp(j)) - reff0(fullsentpathq(j)) )^2;
-                framecounter = framecounter + 1;
-            elseif max(testf0(fullsentpathp(j)), reff0(fullsentpathq(j))) > 0
-                voicingdiffcount=voicingdiffcount+1;
-            end
-        end
-        thiscost3 = sqrt(thiscost3/framecounter);
-        
-        result( (z-1)*(length(mapmethods)+length(mapf0measures)) + length(mapmethods) + 1 ) = thiscost3;
-        
-        result( (z-1)*(length(mapmethods)+length(mapf0measures)) + length(mapmethods) + 2 ) = voicingdiffcount/length(fullsentpathp);
-
-        
+       
         
         %            distlist(i,k1:k2)=[thiscost,length(twosecpathp)- ...
         %                   testlength]

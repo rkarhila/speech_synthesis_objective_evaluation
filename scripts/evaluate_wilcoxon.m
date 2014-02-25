@@ -1,21 +1,8 @@
+function [goodness] = evaluate_wilcoxon(objective_scores, subjective_scores, opinion_matrix, systems)
 
-addpath ../include/radarplot
-
-%simref_2009_EH1=load('blizzard_tests/2009_simrefEH1.ascii');
-simref_2009_EH2=load('../blizzard_tests/2009_simrefEH2.ascii');
-natref_2009_EH2=load('../blizzard_tests/2009_natrefEH2.ascii');
-
-%sims=load('../devel/2009_EH2_objective_results_sim');
-%nats=load('devel/2009_EH2_objective_results_nat');
-sims=load('../devel/objective_results_gmm_sim');
-
-listeningsims=load('../blizzard_tests/2009_subjective_eval_sim_means_only_num.txt');
-listeningnats=load('../blizzard_tests/2009_subjective_eval_nat_means_only_num.txt');
-
-listeningscores=listeningsims;
-refmat=simref_2009_EH2;
-
-refscores=sims;
+listeningscores=subjective_scores;
+refmat=opinion_matrix;
+refscores=objective_scores;
 
 invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 
@@ -70,7 +57,7 @@ confmatr=zeros(featcount,3,3);
 % plot with different p-values:
 plotfeat=3
 clf;
-for pval=[0.01, 0.05]
+for pval=[0.05]
     %results=zeros(featcount,13);
     results=zeros(featcount,7);
     confmatr=zeros(3,3,featcount);
@@ -278,7 +265,7 @@ for pval=[0.01, 0.05]
      disp('      pval      feat   accuracy precision recall f1score   direction')
 
     disp(results)
-    
+    goodness=results;
 end
 
 
