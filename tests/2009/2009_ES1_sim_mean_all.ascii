@@ -1,0 +1,19 @@
+[1] ""
+[1] ""
+[1] "Mean Opinion Scores"
+[1] ""
+[1] "Summary of all data ignoring factors"
+[1] ""
+[1] ""
+[1] "Similarity scores comparing to original speaker for task ES1 (All listeners)"
+[1] "Similarity to original speaker"
+  median MAD mean   sd   n na
+A      5 0.0  4.7 0.58 174  0
+D      2 1.5  2.4 0.99 174  0
+H      2 1.5  2.0 0.99 174  0
+J      1 0.0  1.2 0.50 174  0
+L      2 1.5  2.3 0.97 174  0
+P      1 0.0  1.3 0.64 174  0
+S      2 1.5  2.2 1.01 174  0
+W      2 1.5  2.6 1.07 174  0
+
