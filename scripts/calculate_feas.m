@@ -10,7 +10,7 @@ local_conf
 
 [audiofilepath,audiofilename,audiofilext]=fileparts(testfile);
 speakercode=regexprep( audiofilepath, '[^a-zA-Z0-9-_]', '_');
-%disp(testfilename);
+disp(testfile);
 
 itsok=0;
 

@@ -1,20 +1,18 @@
-function [goodness] = evaluate_wilcoxon(objective_scores, subjective_scores, opinion_matrix, systems)
+function [goodness] = evaluate_wilcoxon(objective_scores, subjective_scores, opinion_matrix, systems, drawimage)
 
-listeningscores=subjective_scores;
+listeningmeans=subjective_scores;
 refmat=opinion_matrix;
 refscores=objective_scores;
 
 invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 
-systems = 'BCDEHIJKLMOPQRSTUW';
 
 syscount=length(systems);
 featcount=size(refscores,2);
 
-testlen=19;
+testlen=length(subjective_scores);
 
 bigp=cell(size(refscores,2),1);
-listeningmeans=zeros(length(systems),1);
 machinemeans=zeros(syscount,featcount);
 
 for feat=1:size(refscores,2)
@@ -23,9 +21,6 @@ for feat=1:size(refscores,2)
         s1start=(s1-1)*testlen+1;
         s1end=s1*testlen;
         machinemeans(s1, feat)=mean(refscores (s1start:s1end, feat ));
-        if (feat==1)
-            listeningmeans(s1)=mean(listeningscores(s1start:s1end,2));
-        end
         for s2=s1+1:length(systems)
             s2start=(s2-1)*testlen+1;
             s2end=s2*testlen;
@@ -142,6 +137,8 @@ for pval=[0.05]
         
 %        if feat == plotfeat
 
+        if drawimage==feat
+
             clf
             subplot(1,4,1)
             
@@ -251,14 +248,14 @@ for pval=[0.05]
             
             subplot(1,4,4)
             c=confmatr(:,:,feat);
-            c
+            
             lab={'A->B','B->A', 'A->C','B->C','C->A','C->B'};
             ct=sum(c,2)./3;
             %radarplot( [c(1,2)/ct(1),  c(2,1)/ct(2),  c(1,3)/ct(1),  c(2,3)/ct(2),  c(3,1)/ct(3),  c(3,2)/ct(3) ; ones(1,6)/3  ],lab);
             radarplot( [c(1,2),  c(2,1),  c(1,3),  c(2,3),  c(3,1),  c(3,2) ; ct(1),ct(2),ct(1),ct(2),ct(3),ct(3)  ],lab);
             
-        %end
-        pause()
+        
+        end
     end
     %disp('      pval      feat   criterr   baderrors misserr  minor_err  falseneg    falsepos  corr1 ')
          %    0.0500    1.0000   98.0000   46.0000   38.0000   24.0000   22.0000   30.0000   32.0000
