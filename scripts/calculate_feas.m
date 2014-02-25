@@ -1,8 +1,9 @@
 function test_data = calculate_feas(test_filelist, spec_method, test_feature_domain, use_vad)
+
+%Feature extraction
 %
 % spec_method options straight, fft
-% test_feature_domain options log-mel, mel-cep 
-
+% test_feature_domain options log-mel, mel-cep
 
 fs = 16000;
 mel_dim = 21;
@@ -91,7 +92,7 @@ for findex=1:length(test_filelist)
     switch test_feature_domain
         
         case 'log-mel'
-        
+            
         for frame_index=1:nr_frames_test
             feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)); 
         end
