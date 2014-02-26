@@ -1,13 +1,23 @@
 clear all
 
+utterance_normalised_correlation=0; % include utterance normalised evaluation
+
 ob_scores_sim=load('../devel/objective_results_sim');
 ob_scores_nat=load('../devel/objective_results_nat');
 
 sub_scores_sim=load('../devel/subjective_eval_sim_means_only_num.txt');
 sub_scores_nat=load('../devel/subjective_eval_nat_means_only_num.txt');
 
-[cor_sim, p_sim] = corr(sub_scores_sim,ob_scores_sim);
-[cor_nat, p_nat] = corr(sub_scores_nat,ob_scores_nat);
+[cor_sim,p_sim]=corr(sub_scores_sim,ob_scores_sim);
+[cor_nat,p_nat]=corr(sub_scores_nat,ob_scores_nat);
+
+% [cor_sim, p_sim] = corr([sub_scores_sim ob_scores_sim],'type',correlation_type);
+% [cor_nat, p_nat] = corr([sub_scores_nat ob_scores_nat],'type',correlation_type);
+% 
+% cor_sim = cor_sim(1:size(sub_scores_sim,2),size(sub_scores_sim,2)+1:size(cor_sim,2));
+% p_sim = p_sim(1:size(sub_scores_sim,2),size(sub_scores_sim,2)+1:size(p_sim,2));
+% cor_nat = cor_nat(1:size(sub_scores_nat,2),size(sub_scores_nat,2)+1:size(cor_nat,2));
+% p_nat = p_nat(1:size(sub_scores_nat,2),size(sub_scores_nat,2)+1:size(p_nat,2));
 
 % check if data is from normal distribution
 
@@ -45,7 +55,18 @@ end
 [cor_sim_sys,p_sim_sys]=corr(sub_scores_sys_sim,ob_scores_sys_sim);
 [cor_nat_sys,p_nat_sys]=corr(sub_scores_sys_nat,ob_scores_sys_nat);
 
+
+% [cor_sim_sys, p_sim_sys] = corr([sub_scores_sys_sim ob_scores_sys_sim],'type',correlation_type);
+% [cor_nat_sys, p_nat_sys] = corr([sub_scores_sys_nat ob_scores_sys_nat],'type',correlation_type);
+% 
+% cor_sim_sys = cor_sim_sys(1:size(sub_scores_sys_sim,2),size(sub_scores_sys_sim,2)+1:size(cor_sim_sys,2));
+% p_sim_sys = p_sim_sys(1:size(sub_scores_sys_sim,2),size(sub_scores_sys_sim,2)+1:size(p_sim_sys,2));
+% cor_nat_sys = cor_nat_sys(1:size(sub_scores_sys_nat,2),size(sub_scores_sys_nat,2)+1:size(cor_nat_sys,2));
+% p_nat_sys = p_nat_sys(1:size(sub_scores_sys_nat,2),size(sub_scores_sys_nat,2)+1:size(p_nat_sys,2));
+
 num_data = num_systems*num_utterances;
+
+if utterance_normalised_correlation
 
 for findex = 1:num_utterances
     
@@ -59,21 +80,27 @@ end
 [cor_sim_norm,p_sim_norm]=corr(sub_scores_norm_sim,ob_scores_norm_sim);
 [cor_nat_norm,p_nat_norm]=corr(sub_scores_norm_nat,ob_scores_norm_nat);
 
-%[-1*cor_sim(1,:)' p_sim(1,:)'<0.05 -1*cor_sim_norm(1,:)' p_sim_norm(1,:)'<0.05 -1*cor_sim_sys(1,:)' p_sim_sys(1,:)'<0.05]
+end
 
-%[-1*cor_nat(1,:)' p_nat(1,:)'<0.05 -1*cor_nat_norm(1,:)' p_nat_norm(1,:)'<0.05 -1*cor_nat_sys(1,:)' p_sim_sys(1,:)'<0.05]
+%[-1*cor_sim(1,:)' p_sim(1,:)'<0.05 -1*cor_sim_norm(1,:)' -1*cor_sim_sys(1,:)' p_sim_sys(1,:)'<0.05]
+
+%[-1*cor_nat(1,:)' p_nat(1,:)'<0.05 -1*cor_nat_sys(1,:)' p_sim_sys(1,:)'<0.05]
 
 % rank features based on correlation
 
 [cor_sim_sorted,cor_sim_sorted_index]=sort(abs(cor_sim(1,:)),'descend');
 [cor_nat_sorted,cor_nat_sorted_index]=sort(abs(cor_nat(1,:)),'descend');
 
+if utterance_normalised_correlation
+
 [cor_sim_norm_sorted,cor_sim_norm_sorted_index]=sort(abs(cor_sim_norm(1,:)),'descend');
 [cor_nat_norm_sorted,cor_nat_norm_sorted_index]=sort(abs(cor_nat_norm(1,:)),'descend');
+
+end
 
 [cor_sim_sys_sorted,cor_sim_sys_sorted_index]=sort(abs(cor_sim_sys(1,:)),'descend');
 [cor_nat_sys_sorted,cor_nat_sys_sorted_index]=sort(abs(cor_nat_sys(1,:)),'descend');
 
 % show rank list
 
-%[cor_sim_sorted_index' cor_sim_norm_sorted_index' cor_sim_sys_sorted_index' cor_nat_sorted_index' cor_nat_norm_sorted_index' cor_nat_sys_sorted_index']
+%[cor_sim_sorted_index' cor_sim_sys_sorted_index' cor_nat_sorted_index' cor_nat_sys_sorted_index']

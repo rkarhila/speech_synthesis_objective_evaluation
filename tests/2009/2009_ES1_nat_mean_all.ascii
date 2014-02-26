@@ -1,0 +1,16 @@
+[1] "Naturalness scores comparing to original speaker for task ES1 (All listeners)"
+[1] ""
+[1] "Summary of all data ignoring factors"
+[1] ""
+[1] ""
+[1] "Mean opinion scores (naturalness)"
+  median MAD mean   sd   n na
+A      5 0.0  4.9 0.41 174  0
+D      3 1.5  2.6 0.94 174  0
+H      1 0.0  1.6 0.79 174  0
+J      1 0.0  1.6 0.75 174  0
+L      2 1.5  2.4 0.99 174  0
+P      2 1.5  1.9 0.87 174  0
+S      2 1.5  2.4 0.93 174  0
+W      3 1.5  2.7 0.88 174  0
+

@@ -97,8 +97,6 @@ end
 
 end
 
-
-
 % make to distance measure
 
 ob_scores_sim=-1*ob_scores_sim;
@@ -106,83 +104,19 @@ ob_scores_nat=-1*ob_scores_nat;
 %save ('../devel/objective_results_gmm_sim','ob_scores_sim','-ascii');
 %save ('../devel/objective_results_gmm_nat','ob_scores_nat','-ascii');
 
-% evaluation 1) correlation
+% evaluation 
 
-[cor_sim,p_sim]=corr(sub_scores_sim(:,1),ob_scores_sim)
-[cor_nat,p_nat]=corr(sub_scores_nat(:,1),ob_scores_nat)
-
-if sys_scores
-[cor_sim_sys,p_sim_sys]=corr(sub_scores_sys_sim(:,1),ob_scores_sys_sim)
-[cor_nat_sys,p_nat_sys]=corr(sub_scores_sys_nat(:,1),ob_scores_sys_nat)
-end
-
-% evaluation 2) classification performance
-
-opinion_matrix = load('../blizzard_tests/2009_simrefEH2.ascii');
+opinion_matrix_sim = load('../blizzard_tests/2009_simrefEH2.ascii');
+opinion_matrix_nat = load('../blizzard_tests/2009_natrefEH2.ascii');
 %evaluate_wilcoxon
 %evaluate_wilcoxon(ob_scores_sim, sub_scores_sim, opinion_matrix, [])
 
-% simple version:
+goodness_sim=evaluate_simple(ob_scores_sim,sub_scores_sim,opinion_matrix_sim,num_systems,num_utterances);
 
-class_matrix=zeros(num_systems);
-for findex=1:num_systems
-   class_matrix(findex,:)=sub_scores_sys_sim(findex,1)-sub_scores_sys_sim(:,1)'; 
-end
-class_matrix = sign(opinion_matrix.*class_matrix);
-class_matrix = class_matrix(triu(ones(num_systems)-eye(num_systems))>0);
+disp('sim:cor(u)    cor(s)    acc(2)    acc(3)    ucco(3)')
+disp(goodness_sim)
 
-num_pairs = size(class_matrix,1); % num paired comparisons
-num_classified_pairs = sum(abs(class_matrix)); % num nonzero entries
+goodness_nat=evaluate_simple(ob_scores_nat,sub_scores_nat,opinion_matrix_nat,num_systems,num_utterances);
 
-acc1=zeros(length(test_num_components),1);
-acc2=zeros(length(test_num_components),1);
-ucco=zeros(lentgh(test_num_components),1);
-
-
-for test_num=1:length(test_num_components)
-   
-    % 1) AB
-    
-    ob_class=zeros(num_systems);
-    for findex=1:num_systems
-    ob_class(findex,:) = ob_scores_sys_sim(findex,test_num)-ob_scores_sys_sim(:,test_num);
-    end
-    ob_class = sign(ob_class);
-    ob_class = ob_class(triu(ones(num_systems)-eye(num_systems))>0);
-    
-    num_correct = sum((class_matrix.*ob_class)>0);
-    acc1(test_num) = num_correct/num_classified_pairs;
-    
-    % wilcoxon
-    
-    pmat=ones(num_systems);
-    for findex=1:num_systems
-        
-         b1=(findex-1)*num_utterances+1;
-         e1=b1+num_utterances-1;
-         
-         for findex2=findex+1:num_systems
-         b2=(findex2-1)*num_utterances+1;
-         e2=b2+num_utterances-1;
-         pmat(findex,findex2) = signrank(ob_scores_sim(b1:e1,test_num)-ob_scores_sim(b2:e2,test_num));
-         end 
-    end
-    pmat=pmat<0.05;
-    ob_class = pmat(triu(ones(num_systems)-eye(num_systems))>0).*ob_class;
-      
-    % evaluation
-    
-    conf_matrix=crosstab(class_matrix,ob_class);
-
-    h1=-1*sum(sum(conf_matrix/num_pairs,2).*log(sum(conf_matrix/num_pairs,2)));
-    h2=-1*sum(sum((conf_matrix/num_pairs).*log(max(bsxfun(@times,conf_matrix,1./sum(conf_matrix)),exp(-700)))));
-    
-    ucco(test_num)=(h1-h2)/h1; % uncertainty coefficient (measures association between variables, non-symmatric, here we predict real class (x) from ob_class (y))
-    
-    num_correct = sum(diag(conf_matrix));
-    acc2(test_num) = num_correct/num_pairs;
-    
-    % print
-        
-    [abs(cor_sim(test_num)) abs(cor_sim_sys(test_num)) acc1(test_num) acc2(test_num) ucco(test_num)]
-end
+disp('nat:cor(u)    cor(s)    acc(2)    acc(3)    ucco(3)')
+disp(goodness_nat)
