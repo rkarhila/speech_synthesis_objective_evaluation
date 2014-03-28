@@ -1,7 +1,7 @@
 % likelihood calculation with gmm, calculates also correlation with sub
 % scores
 
-%clear
+clear
 
 addpath /home/uremes/ssw_matlab/include/voicebox
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
@@ -9,6 +9,8 @@ addpath /home/uremes/ssw_matlab/include/gmmbayestb-v1.0
 
 num_systems=18;
 num_utterances=19;
+
+test_num_components = [5 10 30 50];  
 
 % OBS! filepaths have not been updated
 
@@ -19,12 +21,13 @@ sub_scores_sim=load('/home/uremes/ssw_matlab/devel/subjective_eval_sim_means.num
 sub_scores_nat=load('/home/uremes/ssw_matlab/devel/subjective_eval_nat_means.numbers.txt');
 
 spec_method='straight';
-test_feature_domain = 'log-mel';
+test_feature_domain = 'log-mel'; % log-mel, mel-cep
 
-model_type = 'gmm_set'; % gmm_set, gmm_set_diag, in future could be pca/mfa set too
+model_type = 'gmm_set_diag'; % gmm_set, gmm_set_diag, mfa_set
 
 make_ref_data = 0;
 sys_scores=1;
+
 
 if sys_scores
 
@@ -65,18 +68,19 @@ end
 
 % evaluate gmm likelihoods
 
-test_num=1;
-
-for num_components = [30]
+for test_num=1:length(test_num_components)
+    
+num_components = test_num_components(test_num);
 
 load([model_type '_' spec_method(1:2) '-' test_feature_domain '_' int2str(num_components) 'G']);
-   
+
 for findex=1:num_systems
-    
+        
     for uindex=1:num_utterances
         for n=1:length(ref_data_sim{uindex})
             ob_scores_temp(n)=log(gmmb_pdf(ref_data_sim{uindex}(n,:),gmm_model_set{findex})+exp(-700));
         end
+        
         ob_scores_sim((findex-1)*num_utterances+uindex,test_num)=sum(ob_scores_temp/size(ref_data_sim{uindex},1));
         
         for n=1:length(ref_data_nat{uindex})
@@ -91,24 +95,28 @@ for findex=1:num_systems
     end
 end
 
-test_num=test_num+1;
-
 end
 
-[cor_sim,p_sim]=corr(sub_scores_sim(:,1),ob_scores_sim)
-[cor_nat,p_nat]=corr(sub_scores_nat(:,1),ob_scores_nat)
-
-if sys_scores
-[cor_sim_sys,p_sim_sys]=corr(sub_scores_sys_sim(:,1),ob_scores_sys_sim)
-[cor_nat_sys,p_nat_sys]=corr(sub_scores_sys_nat(:,1),ob_scores_sys_nat)
-end
-
-return
-
-cd /home/uremes/ssw_matlab/
+% make to distance measure
 
 ob_scores_sim=-1*ob_scores_sim;
 ob_scores_nat=-1*ob_scores_nat;
-save ('devel/objective_results_sim','ob_scores_sim','-ascii');
-save ('devel/objective_results_nat','ob_scores_nat','-ascii');
-evaluate_wilcoxon
+%save ('../devel/objective_results_gmm_sim','ob_scores_sim','-ascii');
+%save ('../devel/objective_results_gmm_nat','ob_scores_nat','-ascii');
+
+% evaluation 
+
+opinion_matrix_sim = load('../blizzard_tests/2009_simrefEH2.ascii');
+opinion_matrix_nat = load('../blizzard_tests/2009_natrefEH2.ascii');
+%evaluate_wilcoxon
+%evaluate_wilcoxon(ob_scores_sim, sub_scores_sim, opinion_matrix, [])
+
+goodness_sim=evaluate_simple(ob_scores_sim,sub_scores_sim,opinion_matrix_sim,num_systems,num_utterances);
+
+disp('sim:cor(u)    cor(s)    acc(2)    acc(3)    ucco(3)')
+disp(goodness_sim)
+
+goodness_nat=evaluate_simple(ob_scores_nat,sub_scores_nat,opinion_matrix_nat,num_systems,num_utterances);
+
+disp('nat:cor(u)    cor(s)    acc(2)    acc(3)    ucco(3)')
+disp(goodness_nat)

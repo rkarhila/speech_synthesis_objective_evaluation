@@ -1,3 +1,4 @@
+
 function feas_test = calculate_feas(testfile, analysismethod, distmethod, usevad)
 %
 % spec_method options straight, fft
@@ -8,9 +9,10 @@ local_conf
 
 
 
+
 [audiofilepath,audiofilename,audiofilext]=fileparts(testfile);
 speakercode=regexprep( audiofilepath, '[^a-zA-Z0-9-_]', '_');
-disp(testfile);
+%disp(testfilename);
 
 itsok=0;
 
@@ -127,7 +129,7 @@ if itsok~=1
             feas_test=feas_test;
                 
     end
-    
+
     switch distmethod
         
         case 'snr'
