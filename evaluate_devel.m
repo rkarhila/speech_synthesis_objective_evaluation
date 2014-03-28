@@ -17,7 +17,7 @@ if (matlabpool('size') == 0)
     matlabpool
 end
 
-tests={ ...
+dtests={ ...
     struct( ...
         'name',                  'EH2_similarity',...
         'objective_resultfile',  'devel/2009_EH2_objective_results_sim',...
@@ -40,25 +40,17 @@ tests={ ...
 
 
     
-for n=1:length(tests)
-    if exist(tests{n}.objective_resultfile, 'file') == 0;
-        [ sim_averagedist, b2009_EH2_sim_distlist, sim_runtime ] = ...
-            obj_evaluation(BLIZZARD2009_RESULTDIR, ...
-                           tests{n}.reffilelist,tests{n}.testfilelist, ...
-                           mapmethods);
-        
-        save(simfile,tests{n}.objective_resultfile,'-ascii');
-    end
-    
-    objdata=load(tests{n}.objective_resultfile);
-    subjectivedata=load(tests{n}.subjective_resultfile);
-    opinionmat= load(tests{n}.opinionmatrix);
-    systemlist=tests{n}.systems;
-    
-    drawimage=0;
-    
-    tests{n}.results=evaluate_wilcoxon(objdata, subjectivedata, opinionmat, ...
-                               systemlist, drawimage);    
 
+    
+for n=1:length(dtests)
+    if exist(dtests{n}.objective_resultfile, 'file') == 0;   
+        [ objdata, test_runtime ] = obj_evaluation(BLIZZARD2009_RESULTDIR, dtests{n}.reffilelist,dtests{n}.testfilelist, mapmethods);
+        save(dtests{n}.objective_resultfile, 'objdata','-ascii');                      
+        dtests{n}.results=objdata;
+    else      
+        dtests{n}.results=load(dtests{n}.objective_resultfile);
+    end
+    dtests{n}.scores=evaluate_wilcoxon(dtests{n}.results, load(dtests{n}.subjective_resultfile), load(dtests{n}.opinionmatrix), ...
+                               dtests{n}.systems, 0);
 end
 

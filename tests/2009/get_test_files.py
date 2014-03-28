@@ -4,7 +4,7 @@ BLIZZARD2009="/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_200
 EVALUATION="/data/users/rkarhila/speech_synthesis_objective_evaluation/"
 
 
-import csv,re
+import csv,re,os
 
 
 for lng in ["english", "mandarin"]:
@@ -51,17 +51,35 @@ for lng in ["english", "mandarin"]:
             print task
             taskname=re.sub('\/\(.*','', task)
 
+            systems=[]
+
             tfile=open(EVALUATION+'/tests/2009/2009_'+taskname+'_'+test+'.test.scp','w')
             rfile=open(EVALUATION+'/tests/2009/2009_'+taskname+'_'+test+'.ref.scp','w')
 
-            for syst in tasks[test][task]['systems']:
+
+            for syst in sorted(tasks[test][task]['systems']):
                 taskdir=re.sub('[\(\)]','',task)
                 if syst != "A":
+                    ok=True
+                    # Check that the files exist and are readable:
                     for sent in tasks[test][task]['sentences']:
-                        tfile.write(re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/'+lng+'/'+taskdir+r'/2009/\1/wavs/\1_\2.wav', sent)+"\n")
-                        rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/'+lng+'/'+taskdir+r'/2009/\1/wavs/\1_\2.wav',sent)+"\n")
+                        filename=BLIZZARD2009+'/'+re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/'+lng+'/'+taskdir+r'/2009/\1/wavs/\1_\2.wav', sent)
+                        #print filename
+                        if not os.access(filename, os.R_OK):
+                            ok=False
+                        
+                    if ok:
+                        for sent in tasks[test][task]['sentences']:
+                            tfile.write(re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/'+lng+'/'+taskdir+r'/2009/\1/wavs/\1_\2.wav', sent)+"\n")
+                            rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/'+lng+'/'+taskdir+r'/2009/\1/wavs/\1_\2.wav',sent)+"\n")
 
-
+                        systems.append(syst)
             tfile.close()
             rfile.close()
+
+            sfile=open(EVALUATION+'/tests/2009/2009_'+taskname+'_'+test+'.systems','w')
+            for i in sorted(systems):
+                sfile.write(i)
+            sfile.close()
+
 

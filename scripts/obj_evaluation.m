@@ -37,7 +37,7 @@ if ne(length(testfilelist), length(testfilelist))
     
 end
 
-n=length(testfilelist);
+n=length(testfilelist)
 
 if monitoring==1;
     WaitBar = waitbar(0,'Initializing waitbar...');
@@ -51,7 +51,7 @@ tic
 
 
 parfor i=1:length(testfilelist)
-    
+
     [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
     speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
     disp(testfilename);
@@ -87,14 +87,14 @@ parfor i=1:length(testfilelist)
     end
 
     result=zeros(1,testcount);    
-
+    %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1];
+    %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2)];    
     step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
     %step_matrix=[1 1 1.0;0 1 1.0;1 0 1.0];
 
     
     for z=1:length(mapmethods)
         %mapmethod=mapmethods{z};
-        
        [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
             dpfast(distmaps{z},step_matrix,1);      
         

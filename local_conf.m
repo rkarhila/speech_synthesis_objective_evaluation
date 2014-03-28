@@ -6,6 +6,7 @@ addpath ([ EVALHOME, '/scripts'])
 addpath ([ EVALHOME, '/include/columbia_ee_dtw'])
 addpath ([ EVALHOME, '/include/voicebox'])
 addpath ([ EVALHOME, '/include/colea'])
+addpath ([ EVALHOME, '/include/audioread'])
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
 
@@ -35,6 +36,7 @@ LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps3/';
 
 
 BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/';
+%BLIZZARD2009_RESULTDIR = '/akulabra/projects/T40511/synthesis/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
 
 
 fs = 16000;

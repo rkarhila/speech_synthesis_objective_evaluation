@@ -6,14 +6,22 @@ refscores=objective_scores;
 
 invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 
-
 syscount=length(systems);
 featcount=size(refscores,2);
 
 testlen=length(subjective_scores);
 
+testlen=size(objective_scores,1)/length(systems)
+
 bigp=cell(size(refscores,2),1);
 machinemeans=zeros(syscount,featcount);
+
+labelsystems=char(length(systems),1);
+for i=1:length(systems)
+   labelsystems(i)=systems(i) ;
+end
+
+%labelsystems(length(labelsystems)+1)='.';
 
 for feat=1:size(refscores,2)
     bigp{feat}=ones(length(systems),length(systems));
@@ -32,7 +40,7 @@ for feat=1:size(refscores,2)
 end
 
 betters=zeros(length(systems));
-machinebetters=cell(featcount);
+machinebetters=cell(featcount,1);
 for s1=1:length(systems)
     for s2=1:length(systems)
         betters(s1,s2)=listeningmeans(s1)-listeningmeans(s2);
@@ -42,7 +50,7 @@ for s1=1:length(systems)
     end
 end
 
-confmatr=zeros(featcount,3,3);
+%confmatr=zeros(featcount,3,3);
 % classes in confusion matrix:
 % 1 - system A better
 % 2 - system B better
@@ -118,6 +126,8 @@ for pval=[0.05]
         
         directionhit = sum(sum( triu(refmat==  1) .* (directionmatch==1) ) ) / sum(sum(triu(refmat==  1) ) ) ;
         
+        
+        
         confmatr(1,1,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
         confmatr(1,2,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
         confmatr(1,3,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (pmat==  0)  )));
@@ -151,10 +161,10 @@ for pval=[0.05]
                 end
             end
             title('ref')
-            axis([0 19 0 19])
+            axis([0 length(systems)+1 0 length(systems)+1])
             
-            set(gca,'ytick',[1:1:18],'yticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])            
-            set(gca,'xtick',[1:1:18],'xticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])
+            set(gca,'ytick',[1:1:length(systems)],'yticklabel',labelsystems)            
+            set(gca,'xtick',[1:1:length(systems)],'xticklabel',labelsystems)
             % Goddamn manual grid...
             for s1=0.5:1:length(systems)+0.5
                 plot([s1,s1], [0,length(systems)+1], 'linestyle', ':');                
@@ -184,13 +194,14 @@ for pval=[0.05]
 
                 end
             end
-            axis([0 19 0 19])
-            
+
+            axis([0 length(systems)+1 0 length(systems)+1])
+
             %pmat=zeros(syscount,syscount);pmat(bigp{feat}<pval)=1;pmat=pmat.*invdiag;imagesc(1-pmat)
             title(['candidate feat: ',num2str(feat),', pval: ',num2str(pval)])
-
-            set(gca,'ytick',[1:1:18],'yticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])            
-            set(gca,'xtick',[1:1:18],'xticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])
+            
+            set(gca,'ytick',[1:1:length(systems)],'yticklabel',labelsystems)            
+            set(gca,'xtick',[1:1:length(systems)],'xticklabel',labelsystems)
             % Goddamn manual grid...
             for s1=0.5:1:length(systems)+0.5
                 plot([s1,s1], [0,length(systems)+1], 'linestyle', ':');                
@@ -236,10 +247,12 @@ for pval=[0.05]
                     
                 end
             end
-            axis([0 19 0 19])
+            axis([0 length(systems)+1 0 length(systems)+1])
+            
             title(['err n=',num2str(sum(abs(pmat(:)-refmat(:))))] )
-            set(gca,'ytick',[1:1:18],'yticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])            
-            set(gca,'xtick',[1:1:18],'xticklabel',['B';'C';'D';'E';'H';'I';'J';'K';'L';'M';'O';'P';'Q';'R';'S';'T';'U';'W'])
+            set(gca,'ytick',[1:1:length(systems)],'yticklabel',labelsystems)            
+            set(gca,'xtick',[1:1:length(systems)],'xticklabel',labelsystems)
+            
             % Goddamn manual grid...
             for s1=0.5:1:length(systems)+0.5
                 plot([s1,s1], [0,length(systems)+1], 'linestyle', ':');                
