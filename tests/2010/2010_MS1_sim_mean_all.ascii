@@ -1,0 +1,9 @@
+[1] "Similarity to original speaker"
+  median MAD mean   sd   n na
+A      5 0.0  4.6 0.94 248  0
+C      3 1.5  2.8 1.26 248  0
+H      3 1.5  3.2 1.27 248  0
+I      2 1.5  2.0 1.13 248  0
+R      3 1.5  2.6 1.18 248  0
+S      2 1.5  2.1 1.23 248  0
+

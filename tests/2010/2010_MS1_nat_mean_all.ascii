@@ -1,0 +1,9 @@
+[1] "Mean opinion scores (naturalness)"
+  median MAD mean   sd   n na
+A      5 0.0  4.7 0.78 248  0
+C      3 1.5  3.0 1.04 248  0
+H      3 1.5  2.9 1.06 248  0
+I      2 1.5  2.0 1.10 248  0
+R      3 1.5  2.9 1.00 248  0
+S      1 0.0  1.7 0.92 248  0
+
