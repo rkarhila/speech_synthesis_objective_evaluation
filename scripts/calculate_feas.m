@@ -20,7 +20,7 @@ itsok=0;
 if (CACHE_FEATURES == 1)
     cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
     if exist(cachefilename, 'file')
-        feas_test = load(cachefilename, '-ascii');
+        feas_test = parload(cachefilename);
         itsok=1;
     end
 end
@@ -52,7 +52,7 @@ if itsok~=1
 
     % FEATURE EXTRACTION
 
-    [test_audio,nr_frames_test]=prepare_audio(testfile,'use_vad',usevad);
+    [test_audio,nr_frames_test,vad_limits,speech_frames]=prepare_audio(testfile,'use_vad',usevad);
     
     switch analysismethod
         case 'straight' 
@@ -63,18 +63,24 @@ if itsok~=1
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.straight-spec'];
 
                 if exist(stfilename, 'file')
-                    feas_test = load(stfilename, '-ascii');
-                else
+                    feas_test = parload(stfilename);
+                    
+                else                                       
                     [f0raw,~,analysisParams]=exstraightsource(test_audio,fs,prm);
-                    [feas_test,analysisParamsSp]=exstraightspec(test_audio,f0raw,fs,prm);
+                    [feas,analysisParamsSp]=exstraightspec(test_audio,f0raw,fs,prm);
+                    
+                    feas_test = struct('features',feas,'speech_frames',speech_frames);
+                    
                     parsave(stfilename, feas_test);
                 end
 
             else
 
                 [f0raw,~,analysisParams]=exstraightsource(test_audio,fs,prm);
-                [feas_test,analysisParamsSp]=exstraightspec(test_audio,f0raw,fs,prm);
+                [feas,analysisParamsSp]=exstraightspec(test_audio,f0raw,fs,prm);
 
+                feas_test = struct('features',feas,'speech_frames',speech_frames);  
+                
             end
         case 'fft'
 
@@ -85,7 +91,7 @@ if itsok~=1
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.fft-spec'];
 
                 if exist(stfilename, 'file')
-                    feas_test = load(stfilename, '-ascii');
+                    feas_test = parload(stfilename);
                 else
 
                     feas_test=zeros(nr_frames_test,fft_dim);
@@ -106,8 +112,10 @@ if itsok~=1
                     audio_short = hamwin.*test_audio(framestart:framestart+frame_length-1);
                     feas_test(frame_index,:) = sqrt(abs(fft(audio_short,fft_dim)));
                 end
-                feas_test=feas_test';
+                feas=feas_test';
 
+                feas_test = struct('features',feas,'speech_frames',speech_frames);  
+                
             end
 
 
@@ -126,14 +134,14 @@ if itsok~=1
                     feas_test(i,:)=aux_noise;
                 end
             end
-            feas_test=feas_test;
-                
+            feas=feas_test;
+            feas_test = struct('features',feas,'speech_frames',speech_frames);      
     end
 
     switch distmethod
         
         case 'snr'
-            spec_feas=feas_test;
+            spec_feas=feas_test.features;
             feas_test=zeros(nr_frames_test,mel_dim);
 
             for i=1:nr_frames_test
@@ -142,13 +150,16 @@ if itsok~=1
                 mel_norm=M*spec_norm;
                 feas_test(i,:)=mel_norm;
             end
+            feas_test = struct('features',feas_test,'speech_frames',speech_frames);      
+            
         case 'log-mel' 
 
-            spec_feas=feas_test;
+            spec_feas=feas_test.features;
             feas_test=zeros(nr_frames_test,mel_dim);
             for frame_index=1:nr_frames_test
-                feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)); 
+                feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)+1e-20); 
             end
+            feas_test = struct('features',feas_test,'speech_frames',speech_frames);
             
             if (CACHE_FEATURES == 1)
                 cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
@@ -157,14 +168,15 @@ if itsok~=1
             
         case 'mcd'
 
-            spec_feas=feas_test;
+            spec_feas=feas_test.features;
             feas_test=zeros(nr_frames_test,mel_dim);
             for frame_index=1:nr_frames_test
-                feas_test(frame_index,:)=dct(log(M*spec_feas(:,frame_index)));
+                feas_test(frame_index,:)=dct(log(M*spec_feas(:,frame_index)+1e-20));
             end
 
-            feas_test = feas_test;%(:,2:cep_dim)';
-
+            %  feas_test = feas_test;%(:,2:cep_dim)';
+            feas_test = struct('features',feas_test,'speech_frames',speech_frames);
+            
             if (CACHE_FEATURES == 1)
                 cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
                 parsave(cachefilename, feas_test);

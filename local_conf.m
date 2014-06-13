@@ -7,6 +7,8 @@ addpath ([ EVALHOME, '/include/columbia_ee_dtw'])
 addpath ([ EVALHOME, '/include/voicebox'])
 addpath ([ EVALHOME, '/include/colea'])
 addpath ([ EVALHOME, '/include/audioread'])
+addpath ([ EVALHOME, '/include/gmmbayestb-v1.0'])
+
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
 
@@ -27,15 +29,19 @@ LOCAL_FEATDIR ='/akulabra/projects/T40511/synthesis/blizzard_eval/features/';
 
 %Save copies of distance maps for DTW testing
 CACHE_DISTMAPS = 1;
-LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps3/';
+LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps/';
 
 
+LOCAL_MIXTUREMODELDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/gmms/';
 
 
 
 
 
 BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/';
+BLIZZARD2010_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2010_release_version_1/';
+
+
 %BLIZZARD2009_RESULTDIR = '/akulabra/projects/T40511/synthesis/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
 
 

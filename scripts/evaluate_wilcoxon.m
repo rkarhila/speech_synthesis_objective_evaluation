@@ -50,6 +50,7 @@ for s1=1:length(systems)
     end
 end
 
+
 %confmatr=zeros(featcount,3,3);
 % classes in confusion matrix:
 % 1 - system A better

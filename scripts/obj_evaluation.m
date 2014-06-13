@@ -1,44 +1,75 @@
-function [ distlist, runtime ]=obj_evaluation(filepath, reference_sent_list, ...
-    test_sent_list, mapmethods)
+function [ distlist, runtime, testlist ]=obj_evaluation(filepath, reference_sent_list, ...
+    test_sent_list, mapmethods, gaussmethods, gausscomps, filespersystem)
 
 local_conf
 mapdirectory=LOCAL_MAPDIR;
+gmdirectory=LOCAL_MIXTUREMODELDIR;
 
 monitoring=0;
 figuring=0;
 
-%spec_method='straight'; % fft or straight
-%distance_measure = 'fwsnrseg'; % fwsnrseg or mcd or llr
+usevad=1;
+
 
 % So, we have list of reference files and a list of test files.
 % Let's assume that they all exist and behave well
 
-
-
 reffilelist = textread(reference_sent_list,'%s' );
 testfilelist = textread(test_sent_list,'%s' );
 
-
-%mapmethods={'fft-snr','straight-snr','fft-mcd', 'straight-mcd','llr'};
-
-mapf0measures={};
-globalf0measures={};
-%mapf0measures={'rmsd','voicingdiff'};
-%globalf0measures={'rmse','diffvar'};
-
-
-testcount=length(mapmethods)*...
-    (length(mapmethods)+length(mapf0measures))+length(globalf0measures);
-
-distlist=zeros(length(testfilelist),testcount);
-
 if ne(length(testfilelist), length(testfilelist))
     disp('Filelists are different size, this won`t end well');
-    
 end
+
+
+% How many tests do we do?
+
+testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps);
+
+% Make a list of file pair distances, initialise to zero:
+
+testlist=cell(testcount,1);
+
+% In an extremely non-elegant way, let's give some names to the
+% distance methods we will:
+
+for y=1:length(mapmethods)
+
+     spec_and_distmethod=mapmethods{y};
+     mapspec=spec_and_distmethod{1};
+     mapdist=spec_and_distmethod{2};
+     
+     for z=1:length(mapmethods) 
+
+       spec_and_distmethod=mapmethods{z};
+       pathspec=spec_and_distmethod{1};
+       pathdist=spec_and_distmethod{2}; 
+       
+       testlist{(y-1)*length(mapmethods)+z} = ...
+           ['map: ',mapspec,'-',mapdist,', path:',pathspec,'-',pathdist];
+     end   
+end
+for y=1:length(gaussmethods)
+     spec_and_distmethod=gaussmethods{y};
+     featspec=spec_and_distmethod{1};
+     featdist=spec_and_distmethod{2};
+    
+     for z=1:length(gausscomps)
+        testlist{length(mapmethods)^2+(y-1)*length(gaussmethods)+z} =...
+            ['feat: ',featspec,'-',featdist,', gausscomp:',num2str(gausscomps(z))];
+     end
+end
+
+disp(testlist)
+
+% Initialise the list of sentencepair distances:
+distlist=zeros(length(testfilelist),testcount);
 
 n=length(testfilelist)
 
+
+% Do we monitor the progress somehow? We probably shouldn't, but just in
+% case:
 if monitoring==1;
     WaitBar = waitbar(0,'Initializing waitbar...');
 else
@@ -47,20 +78,116 @@ end
 
 tic
 
+
+
 % Loop over file pairs:
+% (use parallel for if available)
+
+systems=[];
+
+for i=1:length(testfilelist)
+
+    % Examine the file we will test:
+    % Extract system code to save in the right place
+    % (and for reporting?)
+    
+    [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
+    speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
+    systemcode=speakercode(1);
+    % disp(testfilename);
+
+    if isempty(find(systems==systemcode))
+        systems=[systems;systemcode];
+    end
+end
+
+par_gaussians=cell(length(systems),1); %length(gausscomps),length(gaussmethods))
+
+
+parfor i=1:length(systems)
+            
+
+    % For the Gaussian evaluation, we need to train the Gaussians for
+    % The new system:
+
+    par_gaussians{i}=cell(length(gausscomps),length(gaussmethods))
+
+    % make train datasets using the various feature extraction methods
+    % specified in gaussmethods:
+    for y=1:length(gaussmethods)
+
+        % Only construct the training feature vectors if the Gaussians
+        % have not been generated yet
+        test_data_sys=0;
+
+        spec_and_distmethod=gaussmethods{y};
+        specmethod=spec_and_distmethod{1};
+        distmethod=spec_and_distmethod{2};
+
+        % train models if not done already
+        for j=1:length(gausscomps)
+
+        
+
+            num_components=gausscomps(j);
+            
+            gaussname=[gmdirectory,systems(i),testfilename,'_',specmethod,'-',distmethod,'_',num2str(num_components),'.gm'];
+            
+            if exist(gaussname, 'file') ||  exist([gaussname,'.mat'], 'file')
+                disp(['loading gmm from ', gaussname]);
+                gmm_model_set=parload(gaussname);
+            else
+                % If the GMM has not been computed already, gather the data (if not done already):
+                if test_data_sys==0
+                    disp(['collecting training data for gmm ',systems(i)]);
+                    % Construct feature vectors from training data:
+
+                    featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad);
+                    test_data_sys=featstruct.features(featstruct.speech_frames,:);
+                    
+                    for p=2:filespersystem
+                        featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
+                        test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
+                    end                    
+                    parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
+                end
+                
+                disp(['train gmm system ', systems(i) ,', ',num2str(num_components)]);
+                gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
+                disp(['-done gmm system ', systems(i) ,', ',num2str(num_components)]);
+                
+                % Use a separate saving function to write the gmm to disk
+                % inside a parallel loop
+                parsave(gaussname, gmm_model_set);
+            end
+            disp(['setting par_gaussians{',num2str(i),'}{',num2str(y),',',num2str(j),'}']);% from ', gaussname ]);
+            par_gaussians{i}{y,j}=gmm_model_set;
+            
+        end
+        
+        % Make sure not to leave the old features hanging around:
+        test_data_sys=0;
+    end
+    
+    
+end
 
 
 parfor i=1:length(testfilelist)
 
+    % Examine the file we will test:
+    % Extract system code to save in the right place
+    % (and for reporting?)
+    
     [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
     speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
+    systemcode=speakercode(1);
     disp(testfilename);
-    
+
+    % Compute distance maps between test and ref sample;
+    % Load from disk if we have already computed it.
     distmaps=cell(length(mapmethods));
-    
-    %testf0name=[mapdirectory,speakercode,testfilename,'_testf0.map'];
-    %reff0name=[mapdirectory,speakercode,testfilename,'_reff0.map'];
-    
+      
     for y=1:length(mapmethods)
         spec_and_distmethod=mapmethods{y};
         specmethod=spec_and_distmethod{1};
@@ -69,95 +196,92 @@ parfor i=1:length(testfilelist)
         
         mapname=[mapdirectory,speakercode,testfilename,'_',mapmethod,'_norm.map'];
         
-        if exist(mapname, 'file')
-            distmaps{y}=load(mapname, '-ascii');
+        if exist(mapname, 'file') ||  exist([mapname,'.mat'], 'file')
+            distmaps{y}=parload(mapname);
         else
-            usevad=1;
             ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
             test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,distmethod,usevad);
             
-            [distmap]=make_dist_map(test_feat,ref_feat, ...
-                distmethod);
-            
-            %distmap=(distmap-min(distmap(:)))/(max(distmap(:)-min(distmap(:))));
+            [distmap]=make_dist_map(test_feat.features,ref_feat.features, distmethod);
             
             distmaps{y}=distmap;
+            % Use a separate saving function to write the map to disk 
+            % inside a parallel loop
             parsave(mapname, distmap);
-        end
+        
+        end          
     end
 
     result=zeros(1,testcount);    
+    
     %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1];
     %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2)];    
     step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
     %step_matrix=[1 1 1.0;0 1 1.0;1 0 1.0];
 
     
+    % Do DTW in the distance map:
     for z=1:length(mapmethods)
-        %mapmethod=mapmethods{z};
+
        [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
             dpfast(distmaps{z},step_matrix,1);      
         
-            
-            
-        % test_audio
-        % Frame length=80 samples
-        fs=16000;
-        step_ms=10;
-        step_length=fs*step_ms/1000;
-
-
-        %test_audio=test_audio(limits(1):limits(length(limits)));
-
-        %disp([limits(1), limits(length(limits))]);
-
         fullsentpathp=pathp;
         fullsentpathq=pathq;
 
-        %disp([length(fullsentpathp),length(fullsentpathq)])
-
         for y=1:length(mapmethods)
-            %pathmethod=mapmethods{y};
-
-            
             thiscost3=0;
-
-%           Again, which way should it go?
-%            for j=1:length(fullsentpathp)
-%                thiscost3=thiscost3+distmaps{y}(fullsentpathp(j),fullsentpathq(j));
-%            end
-
             for j=1:length(fullsentpathp)
                 thiscost3=thiscost3+distmaps{y}(fullsentpathp(j),fullsentpathq(j));
             end
-
             thiscost3 = thiscost3/length(fullsentpathp);
-            
 
-            result( (z-1)*(length(mapmethods)+length(mapf0measures)) + y) = thiscost3;
-            
-%            result((z-1)*length(mapmethods)^3+y*length(mapmethods))=thiscost3;
+            result( (z-1)*(length(mapmethods)) + y) = thiscost3;
             
         end
-       
-        
-        %            distlist(i,k1:k2)=[thiscost,length(twosecpathp)- ...
-        %                   testlength]
         
     end
     
-%        disp(result);
-        fprintf('%0.1f\t', result);
-        disp('\n');
-        distlist(i,:) = distlist(i,:) + result;
+    
+    % Calculate likelihood scores between ref gm model and the test sentence:
+    
+    for y=1:length(gaussmethods)
+                               
+       spec_and_distmethod=gaussmethods{y};
+       specmethod=spec_and_distmethod{1};
+       distmethod=spec_and_distmethod{2};   
+
+       test_feat=calculate_feas([filepath,testfilelist{i}], specmethod, distmethod,usevad);
+       
+       for j=1:length(gausscomps)  
+            
+            % Again this line? Hope it is cached...
+            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
+                       
+            disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
+            disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
+            %par_gaussians{ (y-1)*length(gausscomps)+j }
+            
+            gmmres= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{find(systems==systemcode)}{y,j})+exp(-700)))/size(test_feat,1);
+            
+            gmmres
+            if isnan(gmmres)
+                disp(gmmb_pdf(test_feat, par_gaussians{find(systems==systemcode)}{y,j}))
+            end
+            result( length(mapmethods)^2 + (y-1)*length(gausscomps) + j) = gmmres;
+                
+        
+        end
+    end
+    
+    
+    fprintf('%0.1f\t', result);
+    disp('\n');
+    distlist(i,:) = distlist(i,:) + result;
 
     
-    
-%    disp(testfilelist{i})
-%    disp(distlist(i,:))
-    
     if monitoring==1;
-        
+       
         %Here's the progress bar code
         t=toc;
         Perc=i/n;
@@ -175,8 +299,6 @@ end
 if monitoring==1;
     close(WaitBar);
 end
-
-averagedist=mean(abs(distlist));
 
 runtime=toc;
 
