@@ -9,7 +9,7 @@ monitoring=0;
 figuring=0;
 
 usevad=1;
-
+pesq_scorecount=3;
 
 % So, we have list of reference files and a list of test files.
 % Let's assume that they all exist and behave well
@@ -24,7 +24,7 @@ end
 
 % How many tests do we do?
 
-testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps);
+testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + pesq_scorecount;
 
 % Make a list of file pair distances, initialise to zero:
 
@@ -59,6 +59,15 @@ for y=1:length(gaussmethods)
             ['feat: ',featspec,'-',featdist,', gausscomp:',num2str(gausscomps(z))];
      end
 end
+
+testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +1} ...
+    = 'PESQ Narrowband MOS';
+
+testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +2} ...
+    = 'PESQ Narrowband MOS LQ0';
+
+testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +3} ...
+    = 'PESQ Wideband MOS LQ0';
 
 disp(testlist)
 
@@ -258,13 +267,12 @@ parfor i=1:length(testfilelist)
             % Again this line? Hope it is cached...
             ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
                        
-            disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
-            disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
+            %disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
+            %disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
             %par_gaussians{ (y-1)*length(gausscomps)+j }
             
             gmmres= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{find(systems==systemcode)}{y,j})+exp(-700)))/size(test_feat,1);
             
-            gmmres
             if isnan(gmmres)
                 disp(gmmb_pdf(test_feat, par_gaussians{find(systems==systemcode)}{y,j}))
             end
@@ -274,6 +282,16 @@ parfor i=1:length(testfilelist)
         end
     end
     
+    
+    pesqref=prepare_audio([filepath,reffilelist{i}],'use_vad',usevad);
+    pesqtest=prepare_audio([filepath,testfilelist{i}],'use_vad',usevad);
+    
+    scores_nb = pesqbin( pesqref, pesqtest, 16000, 'nb' );
+    scores_wb = pesqbin( pesqref, pesqtest, 16000, 'wb' );
+    
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 1) = 5 - scores_nb(1)
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 2) = 5 - scores_nb(2)
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 3) = 5 - scores_wb
     
     fprintf('%0.1f\t', result);
     disp('\n');

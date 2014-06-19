@@ -153,8 +153,8 @@ for lng in ["mandarin"]:
                         
                     if ok:
                         for sent in tasks[test][task]['sentences']:
-                            tfile.write(re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/'+lng+'/'+taskdir+r'/2008/\1/\1_\2.wav', sent)+"\n")
-                            rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/'+lng+'/'+taskdir+r'/2008/\1/\1_\2.wav',sent)+"\n")
+                            tfile.write(re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/'+lng+'/'+r'/2008/\1/\1_\2.wav', sent)+"\n")
+                            rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/'+lng+'/'+r'/2008/\1/\1_\2.wav',sent)+"\n")
 
                         systems.append(syst)
             tfile.close()

@@ -8,10 +8,11 @@ addpath ([ EVALHOME, '/include/voicebox'])
 addpath ([ EVALHOME, '/include/colea'])
 addpath ([ EVALHOME, '/include/audioread'])
 addpath ([ EVALHOME, '/include/gmmbayestb-v1.0'])
+addpath ([ EVALHOME, '/include/matlab-pesq-wrapper'])
 
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
-
+setenv('PATH', '/akulabra/projects/T40511/Modules/opt/pesq/amd_2/bin/:/akulabra/projects/T40511/Modules/opt/sptk/3.5/bin:/akulabra/projects/T40511/Modules/opt/hts/2.3alpha/bin:/home/rkarhila/bin:/usr/lib/lightdm/lightdm:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/opt/bin:/p/bin:/home/rkarhila/bin')
 
 USE_STRAIGHT        = 1;
 
@@ -37,10 +38,10 @@ LOCAL_MIXTUREMODELDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/gmms
 
 
 
-
+BLIZZARD2008_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2008_release_version_1/';
 BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/';
 BLIZZARD2010_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2010_release_version_1/';
-
+BLIZZARD2011_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2011_release_version_1/';
 
 %BLIZZARD2009_RESULTDIR = '/akulabra/projects/T40511/synthesis/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
 
