@@ -60,7 +60,7 @@ if (matlabpool('size') == 0)
     matlabpool
 end
 
-tests={ ...
+tests2008={ ...
     struct( ...  
         'name',                  'english_full_similarity',...
         'objective_resultfile',  'tests/2008/2008_english_full_objective_results_sim',...
@@ -131,19 +131,19 @@ tests={ ...
 
 
     
-for n=1:length(tests)
-    if exist(tests{n}.objective_resultfile, 'file') == 0;   
-        [ objdata, test_runtime, testlist] = obj_evaluation(BLIZZARD2008_RESULTDIR, tests{n}.reffilelist,tests{n}.testfilelist,...
-            mapmethods,  gaussmethods, gausscomps, tests{n}.sentencesperspeaker);
-        save(tests{n}.objective_resultfile, 'objdata','-ascii');
-        tests{n}.results=objdata;
+for n=1:length(tests2008)
+    if exist(tests2008{n}.objective_resultfile, 'file') == 0;   
+        [ objdata, test_runtime, testlist] = obj_evaluation(BLIZZARD2008_RESULTDIR, tests2008{n}.reffilelist,tests2008{n}.testfilelist,...
+            mapmethods,  gaussmethods, gausscomps, tests2008{n}.sentencesperspeaker);
+        save(tests2008{n}.objective_resultfile, 'objdata','-ascii');
+        tests2008{n}.results=objdata;
     else      
-        disp(['Loading results from ',tests{n}.objective_resultfile])
-        tests{n}.results=load(tests{n}.objective_resultfile);
+        disp(['Loading results from ',tests2008{n}.objective_resultfile])
+        tests2008{n}.results=load(tests2008{n}.objective_resultfile);
         
     end
     
-    tests{n}.scores=evaluate_wilcoxon(tests{n}.results, load(tests{n}.subjective_resultfile), load(tests{n}.opinionmatrix), ...
-                               tests{n}.systems, 0);
+    tests2008{n}.scores=evaluate_wilcoxon(tests2008{n}.results, load(tests2008{n}.subjective_resultfile), load(tests2008{n}.opinionmatrix), ...
+                               tests2008{n}.systems, 0);
 end
 
