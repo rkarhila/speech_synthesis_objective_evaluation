@@ -43,7 +43,7 @@ BLIZZARD2009_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_an
 BLIZZARD2010_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2010_release_version_1/';
 BLIZZARD2011_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2011_release_version_1/';
 BLIZZARD2012_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2012/afs/.inf.ed.ac.uk/group/blizzard/blizzard_2012/analysis/distribution/full_distribution/';
-
+BLIZZARD2013_RESULTDIR = '/data/users/rkarhila/blizzard_results/blizzard_wavs_and_scores_2013_release_version_1/';
 %BLIZZARD2009_RESULTDIR = '/akulabra/projects/T40511/synthesis/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
 
 

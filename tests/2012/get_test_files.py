@@ -92,7 +92,10 @@ for csvfile in [BLIZZARD2012+ "test_results/sim_and_mos.csv"]:
                                     else:
                                         tfile.write(re.sub(r'([^_]+)\_(.*)', syst+'/submission_directory/2012'+r'/\1/wav/\1_\2.wav', sent)+"\n")
 
-                                    rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/2012'+r'/\1/wav/\1_\2.wav', sent)+"\n")
+                                    if task=="booksent":
+                                        rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/2012'+r'/audiobook_sentences/wav/\1_\2.wav', sent)+"\n")
+                                    else:
+                                        rfile.write(re.sub(r'([^_]+)\_(.*)', 'A'+'/submission_directory/2012'+r'/\1/wav/\1_\2.wav', sent)+"\n")
 
                                 systems.append(syst)
                     tfile.close()

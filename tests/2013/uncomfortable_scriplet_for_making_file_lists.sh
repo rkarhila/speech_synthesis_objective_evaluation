@@ -15,14 +15,14 @@ find -name "*.wav" | egrep 'booksent_2013_(0040|0015|0064|0038|0014|0056|0027|00
 
 # EH2 01_ 0036|0040|0015|0064|0038|0014|0056|0027|0019|0010|0062|0091|0013|0037|0036
 
-find -name "*.wav" | egrep 'booksent_2013_(0036|0040|0015|0064|0038|0014|0056|0027|0019|0010|0062|0091|0013|0037|0036)' | sort | grep -v '/A/' | grep EH2 > /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/2013_EH2_sim.test.scp
+find -name "*.wav" | egrep 'booksent_2013_(0036|0040|0015|0064|0038|0014|0056|0027|0019|0010|0062|0091|0013|0037|0036)' | sort| grep '/wav/' | grep -v '/A/' | grep EH2 > /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/2013_EH2_sim.test.scp
 
 
 # EH2 02_ 0005|0012|0059|0076|0086|0068|0060|0055|0097|0042|0006|0051|0018|0020|0079
 # EH2 04_ 0032|0080|0083|0048|0078|0002|0061|0073|0075|0035|0033|0096|0085|0087|0016
 
 
-find -name "*.wav" | egrep 'booksent_2013_(0005|0012|0059|0076|0086|0068|0060|0055|0097|0042|0006|0051|0018|0020|0079|0032|0080|0083|0048|0078|0002|0061|0073|0075|0035|0033|0096|0085|0087|0016)' | sort | grep -v '/A/' | grep EH2 > /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/2013_EH2_nat.test.scp
+find -name "*.wav" | egrep 'booksent_2013_(0005|0012|0059|0076|0086|0068|0060|0055|0097|0042|0006|0051|0018|0020|0079|0032|0080|0083|0048|0078|0002|0061|0073|0075|0035|0033|0096|0085|0087|0016)' | sort | grep -v '/A/' | grep '/wav/'| grep EH2 > /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/2013_EH2_nat.test.scp
 
 
 for file in /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/2013_*.test.scp; do sed -r 's/(\/)[B-Z](\/)/\1A\2/g' $file  > /data/users/rkarhila/speech_synthesis_objective_evaluation/tests/2013/`basename $file .test.scp`.ref.scp; done
