@@ -9,6 +9,7 @@ addpath ([ EVALHOME, '/include/colea'])
 addpath ([ EVALHOME, '/include/audioread'])
 addpath ([ EVALHOME, '/include/gmmbayestb-v1.0'])
 addpath ([ EVALHOME, '/include/matlab-pesq-wrapper'])
+addpath ([ EVALHOME, '/include/apply_hatch'])
 
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
