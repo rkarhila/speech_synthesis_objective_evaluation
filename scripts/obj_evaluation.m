@@ -33,6 +33,7 @@ testlist=cell(testcount,1);
 % In an extremely non-elegant way, let's give some names to the
 % distance methods we will:
 
+ind=1;
 for y=1:length(mapmethods)
 
      spec_and_distmethod=mapmethods{y};
@@ -45,8 +46,9 @@ for y=1:length(mapmethods)
        pathspec=spec_and_distmethod{1};
        pathdist=spec_and_distmethod{2}; 
        
-       testlist{(y-1)*length(mapmethods)+z} = ...
+       testlist{ind} = ...
            ['map: ',mapspec,'-',mapdist,', path:',pathspec,'-',pathdist];
+       ind=ind+1;
      end   
 end
 for y=1:length(gaussmethods)
@@ -55,21 +57,20 @@ for y=1:length(gaussmethods)
      featdist=spec_and_distmethod{2};
     
      for z=1:length(gausscomps)
-        testlist{length(mapmethods)^2+(y-1)*length(gaussmethods)+z} =...
+        testlist{ind} =...
             ['feat: ',featspec,'-',featdist,', gausscomp:',num2str(gausscomps(z))];
+        ind=ind+1;
      end
 end
 
-testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +1} ...
-    = 'PESQ Narrowband MOS';
-
-testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +2} ...
-    = 'PESQ Narrowband MOS LQ0';
-
-testlist{length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) +3} ...
-    = 'PESQ Wideband MOS LQ0';
+testlist{ind}= 'PESQ Narrowband MOS';
+ind=ind+1;
+testlist{ind}= 'PESQ Narrowband MOS LQ0';
+ind=ind+1;
+testlist{ind}= 'PESQ Wideband MOS LQ0';
 
 disp(testlist)
+
 
 % Initialise the list of sentencepair distances:
 distlist=zeros(length(testfilelist),testcount);

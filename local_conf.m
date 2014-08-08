@@ -9,7 +9,7 @@ addpath ([ EVALHOME, '/include/colea'])
 addpath ([ EVALHOME, '/include/audioread'])
 addpath ([ EVALHOME, '/include/gmmbayestb-v1.0'])
 addpath ([ EVALHOME, '/include/matlab-pesq-wrapper'])
-addpath ([ EVALHOME, '/include/apply_hatch'])
+addpath ([ EVALHOME, '/include/applyhatch'])
 
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
@@ -53,8 +53,21 @@ mel_dim = 21;
 frame_ms = 25;
 
 
-step_ms = 10 ; % 5 ms step
+step_ms = 10 ; % Used to be 5 ms step
 frame_rate = ceil(1000/step_ms);
+
+mapmethods={ {'fft','snr'},...
+             {'straight','snr'},...
+             {'fft','mcd'}, ...
+             {'straight','mcd'}, ...
+             {'llr','llr'}};
+
+gaussmethods= { { 'straight', 'log-mel' }, ...
+                { 'fft', 'log-mel'}, ...
+                { 'straight', 'mcd' }, ...
+                { 'fft', 'mcd'} };
+                
+gausscomps=[10,30,50];        
 
 
 spectrum_dim=1024;
