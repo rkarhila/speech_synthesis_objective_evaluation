@@ -10,6 +10,9 @@ addpath ([ EVALHOME, '/include/audioread'])
 addpath ([ EVALHOME, '/include/gmmbayestb-v1.0'])
 addpath ([ EVALHOME, '/include/matlab-pesq-wrapper'])
 addpath ([ EVALHOME, '/include/applyhatch'])
+addpath ([ EVALHOME, '/include/fitit'])
+addpath ([ EVALHOME, '/include/logistic'])
+
 
 addpath /akulabra/projects/T40511/Modules/opt/STRAIGHT/V40_003
 
@@ -25,12 +28,12 @@ if USE_STRAIGHT == 1
 end
 
 CACHE_FEATURES = 0;
-CACHE_STRAIGHT = 1;
+CACHE_STRAIGHT = 0;
 LOCAL_FEATDIR ='/akulabra/projects/T40511/synthesis/blizzard_eval/features/';
 
 
 %Save copies of distance maps for DTW testing
-CACHE_DISTMAPS = 1;
+CACHE_DISTMAPS = 0;
 LOCAL_MAPDIR   ='/akulabra/projects/T40511/synthesis/blizzard_eval/distmaps/';
 
 
@@ -62,13 +65,20 @@ mapmethods={ {'fft','snr'},...
              {'straight','mcd'}, ...
              {'llr','llr'}};
 
+mapmethods={};         
+         
 gaussmethods= { { 'straight', 'log-mel' }, ...
                 { 'fft', 'log-mel'}, ...
                 { 'straight', 'mcd' }, ...
                 { 'fft', 'mcd'} };
                 
-gausscomps=[10,30,50];        
+gausstypes={'diag', 'full'};
+
+gausscomps={[10,30,50], [7,11,18]};        
+
+
 
 
 spectrum_dim=1024;
 
+curve_smoothing_coeff=0.6;

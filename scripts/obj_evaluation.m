@@ -24,7 +24,7 @@ end
 
 % How many tests do we do?
 
-testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + pesq_scorecount;
+testcount=length(mapmethods)^2 + length(gaussmethods)*(length(gausscomps{1}) + length(gausscomps{2})) + pesq_scorecount;
 
 % Make a list of file pair distances, initialise to zero:
 
@@ -55,11 +55,12 @@ for y=1:length(gaussmethods)
      spec_and_distmethod=gaussmethods{y};
      featspec=spec_and_distmethod{1};
      featdist=spec_and_distmethod{2};
-    
-     for z=1:length(gausscomps)
-        testlist{ind} =...
-            ['feat: ',featspec,'-',featdist,', gausscomp:',num2str(gausscomps(z))];
-        ind=ind+1;
+     for j0=1:length(gausstypes)
+         for z=1:length(gausscomps{j0})
+            testlist{ind} =...
+                ['feat: ',featspec,'-',featdist,', ',gausstypes{j0},' covariance, gausscomp:',num2str(gausscomps{j0}(z))];
+            ind=ind+1;
+         end
      end
 end
 
@@ -120,7 +121,7 @@ parfor i=1:length(systems)
     % For the Gaussian evaluation, we need to train the Gaussians for
     % The new system:
 
-    par_gaussians{i}=cell(length(gausscomps),length(gaussmethods))
+    par_gaussians{i}=cell(length(gausscomps{1})+length(gausscomps{2}),length(gausstypes),length(gaussmethods))
 
     % make train datasets using the various feature extraction methods
     % specified in gaussmethods:
@@ -135,46 +136,54 @@ parfor i=1:length(systems)
         distmethod=spec_and_distmethod{2};
 
         % train models if not done already
-        for j=1:length(gausscomps)
-
         
-
-            num_components=gausscomps(j);
+        for j0=1:length(gausstypes)
             
-            gaussname=[gmdirectory,systems(i),testfilename,'_',specmethod,'-',distmethod,'_',num2str(num_components),'.gm'];
-            
-            if exist(gaussname, 'file') ||  exist([gaussname,'.mat'], 'file')
-                disp(['loading gmm from ', gaussname]);
-                gmm_model_set=parload(gaussname);
-            else
-                % If the GMM has not been computed already, gather the data (if not done already):
-                if test_data_sys==0
-                    disp(['collecting training data for gmm ',systems(i)]);
-                    % Construct feature vectors from training data:
+            for j=1:length(gausscomps{j0})
 
-                    featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad);
-                    test_data_sys=featstruct.features(featstruct.speech_frames,:);
+                num_components=gausscomps{j0}(j);
+
+                gaussname=[gmdirectory,systems(i),testfilename,'_',specmethod,'-',distmethod,'_',num2str(num_components),'_',gausstypes{j0},'.gm'];
+
+                
+                if exist(gaussname, 'file') ||  exist([gaussname,'.mat'], 'file')
+                    disp(['loading gmm from ', gaussname]);
+                    gmm_model_set=parload(gaussname);
+                else
+                    % If the GMM has not been computed already, gather the data (if not done already):
+                    if test_data_sys==0
+                        disp(['collecting training data for gmm ',systems(i)]);
+                        % Construct feature vectors from training data:
+
+                        featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad);
+                        test_data_sys=featstruct.features(featstruct.speech_frames,:);
+
+                        for p=2:filespersystem
+                            featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
+                            test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
+                        end                    
+                        parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
+                    end
+
+                    disp(['train ',gausstypes{j0},' covariance gmm system ', systems(i) ,', ',num2str(num_components)]);
                     
-                    for p=2:filespersystem
-                        featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
-                        test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
-                    end                    
-                    parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
+                    if gausstypes{j0}=='diag'
+                        gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
+                    else
+                        gmm_model_set=gmmb_em(test_data_sys,'components',num_components);                       
+                    end
+                    
+                    disp(['-done gmm system ', systems(i) ,', ',num2str(num_components)]);
+
+                    % Use a separate saving function to write the gmm to disk
+                    % inside a parallel loop
+                    parsave(gaussname, gmm_model_set);
                 end
-                
-                disp(['train gmm system ', systems(i) ,', ',num2str(num_components)]);
-                gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
-                disp(['-done gmm system ', systems(i) ,', ',num2str(num_components)]);
-                
-                % Use a separate saving function to write the gmm to disk
-                % inside a parallel loop
-                parsave(gaussname, gmm_model_set);
+                disp(['setting par_gaussians{',num2str(i),'}{',num2str(y),',',num2str(j),'}']);% from ', gaussname ]);
+                par_gaussians{i}{y,j0,j}=gmm_model_set;
+
             end
-            disp(['setting par_gaussians{',num2str(i),'}{',num2str(y),',',num2str(j),'}']);% from ', gaussname ]);
-            par_gaussians{i}{y,j}=gmm_model_set;
-            
         end
-        
         % Make sure not to leave the old features hanging around:
         test_data_sys=0;
     end
@@ -262,25 +271,28 @@ parfor i=1:length(testfilelist)
        distmethod=spec_and_distmethod{2};   
 
        test_feat=calculate_feas([filepath,testfilelist{i}], specmethod, distmethod,usevad);
-       
-       for j=1:length(gausscomps)  
-            
-            % Again this line? Hope it is cached...
-            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
-                       
-            %disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
-            %disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
-            %par_gaussians{ (y-1)*length(gausscomps)+j }
-            
-            gmmres= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{find(systems==systemcode)}{y,j})+exp(-700)))/size(test_feat,1);
-            
-            if isnan(gmmres)
-                disp(gmmb_pdf(test_feat, par_gaussians{find(systems==systemcode)}{y,j}))
-            end
-            result( length(mapmethods)^2 + (y-1)*length(gausscomps) + j) = gmmres;
-                
-        
-        end
+
+       for j0=1:length(gausstypes)
+
+           for j=1:length(gausscomps{j0})  
+
+                % Again this line? Hope it is cached...
+                ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
+
+                %disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
+                %disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
+                %par_gaussians{ (y-1)*length(gausscomps)+j }
+
+                gmmres= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{find(systems==systemcode)}{y,j0,j})+exp(-700)))/size(test_feat,1);
+
+                if isnan(gmmres)
+                    disp(gmmb_pdf(test_feat, par_gaussians{find(systems==systemcode)}{y,j0,j}))
+                end
+                result( length(mapmethods)^2 + (y-1)*length(gausscomps{j0}) + j) = gmmres;
+
+
+           end
+       end
     end
     
     
@@ -290,9 +302,9 @@ parfor i=1:length(testfilelist)
     scores_nb = pesqbin( pesqref, pesqtest, 16000, 'nb' );
     scores_wb = pesqbin( pesqref, pesqtest, 16000, 'wb' );
     
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 1) = 5 - scores_nb(1)
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 2) = 5 - scores_nb(2)
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps) + 3) = 5 - scores_wb
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 1) = 5 - scores_nb(1)
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 2) = 5 - scores_nb(2)
+    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 3) = 5 - scores_wb
     
     fprintf('%0.1f\t', result);
     disp('\n');
