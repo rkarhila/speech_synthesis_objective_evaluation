@@ -8,6 +8,8 @@ gmdirectory=LOCAL_MIXTUREMODELDIR;
 monitoring=0;
 figuring=0;
 
+gauss_retr={gauss_retries};
+
 usevad=1;
 pesq_scorecount=3;
 
@@ -117,7 +119,6 @@ par_gaussians=cell(length(systems),1); %length(gausscomps),length(gaussmethods))
 
 parfor i=1:length(systems)
             
-
     % For the Gaussian evaluation, we need to train the Gaussians for
     % The new system:
 
@@ -167,7 +168,7 @@ parfor i=1:length(systems)
                     disp(['train ',gausstypes{j0},' covariance gmm system ', systems(i) ,', ',num2str(num_components)]);
 
                     tries=0
-                    while tries<gauss_retries
+                    while tries < gauss_retr{1}
                         try
                             if gausstypes{j0}=='diag'
                                 gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
@@ -178,7 +179,7 @@ parfor i=1:length(systems)
                             end
                         catch me
                             tries=tries+1;
-                            if tries==gauss_retries
+                            if tries==gauss_retr{1}
                                 error('foo!');
                             end
                         end
