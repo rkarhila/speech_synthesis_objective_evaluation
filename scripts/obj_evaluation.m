@@ -144,7 +144,6 @@ parfor i=1:length(systems)
                 num_components=gausscomps{j0}(j);
 
                 gaussname=[gmdirectory,systems(i),testfilename,'_',specmethod,'-',distmethod,'_',num2str(num_components),'_',gausstypes{j0},'.gm'];
-
                 
                 if exist(gaussname, 'file') ||  exist([gaussname,'.mat'], 'file')
                     disp(['loading gmm from ', gaussname]);
@@ -164,15 +163,27 @@ parfor i=1:length(systems)
                         end                    
                         parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
                     end
-
+                    
                     disp(['train ',gausstypes{j0},' covariance gmm system ', systems(i) ,', ',num2str(num_components)]);
-                    
-                    if gausstypes{j0}=='diag'
-                        gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
-                    else
-                        gmm_model_set=gmmb_em(test_data_sys,'components',num_components);                       
+
+                    tries=0
+                    while tries<gauss_retries
+                        try
+                            if gausstypes{j0}=='diag'
+                                gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
+                                tries=5;
+                            else
+                                gmm_model_set=gmmb_em(test_data_sys,'components',num_components);                       
+                                tries=5;
+                            end
+                        catch me
+                            tries=tries+1;
+                            if tries==gauss_retries
+                                error('foo!');
+                            end
+                        end
                     end
-                    
+                        
                     disp(['-done gmm system ', systems(i) ,', ',num2str(num_components)]);
 
                     % Use a separate saving function to write the gmm to disk

@@ -62,7 +62,7 @@ if itsok~=1
                 % feature files
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.straight-spec'];
 
-                if exist(stfilename, 'file')
+                if exist([stfilename,'.mat'], 'file')
                     feas_test = parload(stfilename);
                     
                 else                                       
@@ -90,7 +90,7 @@ if itsok~=1
 
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.fft-spec'];
 
-                if exist(stfilename, 'file')
+                if exist([stfilename,'.mat'], 'file')
                     feas_test = parload(stfilename);
                 else
 
