@@ -244,6 +244,7 @@ parfor i=1:length(testfilelist)
     end
 
     result=zeros(1,testcount);    
+    resultindex=1;
     
     %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1];
     %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2)];    
@@ -267,8 +268,9 @@ parfor i=1:length(testfilelist)
             end
             thiscost3 = thiscost3/length(fullsentpathp);
 
-            result( (z-1)*(length(mapmethods)) + y) = thiscost3;
-            
+            %result( (z-1)*(length(mapmethods)) + y) = thiscost3;
+            result(resultindex) = thiscost3;
+            resultindex=resultindex+1;
         end
         
     end
@@ -300,8 +302,8 @@ parfor i=1:length(testfilelist)
                 if isnan(gmmres)
                     disp(gmmb_pdf(test_feat, par_gaussians{find(systems==systemcode)}{y,j0,j}))
                 end
-                result( length(mapmethods)^2 + (y-1)*length(gausscomps{j0}) + j) = gmmres;
-
+                result(resultindex) = gmmres; % length(mapmethods)^2 + (y-1)*length(gausscomps{j0}) + j) = gmmres;
+                resultindex=resultindex+1;
 
            end
        end
@@ -314,9 +316,18 @@ parfor i=1:length(testfilelist)
     scores_nb = pesqbin( pesqref, pesqtest, 16000, 'nb' );
     scores_wb = pesqbin( pesqref, pesqtest, 16000, 'wb' );
     
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 1) = 5 - scores_nb(1)
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 2) = 5 - scores_nb(2)
-    result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 3) = 5 - scores_wb
+    result(resultindex) = 5 - scores_nb(1)
+    resultindex=resultindex+1;
+    
+    result(resultindex) = 5 - scores_nb(2)
+    resultindex=resultindex+1;
+    
+      
+    result(resultindex) = 5 - scores_wb
+    
+    %result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 1) = 5 - scores_nb(1)
+    %result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 2) = 5 - scores_nb(2)
+    %result( length(mapmethods)^2 + length(gaussmethods)*length(gausscomps{j0}) + 3) = 5 - scores_wb
     
     fprintf('%0.1f\t', result);
     disp('\n');
