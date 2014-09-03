@@ -19,7 +19,7 @@ itsok=0;
 
 if (CACHE_FEATURES == 1)
     cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
-    if exist(cachefilename, 'file')
+    if exist([cachefilename,'mat'], 'file')
         feas_test = parload(cachefilename);
         itsok=1;
     end
