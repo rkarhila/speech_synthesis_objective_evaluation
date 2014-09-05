@@ -557,9 +557,10 @@ for comparisoncount=1:3
             
             Value_difference=handbookcurves{feat}{1};
             Smoothed_probability=handbookcurves{feat}{2};
-            if feat>37
+            % Add miniscule noise to make values unique:
+            %if feat>37
                 Value_difference=Value_difference+10^-12*rand(size(Value_difference));
-            end
+            %end
             myfit=fitit(Value_difference,Smoothed_probability)
 
             if feat==max(featlist)
@@ -576,7 +577,7 @@ for comparisoncount=1:3
         end
     end
     
-    figure(201)
+    hFig = figure(201)
     set(hFig, 'Position', [0 0 1000 1000]);    
 
     
