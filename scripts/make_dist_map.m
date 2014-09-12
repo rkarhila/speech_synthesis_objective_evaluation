@@ -141,7 +141,10 @@ switch ds_type
             for j=1:nr_frames_ref
 
                 mcep_ref=feas_ref(j,:);
-                distmap(i,j)=sqrt(2*sum(power(mcep_test(2:min(mel_dim,cep_dim+1))-mcep_ref(2:min(mel_dim,cep_dim+1)),2)));
+                % This used to be from (2:min(mel_dim,cep_dim+1), but the
+                % first dimension is now removed already in calculate_feas
+                % to make GMM training easier.
+                distmap(i,j)=sqrt(2*sum(power(mcep_test(1:min(mel_dim,cep_dim+1))-mcep_ref(1:min(mel_dim,cep_dim+1)),2)));
 
             end
 

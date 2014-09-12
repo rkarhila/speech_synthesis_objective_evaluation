@@ -174,7 +174,10 @@ if itsok~=1
                 feas_test(frame_index,:)=dct(log(M*spec_feas(:,frame_index)+1e-20));
             end
 
+            % Let's not save the first channel here!
             %  feas_test = feas_test;%(:,2:cep_dim)';
+            feas_test = feas_test(:,2:cep_dim);
+            
             feas_test = struct('features',feas_test,'speech_frames',speech_frames);
             
             if (CACHE_FEATURES == 1)

@@ -23,7 +23,8 @@ handbookcurves = cell(1,size(simsigs{1},1));
 
 %%%% For all feats! 
 
-for feat=[2,12,38,50] %1:size(simsigs{1},1);    
+%for feat=[2,12,38,50] 
+for feat=1:length(testlist)
 
     clf
     
@@ -41,6 +42,7 @@ for feat=[2,12,38,50] %1:size(simsigs{1},1);
         natmaxs=max(maxs,res{comparisoncount}.natmaxs);    
     end
      
+    xmaxval=[-inf, -inf];
     
     for comparisoncount=1:3                    
 
@@ -176,9 +178,6 @@ for feat=[2,12,38,50] %1:size(simsigs{1},1);
 
             subplot(3,2,2*comparisoncount-1+testtype);
      
-            if (comparisoncount+testtype == 1)
-                suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',testlist{feat}] )
-            end
             
 
             Value_difference=handbookcurves{feat}{1};
@@ -218,12 +217,11 @@ for feat=[2,12,38,50] %1:size(simsigs{1},1);
             else
                 legend off
             end
-            xlabel('Value difference');
-            ylabel('% correct significant evaluations');
-            axis([0,maxs(feat),-0.2,1]);
+            xlabel('Value difference','FontSize',12);
+            ylabel('% correct significant evaluations','FontSize',12);
 
             grid minor
-            title([testname,', ',comparisonname],'FontSize',18); 
+            title([testname,', ',comparisonname],'FontSize',15); 
 
             
             % Now for some funky histograms:
@@ -284,10 +282,27 @@ for feat=[2,12,38,50] %1:size(simsigs{1},1);
                 end
             end
 
+            %xmaxval(testtype+1)=max(xmaxval(testtype+1),(binedges(end)+binedges(end-1))/2);
+            xmaxval(testtype+1)=max(xmaxval(testtype+1),allvals(round(0.98*length(allvals))));
+            
         end
 
     end
+
+    for comparisoncount=1:3
+        for testtype=0:1
+            subplot(3,2,2*comparisoncount-1+testtype);
+            %axis([0,maxs(feat),-0.2,1]);
+            axis([0,xmaxval(testtype+1),-0.2,1]);
+        end
+    end
+
     
-    waitforbuttonpress
     
+    h = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',testlist{feat}])
+    set(h,'FontSize',18,'FontWeight','normal')
+    
+    
+    %waitforbuttonpress
+    export_fig('-painters','-r600','-q101',['results/figures/pair_evaluations_for_feature_',num2str(feat),'.pdf'])
 end
