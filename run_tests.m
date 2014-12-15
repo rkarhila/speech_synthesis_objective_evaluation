@@ -154,7 +154,8 @@ for comparisoncount=1:3
         for r=1:length(tests{p})
             t=tests{p}{r};
 
-            [sigs,nons]=get_significance_distances_by_systemtype(t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
+            disp(['test ',num2str(2007+p),' ',comparisontypeslist{comparisoncount}{1}]);
+            [sigs,nons]=get_significance_distances_by_systemtype(t.name,t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
 
             for comparisontype=comparisontypes
 

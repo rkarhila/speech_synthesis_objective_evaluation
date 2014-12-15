@@ -12,16 +12,16 @@ local_conf
 %    ref_audio=ref_audio(limits(1):limits(length(limits)));
 
 
-spectrum_dim=1024;
-fft_dim=spectrum_dim/2+1;
+%spectrum_dim=1024;
+%fft_dim=spectrum_dim/2+1;
 
 % FWS:
 M = melbankm(mel_dim, spectrum_dim, fs, 0, 0.5, 'u');
-gamma1=0.2;
+%gamma1=0.2;
 
 
 % MCEP-D
-cep_dim=39;
+%cep_dim=39;
 
 
 nr_frames_test=size(feas_test,1);
@@ -47,7 +47,7 @@ distmap=zeros(nr_frames_test,nr_frames_ref);
 
 
 
-hamwin=hamming(frame_ms*fs/1000);
+%hamwin=hamming(frame_ms*fs/1000);
 
 
 switch ds_type
@@ -144,7 +144,10 @@ switch ds_type
                 % This used to be from (2:min(mel_dim,cep_dim+1), but the
                 % first dimension is now removed already in calculate_feas
                 % to make GMM training easier.
-                distmap(i,j)=sqrt(2*sum(power(mcep_test(1:min(mel_dim,cep_dim+1))-mcep_ref(1:min(mel_dim,cep_dim+1)),2)));
+                %distmap(i,j)=sqrt(2*sum(power(mcep_test(2:min(mel_dim,cep_dim+1))-mcep_ref(2:min(mel_dim,cep_dim+1)),2)));
+                %disp(min(mel_dim,cep_dim))
+                %disp(size(mcep_test))
+                distmap(i,j)=sqrt(2*sum(power(mcep_test-mcep_ref,2)));
 
             end
 

@@ -27,16 +27,7 @@ end
 
 if itsok~=1
 
-    fs = 16000;
-    mel_dim = 21;
-    spectrum_dim=1024;
-
     M = melbankm(mel_dim, spectrum_dim, fs, 0, 0.5, 'u');
-
-    cep_dim = 13;
-
-    frame_ms = 25;
-    step_ms = 10 ; % 5 ms step
 
     step_length=fs*step_ms/1000;
     frame_length=fs*frame_ms/1000;

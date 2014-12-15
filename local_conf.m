@@ -12,6 +12,8 @@ addpath ([ EVALHOME, '/include/matlab-pesq-wrapper'])
 addpath ([ EVALHOME, '/include/applyhatch'])
 addpath ([ EVALHOME, '/include/fitit'])
 addpath ([ EVALHOME, '/include/logistic'])
+addpath ([ EVALHOME, '/include/export_fig'])
+addpath ([ EVALHOME, '/include/rasta'])
 
 
 addpath /work/asr/Modules/opt/STRAIGHT/V40_003
@@ -52,11 +54,18 @@ BLIZZARD2013_RESULTDIR = '/work/asr/u/rkarhila/blizzard_results/blizzard_wavs_an
 
 
 fs = 16000;
-mel_dim = 21;
 frame_ms = 25;
-
-
 step_ms = 10 ; % Used to be 5 ms step
+
+% MCEP-D
+spectrum_dim=1024;
+cep_dim = 13;
+mel_dim = 21;
+
+%FWS
+gamma1=0.2;
+
+
 frame_rate = ceil(1000/step_ms);
 
 mapmethods={ {'fft','snr'},...

@@ -156,11 +156,13 @@ parfor i=1:length(systems)
                         % Construct feature vectors from training data:
 
                         featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad);
-                        test_data_sys=featstruct.features(featstruct.speech_frames,:);
+                        deltabase=featstruct.features(featstruct.speech_frames,:);
+                        test_data_sys=[deltabase, deltas(deltafeat,3), deltas(deltafeat,5)];
 
                         for p=2:filespersystem
                             featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
-                            test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
+                            deltabase=featstruct.features(featstruct.speech_frames,:);
+                            test_data_sys=[test_data_sys; [deltabase, deltas(deltafeat,3), deltas(deltafeat,5)]];
                         end                    
                         parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
                     end
