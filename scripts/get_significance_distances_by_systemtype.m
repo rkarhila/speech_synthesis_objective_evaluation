@@ -1,25 +1,10 @@
-% <<<<<<< HEAD
-% function [significants_by_type, non_significants_by_type] = get_significance_distances_by_systemtype(testname,objective_scores, subjective_scores, opinion_matrix, systems, systemtypes)
-% 
-% listeningmeans=subjective_scores;
-% refmat=opinion_matrix;
-% refscores=objective_scores;
-% 
-% %opinion_matrix;
-% %invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
-% 
-% syscount=length(systems);
-% featcount=size(refscores,2);
-% 
-% %testlen=length(subjective_scores);
-% =======
+
 function [significants_by_type, non_significants_by_type, correlations_utt, correlations_sys, bestguesscorrect] = get_significance_distances_by_systemtype(objective_scores, subjective_scores, opinion_matrix, systems, systemtypes)
 
 bestguesscorrect=0;
 
 syscount=length(systems);
 featcount=size(objective_scores,2);
-% >>>>>>> 5eeaa601b37a34588d5120bec85fddd2f5cc1653
 
 testlen=size(objective_scores,1)/length(systems);
 
@@ -92,15 +77,8 @@ for n=1:3
         
         machinebetters{feat}(machinebetters{feat}==0)=1e-30;
 
-%<<<<<<< HEAD
-%        machinebetters{feat};
-
-        %directionmatch = triu(sign(machinebetters{feat}).*sign(betters)) ;    
-
-%        significant_diffs=triu(machinebetters{feat}.*sign(betters).*(refmat==1).*(typematrix==n),1);
-%=======
         significant_diffs=triu(machinebetters{feat}.*sign(betters).*(opinion_matrix==1).*(typematrix==n),1);
-%>>>>>>> 5eeaa601b37a34588d5120bec85fddd2f5cc1653
+
         significant_diffs=significant_diffs(:)';
         significant_diffs=significant_diffs(significant_diffs ~= 0);
         significant_diffs(significant_diffs == 1e-30) = 0;
