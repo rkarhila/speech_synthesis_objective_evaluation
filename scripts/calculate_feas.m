@@ -1,5 +1,5 @@
 
-function feas_test = calculate_feas(testfile, analysismethod, distmethod, usevad)
+function feas_test = calculate_feas(testfile, analysismethod, distmethod, usevad, usedelta)
 %
 % spec_method options straight, fft
 % test_feature_domain options log-mel, mel-cep 
@@ -18,7 +18,7 @@ itsok=0;
 
 
 if (CACHE_FEATURES == 1)
-    cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
+    cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
     if exist([cachefilename,'.mat'], 'file')
         feas_test = parload(cachefilename);
         itsok=1;
@@ -141,7 +141,12 @@ if itsok~=1
                 mel_norm=M*spec_norm;
                 feas_test(i,:)=mel_norm;
             end
-            feas_test = struct('features',feas_test,'speech_frames',speech_frames);      
+            feas_test = struct('features',feas_test,'speech_frames',speech_frames);
+            
+            if (CACHE_FEATURES == 1)
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
+                parsave(cachefilename, feas_test);
+            end                
             
         case 'log-mel' 
 
@@ -149,11 +154,16 @@ if itsok~=1
             feas_test=zeros(nr_frames_test,mel_dim);
             for frame_index=1:nr_frames_test
                 feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)+1e-20); 
+            end            
+            
+            if usedelta == 1
+                feas_test = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames);
+            else            
+                feas_test = struct('features',feas_test,'speech_frames',speech_frames);
             end
-            feas_test = struct('features',feas_test,'speech_frames',speech_frames);
             
             if (CACHE_FEATURES == 1)
-                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
                 parsave(cachefilename, feas_test);
             end    
             
@@ -169,10 +179,14 @@ if itsok~=1
             %  feas_test = feas_test;%(:,2:cep_dim)';
             feas_test = feas_test(:,2:cep_dim);
             
-            feas_test = struct('features',feas_test,'speech_frames',speech_frames);
+            if usedelta == 1
+                feas_test = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames);
+            else
+                feas_test = struct('features',feas_test,'speech_frames',speech_frames);
+            end
             
             if (CACHE_FEATURES == 1)
-                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod];
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
                 parsave(cachefilename, feas_test);
             end    
 

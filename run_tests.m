@@ -45,9 +45,9 @@ disp(testlist)
 evaluate_test_2008;
 evaluate_test_2009;
 evaluate_test_2010;
-evaluate_test_2011;
-evaluate_test_2012;
-evaluate_test_2013;
+%evaluate_test_2011;
+%evaluate_test_2012;
+%evaluate_test_2013;
 
 
 %

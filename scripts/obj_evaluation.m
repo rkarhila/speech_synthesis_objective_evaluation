@@ -155,14 +155,14 @@ parfor i=1:length(systems)
                         disp(['collecting training data for gmm ',systems(i)]);
                         % Construct feature vectors from training data:
 
-                        featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad);
-                        deltabase=featstruct.features(featstruct.speech_frames,:);
-                        test_data_sys=[deltabase, deltas(deltafeat,3), deltas(deltafeat,5)];
+                        featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+1}], specmethod, distmethod,usevad,1);
+                        test_data_sys=featstruct.features(featstruct.speech_frames,:);
+                        %test_data_sys=[deltabase, deltas(deltabase,3), deltas(deltabase,5)];
 
                         for p=2:filespersystem
                             featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
-                            deltabase=featstruct.features(featstruct.speech_frames,:);
-                            test_data_sys=[test_data_sys; [deltabase, deltas(deltafeat,3), deltas(deltafeat,5)]];
+                            test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
+                            
                         end                    
                         parsave(['/tmp/matlabdump_',systems(i)], test_data_sys);
                     end
@@ -232,8 +232,8 @@ parfor i=1:length(testfilelist)
         if exist(mapname, 'file') ||  exist([mapname,'.mat'], 'file')
             distmaps{y}=parload(mapname);
         else
-            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
-            test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,distmethod,usevad);
+            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad, 0);
+            test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,distmethod,usevad, 0);
             
             [distmap]=make_dist_map(test_feat.features,ref_feat.features, distmethod);
             
@@ -286,14 +286,14 @@ parfor i=1:length(testfilelist)
        specmethod=spec_and_distmethod{1};
        distmethod=spec_and_distmethod{2};   
 
-       test_feat=calculate_feas([filepath,testfilelist{i}], specmethod, distmethod,usevad);
+       test_feat=calculate_feas([filepath,testfilelist{i}], specmethod, distmethod,usevad, 1);
 
        for j0=1:length(gausstypes)
 
            for j=1:length(gausscomps{j0})  
 
                 % Again this line? Hope it is cached...
-                ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad);
+                ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad, 1);
 
                 %disp(['result index ',num2str(length(mapmethods)^2 + (y-1)*length(gausscomps) + j), ' of ' num2str(length(result))]);
                 %disp(['gaussian ', num2str((y-1)*length(gausscomps)+j),' of ',num2str(length(par_gaussians)  ) ]);
