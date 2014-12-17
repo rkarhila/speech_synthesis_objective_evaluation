@@ -160,7 +160,7 @@ parfor i=1:length(systems)
                         %test_data_sys=[deltabase, deltas(deltabase,3), deltas(deltabase,5)];
 
                         for p=2:filespersystem
-                            featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad);                             
+                            featstruct=calculate_feas([filepath,testfilelist{(i-1)*filespersystem+p}], specmethod, distmethod,usevad,1);                             
                             test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
                             
                         end                    

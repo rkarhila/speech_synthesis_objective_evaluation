@@ -16,9 +16,14 @@ speakercode=regexprep( audiofilepath, '[^a-zA-Z0-9-_]', '_');
 
 itsok=0;
 
-
+if (usedelta == 1); 
+    deltatag = '_delta';
+else
+    deltatag = '';
+end
+    
 if (CACHE_FEATURES == 1)
-    cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
+    cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
     if exist([cachefilename,'.mat'], 'file')
         feas_test = parload(cachefilename);
         itsok=1;
@@ -144,7 +149,7 @@ if itsok~=1
             feas_test = struct('features',feas_test,'speech_frames',speech_frames);
             
             if (CACHE_FEATURES == 1)
-                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
                 parsave(cachefilename, feas_test);
             end                
             
@@ -163,7 +168,7 @@ if itsok~=1
             end
             
             if (CACHE_FEATURES == 1)
-                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
                 parsave(cachefilename, feas_test);
             end    
             
@@ -186,7 +191,7 @@ if itsok~=1
             end
             
             if (CACHE_FEATURES == 1)
-                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,'_', usedelta];
+                cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
                 parsave(cachefilename, feas_test);
             end    
 
