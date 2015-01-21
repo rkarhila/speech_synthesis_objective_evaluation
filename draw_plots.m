@@ -94,22 +94,23 @@ for feat=1:length(testlist)
 
             goodtable=[good2vals', ones(size(good2vals'))];
             badtable=[bad2vals', -ones(size(bad2vals'))];
-            nontable=[non2vals', -zeros(size(non2vals'))];
+            %nontable=[non2vals', -zeros(size(non2vals'))];
 
-            alltable=[goodtable;badtable;nontable];
+            %alltable=[goodtable;badtable;nontable];
+            alltable=[goodtable;badtable];
             alltable=sortrows(alltable,1);
 
             z=alltable(:,1);
             x=zeros(size(z));
 
             for i=1:length(z)
-                x(i)=sum(alltable(max(1,i-nn):min(i+nn,length(z)),2)==1)/( min(i+nn,length(z))-max(1,i-nn) );
+                x(i)=sum(alltable(max(1,i-nn):min(i+nn,length(z)),2)==1)/( min(i+nn,length(z))-max(1,i-nn)+1 );
 
             end
 
             handbookcurves{feat}={z,x}; 
 
-            %handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
+            handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
 
 
             srvals=sort(vals);
@@ -138,39 +139,39 @@ for feat=1:length(testlist)
             performances=zeros(length(featlist),12);
 
             performances(feat,1)=0;
-            performances(feat,2)=sum(vals>0)/(sum(vals<inf)+sum(nonvals<inf));   
+            performances(feat,2)=sum(vals>0)/(sum(vals<inf));   
 
 
-            thr50=max(0,srvals(min(find(nonsaccum>0.5))));
+            thr50=max(0,srvals(min(find(accum>0.5))));
             if (isempty(thr50))
                 thr50=-1
             end
                 performances(feat,3)=thr50;
-                performances(feat,4)=sum(nonsaccum>0.5)/(sum(vals<inf)+sum(nonvals<inf));
+                performances(feat,4)=sum(accum>0.5)/(sum(vals<inf));
 
-            thr75=max(0,srvals(min(find(nonsaccum>0.75))));   
+            thr75=max(0,srvals(min(find(accum>0.75))));   
 
             if (isempty(thr75))
                 thr75=-1;
             end
                 performances(feat,5)=thr75;
-                performances(feat,6)=sum(nonsaccum>0.75)/(sum(vals<inf)+sum(nonvals<inf));
+                performances(feat,6)=sum(accum>0.75)/(sum(vals<inf));
 
-            thr90=max(0,srvals(min(find(nonsaccum>0.9))));
+            thr90=max(0,srvals(min(find(accum>0.9))));
             if (isempty(thr90))
                 thr90=-1;
             end            
 
             performances(feat,7)=thr90;
-            performances(feat,8)=sum(nonsaccum>0.9)/(sum(vals<inf)+sum(nonvals<inf));
+            performances(feat,8)=sum(accum>0.9)/(sum(vals<inf));
 
-            thr95=max(0,srvals(min(find(nonsaccum>0.95))));
+            thr95=max(0,srvals(min(find(accum>0.95))));
             if (isempty(thr95))
                 thr95 = -1;            
             end
 
             performances(feat,9)=thr95;
-            performances(feat,10)=sum(nonsaccum>0.95)/(sum(vals<inf)+sum(nonvals<inf));
+            performances(feat,10)=sum(accum>0.95)/(sum(vals<inf));
 
 
 
@@ -190,9 +191,32 @@ for feat=1:length(testlist)
             disp([testname,', ',comparisonname, '  thresholds 50/75/90/95:']);
             disp([thr50,thr75,thr90,thr95]);
 
-            myfit=fitit(Value_difference,Smoothed_probability)
+            %myfit=fitit(Value_difference,Smoothed_probability)
 
+            plot(Value_difference,Smoothed_probability,'ro');
+            
+            
             hold on 
+                        
+            % Set up fittype and options.
+            %ft = fittype( 'a*(1./(1+exp(-b*(x-c))))-d*(1./(1+exp(-e*(x-f))))', 'independent', 'x', 'dependent', 'y' );
+            %opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+            %opts.Display = 'Off';
+            %opts.Lower = [0 0 -max(Value_difference) 0 0 -max(Value_difference)];
+            %opts.MaxIter = 2000;
+            %opts.Robust = 'Bisquare';
+            %opts.StartPoint = [0.922145914880582 0.218085009465261 0.728012434223707*max(Value_difference) 0.42682131558088 0.553021099030541 0.131141186759214*max(Value_difference)];
+            %opts.Upper = [1 10 1 1 10 0.5];
+            %opts.Upper = [1 10 max(Value_difference) 1 10 0.5*max(Value_difference)];
+            
+            
+
+            % Fit model to data.
+            %[fitresult, gof] = fit( Value_difference, Smoothed_probability, ft, opts );
+            %plot(fitresult,'b--');
+
+
+            
             if thr50>=0
                 line([thr50,thr50],[0,1],'color','b')
                 text(thr50,0.05,'50%');
@@ -210,10 +234,28 @@ for feat=1:length(testlist)
                 text(thr95,0.2,'95%'); 
             end        
 
+            
+            % A smoothing spline to give a rough estimate of the
+            % probability of correct guesses:
+            
+            % Set up fittype and options.
+            ft = fittype( 'smoothingspline' );
+            opts = fitoptions( 'Method', 'SmoothingSpline' );
+            opts.Normalize = 'on';
+            opts.SmoothingParam = 0.95;
+
+            % Fit model to data.
+            [fitresult, gof] = fit( Value_difference, Smoothed_probability, ft, opts );
+
+            h = plot(fitresult,'b');
+            h(1).LineWidth =2;
+
+
+            
 
             % if feat==max(featlist)
             if comparisoncount+testtype == 4
-                legend('Correct evaluations in NN-window','LOWESS smoothed probability',2,'Location','East')
+                legend('Correct evaluations in NN-window','Smoothed spline',2,'Location','East')
             else
                 legend off
             end
@@ -228,18 +270,18 @@ for feat=1:length(testlist)
 
             
             
-            binstepsize=(maxs(feat)-mins(feat))/binsteps;
+            %binstepsize=(maxs(feat)-mins(feat))/binsteps;
             %binstepsize=roundn(binstepsize,floor(log10(binstepsize)));
 
-            binmin=floor(mins(feat)/binstepsize)*binstepsize;
-            binmax=ceil(maxs(feat)/binstepsize)*binstepsize;
+            %binmin=floor(mins(feat)/binstepsize)*binstepsize;
+            %binmax=ceil(maxs(feat)/binstepsize)*binstepsize;
 
-            binedges=[binmin:binstepsize:binmax];
+            %binedges=[binmin:binstepsize:binmax];
 
 
-            logbins=(logbase.^(0:1/(length(binedges)-1):1)-1)/(logbase-1);
+            %logbins=(logbase.^(0:1/(length(binedges)-1):1)-1)/(logbase-1);
 
-            logbinedges=(binmax-binmin)*logbins;
+            %logbinedges=(binmax-binmin)*logbins;
 
             labeledges=cell(size(binedges));
             labelskip=1;
@@ -266,19 +308,21 @@ for feat=1:length(testlist)
             nonsbinc=histc(abs(nonvals),binedges);     
 
             bincs=[sigsbinc;nonsbinc;negsbinc];
+            %bincs=[sigsbinc;zeros(size(sigsbinc));negsbinc];
             bincs=(bincs./ repmat(sum(bincs,1),3,1))*0.2
 
+            upedge=1.25
             ycoords=cumsum(bincs,1);
             
             for h=1:length(binedges)-1
                 if bincs(1,h) > 0
-                    rectangle('Position', [binedges(h), -ycoords(1,h), binedges(h+1)-binedges(h), bincs(1,h)], 'FaceColor','g')
+                    rectangle('Position', [binedges(h), upedge-ycoords(1,h), binedges(h+1)-binedges(h), bincs(1,h)], 'FaceColor','g')
                 end
                 if bincs(2,h) > 0
-                    rectangle('Position', [binedges(h), -ycoords(2,h), binedges(h+1)-binedges(h), bincs(2,h)], 'FaceColor','y')
+                    rectangle('Position', [binedges(h), upedge-ycoords(2,h), binedges(h+1)-binedges(h), bincs(2,h)], 'FaceColor','y')
                 end
                 if bincs(3,h)
-                    rectangle('Position', [binedges(h), -ycoords(3,h), binedges(h+1)-binedges(h), bincs(3,h)], 'FaceColor','r')
+                    rectangle('Position', [binedges(h), upedge-ycoords(3,h), binedges(h+1)-binedges(h), bincs(3,h)], 'FaceColor','r')
                 end
             end
 
@@ -293,7 +337,7 @@ for feat=1:length(testlist)
         for testtype=0:1
             subplot(3,2,2*comparisoncount-1+testtype);
             %axis([0,maxs(feat),-0.2,1]);
-            axis([0,xmaxval(testtype+1),-0.2,1]);
+            axis([0,xmaxval(testtype+1),0,1.25]);
         end
     end
 
@@ -304,5 +348,5 @@ for feat=1:length(testlist)
     
     
     %waitforbuttonpress
-    export_fig('-painters','-r600','-q101',['results/figures/pair_evaluations_for_feature_',num2str(feat),'.pdf'])
+    export_fig('-painters','-r600','-q101',['results/figures/pair_evaluations_for_feature_',num2str(feat),'_fixed_logistics.pdf'])
 end
