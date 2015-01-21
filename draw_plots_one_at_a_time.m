@@ -109,7 +109,7 @@ for feat=1:length(testlist)
 
             handbookcurves{feat}={z,x}; 
 
-            handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
+            %handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
 
 
             srvals=sort(vals);
@@ -228,18 +228,18 @@ for feat=1:length(testlist)
 
             
             
-            %binstepsize=(maxs(feat)-mins(feat))/binsteps;
+            binstepsize=(maxs(feat)-mins(feat))/binsteps;
             %binstepsize=roundn(binstepsize,floor(log10(binstepsize)));
 
-            %binmin=floor(mins(feat)/binstepsize)*binstepsize;
-            %binmax=ceil(maxs(feat)/binstepsize)*binstepsize;
+            binmin=floor(mins(feat)/binstepsize)*binstepsize;
+            binmax=ceil(maxs(feat)/binstepsize)*binstepsize;
 
-            %binedges=[binmin:binstepsize:binmax];
+            binedges=[binmin:binstepsize:binmax];
 
 
-            %logbins=(logbase.^(0:1/(length(binedges)-1):1)-1)/(logbase-1);
+            logbins=(logbase.^(0:1/(length(binedges)-1):1)-1)/(logbase-1);
 
-            %logbinedges=(binmax-binmin)*logbins;
+            logbinedges=(binmax-binmin)*logbins;
 
             labeledges=cell(size(binedges));
             labelskip=1;

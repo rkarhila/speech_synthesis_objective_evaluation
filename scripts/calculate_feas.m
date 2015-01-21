@@ -25,8 +25,12 @@ end
 if (CACHE_FEATURES == 1)
     cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
     if exist([cachefilename,'.mat'], 'file')
-        feas_test = parload(cachefilename);
-        itsok=1;
+        try
+            feas_test = parload(cachefilename);
+            itsok=1;
+        catch
+            itsok=0;
+        end
     end
 end
 
@@ -59,9 +63,15 @@ if itsok~=1
                 stfilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.straight-spec'];
 
                 if exist([stfilename,'.mat'], 'file')
-                    feas_test = parload(stfilename);
-                    
-                else                                       
+                    try
+                        feas_test = parload(stfilename);
+                        itsok=1;
+                    catch
+                        itsok=0;
+                    end
+                end
+                
+                if itsok~=1
                     [f0raw,~,analysisParams]=exstraightsource(test_audio,fs,prm);
                     [feas,analysisParamsSp]=exstraightspec(test_audio,f0raw,fs,prm);
                     

@@ -41,13 +41,27 @@ testlist{ind}= 'PESQ Wideband MOS LQ0';
 
 disp(testlist)
 
+if ~exist('tests','var')
+    tests=cell(6,1);
 
-evaluate_test_2008;
-evaluate_test_2009;
-evaluate_test_2010;
-%evaluate_test_2011;
-%evaluate_test_2012;
-%evaluate_test_2013;
+    evaluate_test_2008;
+    tests{1}=tests2008;
+
+    evaluate_test_2009;
+    tests{2}=tests2009;
+
+    evaluate_test_2010;
+    tests{3}=tests2010;
+
+    evaluate_test_2011;
+    tests{4}=tests2011;
+
+    evaluate_test_2012;
+    tests{5}=tests2012;
+
+    evaluate_test_2013;
+    tests{6}=tests2013;
+end
 
 
 %
@@ -55,8 +69,6 @@ evaluate_test_2010;
 %   Similarity and naturalness for all test data.
 %
 %
-
-tests={tests2008, tests2009, tests2010, tests2011, tests2012,  tests2013};
 
 sim=tests{1}{1}.scores(:,7);
 nat=tests{1}{2}.scores(:,7);
@@ -136,9 +148,9 @@ comparisontypeslist={ {'All systems', 1:3 }, ...
                       {'Unit selection systems only', 1}, ...
                       {'HMM-systems only',2}  };
 
-res = { struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}},'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}} ), ...
-        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}},'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}} ), ...
-        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}},'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}} ) };
+res = { struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ), ...
+        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ), ...
+        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ) };
 
                   
 for comparisoncount=1:3                      
@@ -155,8 +167,9 @@ for comparisoncount=1:3
             t=tests{p}{r};
 
             disp(['test ',num2str(2007+p),' ',comparisontypeslist{comparisoncount}{1}]);
-            [sigs,nons]=get_significance_distances_by_systemtype(t.name,t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
+            [sigs, nons, correlations_sys, bestguesscorrect] = get_significance_distances_by_systemtype(t.name,t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
 
+            
             for comparisontype=comparisontypes
 
                 if t.testtype == 'sim'
@@ -164,11 +177,22 @@ for comparisoncount=1:3
                     res{comparisoncount}.simnons{n}=nons{comparisontype};
                     res{comparisoncount}.simsigs{n}=sigs{comparisontype};
                     res{comparisoncount}.simspeakers{n}=t.speaker;
+                    
+                    disp(['From sim results:'])
+                    correlations_sys{comparisontype}
+                    res{comparisoncount}.simperformances{n}=correlations_sys{comparisontype};
+                    
+                    res{comparisoncount}.simbest{n}=bestguesscorrect{comparisontype};
+                    
                 else
                     m=m+1;
                     res{comparisoncount}.natnons{m}=nons{comparisontype};
                     res{comparisoncount}.natsigs{m}=sigs{comparisontype};          
                     res{comparisoncount}.natspeakers{m}=t.speaker;
+                    
+                    res{comparisoncount}.natperformances{m}=correlations_sys{comparisontype};
+
+                    res{comparisoncount}.natbest{m}=bestguesscorrect{comparisontype};
                 end
             end
         end
@@ -220,10 +244,53 @@ for comparisoncount=1:3
     res{comparisoncount}.natmaxs=maxs;   
     
     
-    res{comparisoncount}.natperformances=zeros(length(featlist),20);    
-    res{comparisoncount}.simperformances=zeros(length(featlist),20);    
+    %res{comparisoncount}.natperformances=zeros(length(testlist),20);    
+    %res{comparisoncount}.simperformances=zeros(length(testlist),20);    
         
 end
 
+
+natcorr=zeros(comparisoncount,ind);
+simcorr=zeros(comparisoncount,ind);
+
+for comparisoncount=1:3
+   natcorrs=zeros(ind,length(res{comparisoncount}.natperformances));
+   for i=1:length(res{comparisoncount}.natperformances)              
+       natcorrs(:,i)=res{comparisoncount}.natperformances{i};       
+   end
+   natcorrs(natcorrs==0)=nan;
+   natcorr(comparisoncount,:)=nanmean(natcorrs,2);
+
+   simcorrs=zeros(ind,length(res{comparisoncount}.simperformances));
+   for i=1:length(res{comparisoncount}.simperformances)              
+       simcorrs(:,i)=res{comparisoncount}.simperformances{i};       
+   end
+   simcorrs(simcorrs==0)=nan;
+   simcorr(comparisoncount,:)=nanmean(simcorrs,2);
+
+end
+abs(natcorr)
+abs(simcorr)
+
+
+natbest=zeros(ind,comparisoncount);
+simbest=zeros(ind,comparisoncount);
+
+
+for comparisoncount=1:3
+   natbests=zeros(ind,length(res{comparisoncount}.natbest));
+   for i=1:length(res{comparisoncount}.natbest)              
+       natbests(:,i)=res{comparisoncount}.natbest{i};       
+   end
+   natbest(:,comparisoncount)=mean(natbests,2);
+   
+   simbests=zeros(ind,length(res{comparisoncount}.simbest));
+   for i=1:length(res{comparisoncount}.simbest)              
+       simbests(:,i)=res{comparisoncount}.simbest{i};       
+   end
+   simbest(:,comparisoncount)=mean(simbests,2);
+   
+   
+end
 
 

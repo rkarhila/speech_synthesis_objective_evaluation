@@ -174,15 +174,18 @@ parfor i=1:length(systems)
                         try
                             if gausstypes{j0}=='diag'
                                 gmm_model_set=gmmb_em_d(test_data_sys,'components',num_components);
-                                tries=5;
+                                disp(['Done in ',num2str(tries),' tries! System: ', systems(i), ' ', gausstypes{j0}, ' covariance, ', num2str(num_components), ' components']);
+                                tries=gauss_retr{1};
                             else
                                 gmm_model_set=gmmb_em(test_data_sys,'components',num_components);                       
-                                tries=5;
+                                disp(['Done in ',num2str(tries),' tries! System: ', systems(i), ' ', gausstypes{j0}, ' covariance, ', num2str(num_components), ' components']);                               
+                                tries=gauss_retr{1};
                             end
                         catch me
                             tries=tries+1;
+                            disp(['Retrying ',num2str(tries),' tries! System: ', systems(i), ' ', gausstypes{j0}, ' covariance, ', num2str(num_components), ' components']); 
                             if tries==gauss_retr{1}
-                                error('foo!');
+                                error(['Singular gaussian! System: ', systems(i), ' ', gausstypes{j0}, ' covariance, ', num2str(num_components), ' components']);
                             end
                         end
                     end
