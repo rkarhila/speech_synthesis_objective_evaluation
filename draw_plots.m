@@ -23,7 +23,7 @@ handbookcurves = cell(1,size(simsigs{1},1));
 
 %%%% For all feats! 
 
-%for feat=[2,12,38,50] 
+
 for feat=1:length(testlist)
 
     clf

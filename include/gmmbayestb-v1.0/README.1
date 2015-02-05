@@ -1,1 +1,12 @@
-Get gmm-bayes-toolbox from somewhere and put it here; And then patch it!
+## GMMBAYES toolbox
+
+#  Get the source from here:
+
+http://www.it.lut.fi/project/gmmbayes/downloads/src/gmmbayestb/gmmbayestb-v1.0.tar.gz
+
+
+# Apply the patch to enable diagonal covariance Gaussian training:
+
+cp gmmb_em.m gmmb_em_d.m
+patch gmmb_em_d.m < diagonal_covar.patch
+

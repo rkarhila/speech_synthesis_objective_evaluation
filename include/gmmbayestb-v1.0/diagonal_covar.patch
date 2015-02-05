@@ -1,0 +1,66 @@
+--- gmmb_em.m	2005-04-14 13:46:03.000000000 +0300
++++ gmmb_em_d.m	2015-02-05 15:40:17.054754000 +0200
+@@ -69,7 +69,7 @@
+ %
+ 
+ 
+-function [estimate, varargout] = gmmb_em(data, varargin);
++function [estimate, varargout] = gmmb_em_d(data, varargin);
+ 
+ % default parameters
+ conf = struct(...
+@@ -120,6 +120,11 @@
+ 	    ' points.']);
+ end
+ 
++% Set a variance floor of 2% of channel variation for the diagonal:
++varFloor=var(data)/50;
++disp(['min (varFloor) = ',num2str(min(varFloor))]);
++
++
+ switch lower(conf.init)
+ 	case 'fcm1'
+ 		initS = gmmb_em_init_fcm1(data, C, conf.verbose);
+@@ -131,13 +136,12 @@
+ 		error(['Unknown initializer method: ' conf.init]);
+ end
+ 
+-
+ if any(initS.weight == 0)
+ 	error('Initialization produced a zero weight.');
+ end
+ 
+ mu = initS.mu;
+-sigma = initS.sigma;
++sigma = max(initS.sigma,repmat(diag(varFloor),[1,1,C]));
+ weight = initS.weight;
+ 
+ 
+@@ -158,8 +162,9 @@
+ 	pcompx = tulo ./ (sum(tulo,2)*ones(1,C));
+ 	
+ 	if ~all( isfinite(pcompx(:))  )
+-		error('Probabilities are no longer finite.');
+-	end
++        disp([min(varFloor),min(min(min(sigma(:)))), min(min(min(diag(sigma(:))))), max(max(max(sigma(:)))), max(max(max(diag(sigma(:)))))]);
++        error('Probabilities are no longer finite. (Diag cov)');        
++    end
+ 	
+ 	for c = 1:C
+ 		% calculate new estimates
+@@ -175,10 +180,12 @@
+ 		% covariance
+ 		moddata = (data - ones(N,1)*(nmu.')) .* (sqrt(pcompx(:,c))*ones(1,D));
+ 		% sqrt(pcompx) is because it will be squared back
+-		nsigma = (moddata' * moddata) ./ psum;
+-		
++		sigma(:,:,c) = diag(diag((moddata' * moddata) ./ psum));
++		fixerloops(1,c)=0;
++        sigma(:,:,c) = max(sigma(:,:,c), diag(varFloor));
++        
+ 		% covariance matrix goodness assurance
+-		[sigma(:,:,c), fixerloops(1,c)] = gmmb_covfixer(nsigma);
++		%[sigma(:,:,c), fixerloops(1,c)] = gmmb_covfixer(nsigma);
+ 		% covfixer may change the matrix so that log-likelihood
+ 		% decreases. So, if covfixer changes something,
+ 		% disable the stop condition. If going into infinite
