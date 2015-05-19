@@ -1,18 +1,76 @@
 
-function feas_test = calculate_feas(testfile, analysismethod, distmethod, usevad, usedelta)
-%
-% spec_method options straight, fft
-% test_feature_domain options log-mel, mel-cep 
+function feas_test = calculate_feas(testfile, analysisfunction, distfunction, usevad, usedelta)
 
+% Get the usual variables - Why haven't I set them global?
 local_conf
-
-
-
 
 
 [audiofilepath,audiofilename,audiofilext]=fileparts(testfile);
 speakercode=regexprep( audiofilepath, '[^a-zA-Z0-9-_]', '_');
-%disp(testfilename);
+
+
+%
+% Such a complicated procedure! Some of the features are tedious to
+% compute, so we like to cache them in files. That's why the two-line
+% process to do the analysis is surrounded by mumbo-jumbo related to file
+% names etc.
+%
+
+itsok=0;
+
+if (CACHE_FEATURES == 1)
+    %
+    % Make some nice name for the feature to be cached
+    %
+    analysismethod=analysisfunction();
+    cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod];
+    
+    %
+    % Check if it exists and load from file if so.
+    %
+    if exist([cachefilename,'.mat'], 'file')
+        try
+            feas_test = parload(cachefilename);
+            itsok=1;
+        catch
+            itsok=0;
+        end
+    end
+end
+
+if itsok~=1
+
+    % Prepare audio (load file, downsample, pass through VAD etc)
+    %
+    [test_audio,nr_frames_test,vad_limits,speech_frames]=prepare_audio(testfile);
+    
+    % Call the analysis function passed from obj_evaluation.m:
+    %    
+    feas_test = analysisfunction(test_audio,nr_frames_test, speech_frames);
+    
+    % And we're done!
+    %
+    
+end
+
+if (CACHE_FEATURES == 1)    
+    % Was it time-consuming? Maybe.
+    % Let's save our features for possible future use.
+    %
+    parsave(cachefilename, feas_test);
+end    
+
+
+
+
+if (1 == 3) 
+
+    %
+    % Slowly get rid of the code below, by moving to "analysis_..."-
+    % function files!
+    %
+    %
+    %
 
 itsok=0;
 
@@ -21,7 +79,12 @@ if (usedelta == 1);
 else
     deltatag = '';
 end
-    
+
+
+
+
+
+
 if (CACHE_FEATURES == 1)
     cachefilename=[LOCAL_FEATDIR,speakercode,'_',audiofilename,'.',analysismethod,'_',distmethod,deltatag];
     if exist([cachefilename,'.mat'], 'file')
@@ -215,3 +278,4 @@ if itsok~=1
 
 end
 
+end

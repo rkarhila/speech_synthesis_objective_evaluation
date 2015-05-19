@@ -1,5 +1,11 @@
 function [ distmap ]=make_dist_map(feas_test,feas_ref,ds_type)
 
+
+distmap=ds_type(feas_test,feas_ref);
+
+if (1 == 3)
+
+
 local_conf
 
 % Tidy wav files (remove silence from beginning and end)
@@ -179,3 +185,4 @@ end
                         
 
 
+end

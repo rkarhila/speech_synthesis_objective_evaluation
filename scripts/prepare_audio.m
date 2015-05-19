@@ -1,4 +1,4 @@
-function [audio,framecount,vadlimits,speech_frames] = prepare_audio(audiofile, varargin)
+function [audio,framecount,vadlimits,speech_frames] = prepare_audio(varargin)
 % PREPARE_AUDIO  Load and normalise audio and apply VAD
 %   [B,FRAMECOUNT,VADLIMITS] = PREPARE_AUDIO(A) loads wav file, normalises 
 %               and applies voice activity detection based on signal power
@@ -9,6 +9,8 @@ function [audio,framecount,vadlimits,speech_frames] = prepare_audio(audiofile, v
 
 % Load local variables
 local_conf
+
+audiofile=varargin{1}
 
 
 % Load audio & resample if necessary
@@ -47,14 +49,13 @@ vadmask=(audio_short>max(audio_short)-30) & audio_short>-55;
 % Check if we have audio cropping given as parameter of if we have to
 % calculate is ourselves.
 
-if (length(varargin)==1)
+if (length(varargin)==2)
     
     disp('We are in a wrong place in prepare_audio.m, as this bit of code is not ready yet');
     
     vadlimits=varargin;
     speech_frames=vadmask(varargin); % What is this supposed to do?
  
-    
     
 else
     

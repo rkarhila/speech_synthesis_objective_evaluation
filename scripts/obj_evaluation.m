@@ -88,7 +88,8 @@ par_gaussians=cell(length(systems),1);
 disp('Train or load GMMs');
 
 % (use parallel for if available)
-parfor i=1:length(systems)
+%par
+for i=1:length(systems)
       
     par_gaussians{i}=cell(length(gauss_tests),1);
     
@@ -206,7 +207,8 @@ disp('Evaluate the GMMs')
 % Initialise the list of sentencepair distances:
 
 
-parfor y=1:length(gauss_tests)
+%par
+for y=1:length(gauss_tests)
 
     gmmres=zeros(length(testfilelist),1);
 
@@ -266,7 +268,8 @@ disp(gmm_results_all)
 %%%
 
 
-parfor i=1:length(testfilelist)
+%par
+for i=1:length(testfilelist)
 
     % Examine the file we will test:
     % Extract system code to save in the right place
@@ -290,7 +293,7 @@ parfor i=1:length(testfilelist)
         %spec_and_distmethod=mapmethods{y};
         %specmethod=spec_and_distmethod{1};
         %distmethod=spec_and_distmethod{2};
-        mapmethod=[specmethod,'_',distmethod];
+        mapmethod=[specmethod(),'_',distmethod()];
         
         mapname=[mapdirectory,speakercode,testfilename,'_',mapmethod,'_norm.map'];
         
@@ -298,8 +301,8 @@ parfor i=1:length(testfilelist)
             distmap=parload(mapname);
             distmaps.(mapmethod)=distmap;
         else
-            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, distmethod,usevad, 0);
-            test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,distmethod,usevad, 0);
+            ref_feat=calculate_feas([filepath,reffilelist{i}], specmethod, usevad, 0);
+            test_feat=calculate_feas([filepath,testfilelist{i}], specmethod,usevad, 0);
 
             distmap=make_dist_map(test_feat.features,ref_feat.features, distmethod);
             distmaps.(mapmethod)=distmap;
@@ -326,7 +329,7 @@ parfor i=1:length(testfilelist)
         specmethod=spec_and_distmethod{1};
         distmethod=spec_and_distmethod{2};   
 
-        mapmethod=[specmethod,'_',distmethod];
+        mapmethod=[specmethod(),'_',distmethod()];
 
         [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
             dpfast(distmaps.(mapmethod),step_matrix,1);      
@@ -338,7 +341,7 @@ parfor i=1:length(testfilelist)
         specmethod=spec_and_distmethod{1};
         distmethod=spec_and_distmethod{2};   
 
-        pathmethod=[specmethod,'_',distmethod];
+        pathmethod=[specmethod(),'_',distmethod()];
         
         pathmap=distmaps.(pathmethod);
         pathcost=0;
@@ -378,7 +381,8 @@ if USE_PESQ == 1;
     %
     pesq_results_all=zeros(length(testfilelist),length(pesq_tests));
 
-    parfor i=1:length(testfilelist)    
+    %par
+    for i=1:length(testfilelist)    
 
         pesqref=prepare_audio([filepath,reffilelist{i}],'use_vad',usevad);
         pesqtest=prepare_audio([filepath,testfilelist{i}],'use_vad',usevad);

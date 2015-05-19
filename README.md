@@ -68,6 +68,9 @@ extensible.
   * **obj_evaluation.m:** processes first the ** *non-invasive
     tests* ** (ie. GMM):
     * Feature extraction for synthetic speech: **calculate_feas.m**
+      * **prepare_audio.m** uses simple voice activity detection to
+        find the speech frames, and calls the feature extraction and
+        analysis functions.
     * GMM training: **gmmb_em_d.m** and **gmmb_em.m**
     * GMMs are stored in a struct *par_gaussians*
   * Then ** *invasive tests* **
@@ -77,7 +80,7 @@ extensible.
     * Calculation of error along path
   * Then PESQ with **pesqbin.m**
 3. **evaluate_test_20nn.m** also calls **evaluate_wilcoxon.m:**
-
+  * 
 ## Some notes on the data: ##
 
 Developed and tested on the data released in ISCA SynSIG 
