@@ -3,43 +3,8 @@ local_conf;
 % Figurecounter
 fc=100;
 
-% How many tests do we do?
-testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps);
-% Make a list of file pair distances, initialise to zero:
-testlist=cell(testcount,1);
-ind=1
-for y=1:length(mapmethods)
-spec_and_distmethod=mapmethods{y};
-mapspec=spec_and_distmethod{1};
-mapdist=spec_and_distmethod{2};
-for z=1:length(mapmethods)
-spec_and_distmethod=mapmethods{z};
-pathspec=spec_and_distmethod{1};
-pathdist=spec_and_distmethod{2};
-testlist{ind} = ...
-['map: ',mapspec,'-',mapdist,', path:',pathspec,'-',pathdist];
-ind=ind+1;
-end
-end
-for y=1:length(gaussmethods)
-spec_and_distmethod=gaussmethods{y};
-featspec=spec_and_distmethod{1};
-featdist=spec_and_distmethod{2};
-for j0=1:length(gausstypes)
-for z=1:length(gausscomps{j0})
-testlist{ind} =...
-['feat: ',featspec,'-',featdist,', ',gausstypes{j0},' covariance, gausscomp:',num2str(gausscomps{j0}(z))];
-ind=ind+1;
-end
-end
-end
-testlist{ind}= 'PESQ Narrowband MOS';
-ind=ind+1;
-testlist{ind}= 'PESQ Narrowband MOS LQ0';
-ind=ind+1;
-testlist{ind}= 'PESQ Wideband MOS LQ0';
 
-disp(testlist)
+    
 
 if ~exist('tests','var')
     tests=cell(6,1);
@@ -249,9 +214,10 @@ for comparisoncount=1:3
         
 end
 
+ind=length(testlist);
 
-natcorr=zeros(comparisoncount,ind);
-simcorr=zeros(comparisoncount,ind);
+natcorr=zeros(comparisoncount,length(testlist));
+simcorr=zeros(comparisoncount,length(testlist));
 
 for comparisoncount=1:3
    natcorrs=zeros(ind,length(res{comparisoncount}.natperformances));

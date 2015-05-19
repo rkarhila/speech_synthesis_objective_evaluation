@@ -4,15 +4,12 @@
 
 local_conf
 
-% How many tests2011 do we do?
 
-testcount=length(mapmethods)^2 + length(gaussmethods)*length(gausscomps);
-
-% Make a list of file pair distances, initialise to zero:
-
-if (matlabpool('size') == 0)
-    matlabpool
+if (isempty(gcp('nocreate')))
+    parpool;
 end
+   
+
 
 tests2011={ ...
     struct( ...  
@@ -51,8 +48,11 @@ tests2011={ ...
     
 for n=1:length(tests2011)
     if exist(tests2011{n}.objective_resultfile, 'file') == 0;   
-        [ objdata, test_runtime, testlist] = obj_evaluation(BLIZZARD2011_RESULTDIR, tests2011{n}.reffilelist,tests2011{n}.testfilelist,...
-            mapmethods,  gaussmethods, gausscomps, tests2011{n}.sentencesperspeaker);
+        [ invasive_measure_result, non_invasive_measure_result, pesq_result, test_runtime] = ...
+            obj_evaluation(BLIZZARD2011_RESULTDIR, tests2011{n}.reffilelist,tests2011{n}.testfilelist);
+
+        objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
+
         save(tests2011{n}.objective_resultfile, 'objdata','-ascii');
         tests2011{n}.results=objdata;
     else      

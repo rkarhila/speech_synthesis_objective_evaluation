@@ -16,6 +16,7 @@
 
 function [goodness] = evaluate_wilcoxon(objective_scores, subjective_scores, opinion_matrix, systems, drawimage)
 
+local_conf;
 
 listeningmeans=subjective_scores;
 refmat=opinion_matrix;
@@ -26,9 +27,7 @@ invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 syscount=length(systems);
 featcount=size(refscores,2);
 
-testlen=length(subjective_scores);
-
-testlen=size(objective_scores,1)/length(systems)
+testlen=size(objective_scores,1)/length(systems);quit
 
 bigp=cell(size(refscores,2),1);
 machinemeans=zeros(syscount,featcount);
@@ -85,9 +84,10 @@ end
 % 3 - No difference
 
 
-% plot with different p-values:
-plotfeat=3
-clf;
+if (drawimage > 0)
+    figure(60001)
+end
+
 for pval=[0.05]
     %results=zeros(featcount,13);
     results=zeros(featcount,7);
@@ -155,27 +155,40 @@ for pval=[0.05]
         directionhit = sum(sum( triu(refmat==  1) .* (directionmatch==1) ) ) / sum(sum(triu(refmat==  1) ) ) ;
         
         
-        
+        %
+        % Fill the confusion matrix... But how did I do this?
+        % 
+
+
+        %
+        % Case 1: System A better in subjective tests:
+        % 
         confmatr(1,1,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
         confmatr(1,2,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
         confmatr(1,3,feat) = sum(sum( triu((sign(betters)==  1) .* (refmat==  1) .* (pmat==  0)  )));
     
+        %
+        % Case 2: System B better in subjective tests:
+        %
+
         confmatr(2,1,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (sign(machinebetters{feat})==  1) .* (pmat==  1)  )));
         confmatr(2,2,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (sign(machinebetters{feat})== -1) .* (pmat==  1)  )));
         confmatr(2,3,feat) = sum(sum( triu((sign(betters)== -1) .* (refmat==  1) .* (pmat==  0)  )));
         
+        %
+        %  Case 3: No significant difference in subjective tests:
+        %
         confmatr(3,1,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  1) .*  (pmat==1)  )));
         confmatr(3,2,feat) = sum(sum( triu((refmat==0)  .* (sign(betters)==  -1) .*  (pmat==1) )));
         confmatr(3,3,feat) = sum(sum( triu((refmat== 0) .* (pmat== 0 )  )));
         
-        %disp([num2str(pval),', ',num2str(feat),': error: ',num2str(sum(abs(pmat(:)-refmat(:))))]);
-        
-        %results(feat,:)=[pval feat critical_errorssum bad_errorssum missing_errorssum minor_errorssum false_negativesum false_positivesum correctsum accuracy precision recall f1score];
         results(feat,:)=[pval feat accuracy precision recall f1score directionhit];
         
-%        if feat == plotfeat
-
         if drawimage==feat
+
+            %%%
+            %%%%  Some fun with image drawing! 
+            %%%%%
 
             clf
             subplot(1,4,1)
@@ -226,7 +239,7 @@ for pval=[0.05]
             axis([0 length(systems)+1 0 length(systems)+1])
 
             %pmat=zeros(syscount,syscount);pmat(bigp{feat}<pval)=1;pmat=pmat.*invdiag;imagesc(1-pmat)
-            title(['candidate feat: ',num2str(feat),', pval: ',num2str(pval)])
+            title([testlist{feat}.name,', pval: ',num2str(pval)])
             
             set(gca,'ytick',[1:1:length(systems)],'yticklabel',labelsystems)            
             set(gca,'xtick',[1:1:length(systems)],'xticklabel',labelsystems)
@@ -288,12 +301,43 @@ for pval=[0.05]
             end
             
             subplot(1,4,4)
-            c=confmatr(:,:,feat);
-            
-            lab={'A->B','B->A', 'A->C','B->C','C->A','C->B'};
-            ct=sum(c,2)./3;
-            %radarplot( [c(1,2)/ct(1),  c(2,1)/ct(2),  c(1,3)/ct(1),  c(2,3)/ct(2),  c(3,1)/ct(3),  c(3,2)/ct(3) ; ones(1,6)/3  ],lab);
-            radarplot( [c(1,2),  c(2,1),  c(1,3),  c(2,3),  c(3,1),  c(3,2) ; ct(1),ct(2),ct(1),ct(2),ct(3),ct(3)  ],lab);
+            conf=confmatr(:,:,feat);
+                        %radarplot( [c(1,2),  c(2,1),  c(1,3),  c(2,3),  c(3,1),  c(3,2) ; ct(1),ct(2),ct(1),ct(2),ct(3),ct(3)  ],lab);
+    
+            %%%
+            %%% From http://stackoverflow.com/questions/3942892/how-do-i-visualize-a-matrix-with-colors-and-values-displayed
+            %%%
+
+            imagesc(conf);
+            colormap(flipud(gray));
+
+            textStrings = num2str(conf(:),'%i');  %# Create strings from the matrix values
+
+            textStrings = strtrim(cellstr(textStrings));  %# Remove any space padding
+
+            [x,y] = meshgrid(1:3);   %# Create x and y coordinates for the strings
+
+            hStrings = text(x(:),y(:),textStrings(:),...      %# Plot the strings
+                            'HorizontalAlignment','center');
+
+
+            midValue = mean(get(gca,'CLim'));  %# Get the middle value of the color range
+            textColors = repmat(conf(:) > midValue,1,3);  %# Choose white or black for the
+                                                         %#   text color of the strings so
+                                                         %#   they can be easily seen over
+                                                         %#   the background color
+            set(hStrings,{'Color'},num2cell(textColors,2));  %# Change the text colors
+
+
+            set(gca,'XTick',1:3,...                         %# Change the axes tick marks
+                    'XTickLabel',{'A better','B better','No diff'},...  %#   and tick labels
+                    'YTick',1:3,...
+                    'YTickLabel',{'A better','B better','No diff'}, ...
+                    'YTickLabelRotation',90, ...
+                    'TickLength',[0 0]);
+            xlabel( 'Objective measure');
+            ylabel( 'Subjective measure');
+            title('Confusion matrix');
             
         
         end

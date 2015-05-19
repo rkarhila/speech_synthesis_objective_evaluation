@@ -4,9 +4,11 @@
 
 local_conf
 
-if (matlabpool('size') == 0)
-    matlabpool
+
+if (isempty(gcp('nocreate')))
+    parpool;
 end
+   
 
 tests2010={ ...
     struct( ...  
@@ -269,8 +271,10 @@ tests2010={ ...
     
 for n=1:length(tests2010)
     if exist(tests2010{n}.objective_resultfile, 'file') == 0;   
-        [ objdata, test_runtime, testlist] = obj_evaluation(BLIZZARD2010_RESULTDIR, tests2010{n}.reffilelist,tests2010{n}.testfilelist,...
-            mapmethods,  gaussmethods, gausscomps, tests2010{n}.sentencesperspeaker);
+        [ invasive_measure_result, non_invasive_measure_result, pesq_result, test_runtime] = ...
+            obj_evaluation(BLIZZARD2010_RESULTDIR, tests2010{n}.reffilelist,tests2010{n}.testfilelist);
+
+        objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
         save(tests2010{n}.objective_resultfile, 'objdata','-ascii');
         tests2010{n}.results=objdata;
     else      
