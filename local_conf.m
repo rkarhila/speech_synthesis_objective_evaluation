@@ -22,11 +22,6 @@ USE_STRAIGHT        = 1;
 if USE_STRAIGHT == 1
     % Include the STRAIGHT script path:
     addpath /teamwork/t40511_asr/Modules/opt/STRAIGHT/V40_003
-    
-    prm.F0frameUpdateInterval  = 10;     
-    prm.F0searchUpperBound     = 450;            
-    prm.F0searchLowerBound     = 40;             
-    prm.spectralUpdateInterval = 10;      
 end
 
 
@@ -64,35 +59,63 @@ BLIZZARD2013_RESULTDIR = '/teamwork/t40511_asr/p/synthesis_/blizzard_results/bli
 %BLIZZARD2009_RESULTDIR = '/akulabra/projects/T40511/synthesis/blizzard_results/blizzard_wavs_and_scores_2009_release_version_1/'
 
 
-% Some basic parameters for the feature extraction methods:
 
-fs = 16000;
-frame_ms = 25;
-step_ms = 10 ; % Used to be 5 ms step
-    
-step_length=fs*step_ms/1000;
-frame_length=fs*frame_ms/1000;
+%
+%   Methods and parameters:
+%
 
 
-% MCEP-D
-spectrum_dim=1024;
-cep_dim = 13;
-mel_dim = 21;
+audio_preprosessing1.name='audio_preprosessing1';
+audio_preprosessing1.fs = 16000;
+audio_preprosessing1.vad_function = @simple_vad;
+audio_preprosessing1.function=@prepare_audio;
+audio_preprosessing1.frame_ms = 25;
+audio_preprosessing1.step_ms =  10;
 
-%FWS
-gamma1=0.2;
+fft_fws_distance1.name='fft_fws_distance1';
+fft_fws_distance1.analysisfunction=@analysis_fft_for_fwsnrseg;
+fft_fws_distance1.distancefunction=@dist_fwsnrseg; 
+fft_fws_distance1.fs = 16000;
+fft_fws_distance1.frame_ms = 25;
+fft_fws_distance1.step_ms =  10;
+fft_fws_distance1.spectrum_dim = 1024;
+fft_fws_distance1.cep_dim = 13;
+fft_fws_distance1.mel_dim = 21;
+fft_fws_distance1.gamma1 = 0.2;
 
-frame_rate = ceil(1000/step_ms);
-
-%mapmethods={ {'fft','snr'},...
-%             {'straight','snr'},...
-%             {'fft','mcd'}, ...
-%             {'straight','mcd'}, ...
-%             {'llr','llr',''}};
-
+straight_fws_distance1.name='fft_straight_distance1';
+straight_fws_distance1.analysisfunction=@analysis_straight_for_fwsnrseg;
+straight_fws_distance1.distancefunction=@dist_fwsnrseg; 
+straight_fws_distance1.F0frameUpdateInterval  = 10;  
+straight_fws_distance1.F0searchUpperBound     = 450;
+straight_fws_distance1.F0searchLowerBound     = 40;     
+straight_fws_distance1.spectralUpdateInterval = 10;   
+straight_fws_distance1.fs                     = 16000;
+straight_fws_distance1.gamma1                 = 0.2;
+straight_fws_distance1.mel_dim                = 21;
+straight_fws_distance1.spectrum_dim           = 1024;
 
 invasive_tests= { ...
-    struct('map_feature',{{@analysis_fft_for_fwsnrseg, @dist_fwsnrseg}}, 'path_feature',{{@analysis_fft_for_fwsnrseg, @dist_fwsnrseg}},       'name','Distortion: dtw map with fft-snr, path with fft-snr' ) };
+    struct('preprocessing', audio_preprosessing1, ...
+           'map_feature', fft_fws_distance1 , ...
+           'path_feature', fft_fws_distance1 , ...
+           'name','Distortion: dtw with fft-snr, path cost with fft-snr' ),...
+           ...
+    struct('preprocessing', audio_preprosessing1, ...
+           'map_feature', straight_fws_distance1 , ...
+           'path_feature', straight_fws_distance1 , ...
+           'name','Distortion: dtw with straight-snr, path cost with straight-snr' ),...           
+           ...
+    struct('preprocessing', audio_preprosessing1, ...
+           'map_feature', straight_fws_distance1 , ...
+           'path_feature', fft_fws_distance1 , ...
+           'name','Distortion: dtw with straight-snr, path cost with fft-snr' ),...            
+            ...
+    struct('preprocessing', audio_preprosessing1, ...
+           'map_feature', fft_fws_distance1 , ...
+           'path_feature', straight_fws_distance1 , ...
+           'name','Distortion: dtw with fft-snr, path cost with straight-snr' )...           
+           };
 
 
 % invasive_tests= { ...

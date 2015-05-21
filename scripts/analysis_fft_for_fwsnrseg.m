@@ -13,19 +13,30 @@ elseif nargin == 3
 
     local_conf
 
-   
-    test_audio = varargin{1};
-    nr_frames_test=varargin{2};
-    speech_frames=varargin{3};
+    audio_struct= varargin{1};
+    
+    test_audio = audio_struct.audio;
+    nr_frames_test=audio_struct.nr_frames_test;
+    speech_frames=audio_struct.speech_frames;
+    
+    params = varargin{2};
+
+    
+    filename = varargin{3}; % Not used for anything, as it is not judged 
+                            % worthy to cache fft results
+    
      
     %
     % 0. Get some useful variables:
     %    (could be pregenerated but aren't, guess why!)
     
-    fft_dim=spectrum_dim/2+1;
-    hamwin=hamming(frame_ms*fs/1000);
-    M = melbankm(mel_dim, spectrum_dim, fs, 0, 0.5, 'u');
-
+    fft_dim=params.spectrum_dim/2+1;
+    hamwin=hamming(params.frame_ms*params.fs/1000);
+    M = melbankm(params.mel_dim, params.spectrum_dim, params.fs, 0, 0.5, 'u');
+    
+    step_length=params.fs*params.step_ms/1000;
+    frame_length=params.fs*params.frame_ms/1000;    
+    
     %
     % 1. Do FFT:
     %
@@ -40,10 +51,10 @@ elseif nargin == 3
     spec_feas=spec_feas';
     
     %
-    % 2. Get *normalised* Mel-banks:
+    % 2. Get normalised and mel-weighted spectrum:
     %
     
-    feas_test=zeros(nr_frames_test,mel_dim);
+    feas_test=zeros(nr_frames_test,params.mel_dim);
     
     for i=1:nr_frames_test
         feas = spec_feas(:,i);
@@ -55,8 +66,8 @@ elseif nargin == 3
     %
     % Return a struct with info on the (probable) speech frames:
     %
-    
+ 
     returnable = struct('features',feas_test,'speech_frames',speech_frames);
 else
-    error('analysis_fft_for_fwsnrseg requires 0 or 3 arguments.')
+    error('analysis_fft_for_fwsnrseg requires 0 or 3 arguments (audio, parameters, filename).')
 end

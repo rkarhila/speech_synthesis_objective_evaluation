@@ -1,7 +1,22 @@
-function [ distmap ]=make_dist_map(feas_test,feas_ref,ds_type)
+function [ distmap ]=make_dist_map(feas_test,feas_ref,params)
 
 
-distmap=ds_type(feas_test,feas_ref);
+%
+%
+%
+%   OBSOLETE
+%
+%   WAITING FOR REMOVAL
+%
+%   2015/05/21 rk
+%
+feas_test
+
+feas_ref
+
+distmap=params.distancefunction(feas_test.features,feas_ref.features,params);
+
+
 
 if (1 == 3)
 

@@ -1,4 +1,4 @@
-function [audio,framecount,vadlimits,speech_frames] = prepare_audio(varargin)
+function [audiostruct] = prepare_audio(varargin)
 % PREPARE_AUDIO  Load and normalise audio and apply VAD
 %   [B,FRAMECOUNT,VADLIMITS] = PREPARE_AUDIO(A) loads wav file, normalises 
 %               and applies voice activity detection based on signal power
@@ -7,17 +7,21 @@ function [audio,framecount,vadlimits,speech_frames] = prepare_audio(varargin)
 %               start/end cutoff parameters.
 
 
-% Load local variables
-local_conf
 
-audiofile=varargin{1}
+%
+%  Too many things happen here and this is in need of cleaning!
+%
 
+
+audiofile=varargin{1};
+params=varargin{2};
+filename=varargin{3};
 
 % Load audio & resample if necessary
 [ audio , fs1 ] = audioread(audiofile);
 
-if ne(fs1, fs)
-    audio=resample(audio, fs, fs1);
+if ne(fs1, params.fs)
+    audio=resample(audio, params.fs, fs1);
 end
 
 audio=audio*(1/max(audio));
@@ -25,8 +29,8 @@ audio=audio*(1/max(audio));
 
 
 % Calculate frame size
-step_length=fs*step_ms/1000;
-frame_length=fs*frame_ms/1000;
+step_length=params.fs*params.step_ms/1000;
+frame_length=params.fs*params.frame_ms/1000;
 
 % Voice Activity Detection from
 % http://www.sciencedirect.com/science/article/pii/S0167639309001289
@@ -84,3 +88,15 @@ if (min(abs(audio))==0)
 end
 framecount=floor(((vadlimits(2)-vadlimits(1))-frame_length)/step_length);
 
+%
+% Late additions: Let's return a struct instead of massive amount of
+% variables.
+%
+
+nr_test_frames=sum(vadmask);
+
+audiostruct.audio = audio;
+audiostruct.framecount = framecount;
+audiostruct.vadlimits = vadlimits;
+audiostruct.speech_frames = speech_frames;
+audiostruct.nr_frames_test = nr_test_frames;

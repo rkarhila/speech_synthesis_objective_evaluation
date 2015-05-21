@@ -47,8 +47,12 @@ tests_devel={ ...
  
 for n=1:length(tests_devel)
     if exist(tests_devel{n}.objective_resultfile, 'file') == 0;   
-       [ invasive_measure_result, non_invasive_measure_result, pesq_result, test_runtime] = ...
-            obj_evaluation(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);
+%       [ invasive_measure_result, non_invasive_measure_result, pesq_result, test_runtime] = ...
+%            obj_evaluation(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);
+
+       [ invasive_measure_result, test_runtime] = ...
+            evaluate_with_invasive_measures(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);        
+        
 
         objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
         save(tests_devel{n}.objective_resultfile, 'objdata','-ascii');

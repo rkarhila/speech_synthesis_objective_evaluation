@@ -3,12 +3,15 @@ function [returnable] = dist_fwsnrseg(varargin)
 if nargin == 0
     returnable = 'fwSNRseg';
     
-elseif nargin == 2
+elseif nargin == 3
     local_conf;
     
-    feas_test=varargin{1};
-    feas_ref =varargin{2};
     
+    
+    feas_test = varargin{1};
+    feas_ref  = varargin{2};
+    
+    params = varargin{3};
 
     nr_frames_test=size(feas_test,1);
     nr_frames_ref=size(feas_ref,1);
@@ -36,7 +39,7 @@ elseif nargin == 2
             
             mel_norm_ref=max(feas_ref(j,:),exp(-700));
             
-            W1 = power(mel_norm_ref,gamma1);
+            W1 = power(mel_norm_ref,params.gamma1);
             S1 = 10*log10(power(mel_norm_ref,2)./power(mel_norm_ref-mel_norm_test,2)); % min: values below zero are unlikely, max: Inf
             S1 = max(min(S1,35),-10);
             cur_S1 = sum(sum(W1.*S1)./sum(W1));

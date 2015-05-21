@@ -1,4 +1,11 @@
 function [distortion_results_all, gmm_results_all, pesq_results_all , runtime]=obj_evaluation(filepath, reference_sent_list, test_sent_list)
+%
+%
+%  OBSOLETE 
+%  WAITING FOR REMOVAL
+%
+%  2015/05/21 rk
+%
 
 local_conf
 DEBUGGING=0;
@@ -194,7 +201,7 @@ end
 
 %%%
 %%%%
-%%%%%  Continuing: Invasive measures:
+%%%%%  Continuing: Non-invasive measures:
 %%%%%%
 %%%%%%%
 %%%%%% Calculate likelihood scores between ref gm model and the test sentence:
