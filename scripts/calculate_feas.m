@@ -1,6 +1,17 @@
 
 function feas_test = calculate_feas(testfile, analysisfunction, distfunction, usevad, usedelta)
 
+%
+%  OBSOLETE
+%
+%  WAITING FOR REMOVAL
+% 
+%  2015/05/21
+%
+
+
+
+
 % Get the usual variables - Why haven't I set them global?
 local_conf
 
