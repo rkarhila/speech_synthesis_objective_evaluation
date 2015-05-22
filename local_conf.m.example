@@ -95,6 +95,8 @@ straight_fws_distance1.gamma1                 = 0.2;
 straight_fws_distance1.mel_dim                = 21;
 straight_fws_distance1.spectrum_dim           = 1024;
 
+
+
 invasive_tests= { ...
     struct('preprocessing', audio_preprosessing1, ...
            'map_feature', fft_fws_distance1 , ...
@@ -117,7 +119,7 @@ invasive_tests= { ...
            'name','Distortion: dtw with fft-snr, path cost with straight-snr' )...           
            };
 
-
+       
 % invasive_tests= { ...
 %     struct('map_feature',{{'fft','snr'}}, 'path_feature',{{'fft','snr'}},       'name','Distortion: dtw map with fft-snr, path with fft-snr' ), ...
 %     struct('map_feature',{{'fft','snr'}}, 'path_feature',{{'straight','snr'}},  'name','Distortion: dtw map with fft-snr, path with straight-snr' ), ...    
@@ -155,7 +157,68 @@ invasive_tests= { ...
     %
     %};
 
-         
+
+fft_melbank1.name='fft_melbank_analysis';
+fft_melbank1.analysisfunction=@analysis_fft_melbank;
+fft_melbank1.fs = 16000;
+fft_melbank1.frame_ms = 25;
+fft_melbank1.step_ms =  10;
+fft_melbank1.spectrum_dim = 1024;
+fft_melbank1.cep_dim = 13;
+fft_melbank1.mel_dim = 21;
+fft_melbank1.usedelta = 1;
+
+
+straight_melbank1.name='straight_melbank_analysis';
+straight_melbank1.analysisfunction=@analysis_straight_melbank;
+straight_melbank1.fs = 16000;
+straight_melbank1.frame_ms = 25;
+straight_melbank1.step_ms =  10;
+straight_melbank1.spectrum_dim = 1024;
+straight_melbank1.cep_dim = 13;
+straight_melbank1.mel_dim = 21;
+straight_melbank1.usedelta = 1;
+
+
+fft_mfcc1.name='fft_mfcc_analysis';
+fft_mfcc1.analysisfunction=@analysis_fft_mfcc;
+fft_mfcc1.fs = 16000;
+fft_mfcc1.frame_ms = 25;
+fft_mfcc1.step_ms =  10;
+fft_mfcc1.spectrum_dim = 1024;
+fft_mfcc1.cep_dim = 13;
+fft_mfcc1.mel_dim = 21;
+fft_mfcc1.usedelta = 1;
+
+
+straight_mfcc1.name='straight_mfcc_analysis';
+straight_mfcc1.analysisfunction=@analysis_straight_mfcc;
+straight_mfcc1.fs = 16000;
+straight_mfcc1.frame_ms = 25;
+straight_mfcc1.step_ms =  10;
+straight_mfcc1.spectrum_dim = 1024;
+straight_mfcc1.cep_dim = 13;
+straight_mfcc1.mel_dim = 21;
+straight_mfcc1.usedelta = 1;
+
+gmm_diag_10_comp1.name='GMM_diagonal_10_comp';
+gmm_diag_10_comp1.cov_type='diag';
+gmm_diag_10_comp1.num_components=10;
+gmm_diag_10_comp1.trainfunction=@model_train_gmm;
+gmm_diag_10_comp1.testfunction=@model_test_gmm;
+gmm_diag_10_comp1.gauss_retr = 3;
+
+
+
+    
+non_invasive_tests = { ...       
+      struct('preprocessing', audio_preprosessing1, ...
+           'analysis', fft_melbank1 , ...
+           'modelling', gmm_diag_10_comp1 , ...
+           'name','GMM 10 comp diag. cov. of FFT based log-Mel banks' )};     
+
+    
+    
 %gaussmethods= { { 'straight', 'log-mel' }, ...
 %                { 'fft', 'log-mel'}, ...
 %                { 'straight', 'mcd' }, ...
@@ -166,7 +229,6 @@ invasive_tests= { ...
 %gausscomps={[10,30,50], [1,3,5]};        
 
 
-non_invasive_tests= { };
 %     struct('feature',{{'straight','log-mel'}}, 'cov_type','diag','num_comps',10,'name','GMM: feature straight-log-mel, diagonal covariance, 10 components'), ...
 %     struct('feature',{{'straight','log-mel'}}, 'cov_type','diag','num_comps',30,'name','GMM: feature straight-log-mel, diagonal covariance, 30 components'), ...
 %     struct('feature',{{'straight','log-mel'}}, 'cov_type','diag','num_comps',50,'name','GMM: feature straight-log-mel, diagonal covariance, 50 components'), ...
