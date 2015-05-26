@@ -1,4 +1,4 @@
-function [test_results, runtime] = evaluate_with_non_invasive_measures(filepath, reference_sent_list, test_sent_list )
+function [model_results_all, runtime] = evaluate_with_non_invasive_measures(filepath, reference_sent_list, test_sent_list )
 
 
 local_conf
@@ -66,13 +66,13 @@ testcount=length(testlist);
 %
 disp('Train or load GMMs');
 
-par_gaussians=cell(length(systems),1);
+par_modelsets=cell(length(systems),1);
 
 % (use parallel for if available)
 %par
 for i=1:length(systems)
       
-    par_gaussians{i}=cell(length(gauss_tests),1);
+    par_modelsets{i}=cell(length(gauss_tests),1);
     
     % For the Gaussian evaluation, we need to train the Gaussians for
     % The new system:
@@ -87,7 +87,7 @@ for i=1:length(systems)
         % Only construct the training feature vectors if the Gaussians
         % have not been generated yet
         test_data_sys=0;
-        test=non_invasive_tests{y}
+        test=non_invasive_tests{y};
                
         % Some not-so-clever caching of features:
         if ( ~strcmp(old_analysis_name,test.name) )
@@ -106,9 +106,11 @@ for i=1:length(systems)
         % train models if not done already
         % function [model, test_data_sys] = train_system_model(filepath,modelname,testfilenames, method, cached_test_data)
         
-        [gmm_model_set, test_data_sys] = train_system_model( filepath, modelname, testfilenames, test, test_data_sys  )
+        disp(['train ', modelname]);
         
-        par_gaussians{i}{y}=gmm_model_set;
+        [model_set, test_data_sys] = train_system_model( filepath, modelname, testfilenames, test, test_data_sys  );
+        
+        par_modelsets{i}{y}=model_set;
 
     end
     
@@ -129,145 +131,45 @@ end
 
 disp('Evaluate the GMMs')
 
+
 % Initialise the list of sentencepair distances:
+ 
+
+%
+% Make a cell of all the audio files for the reference speaker system:
+% (Should be the same set for all systems!)
 
 
-%par
-for y=1:length(gauss_tests)
+model_results_all=zeros(length(testfilelist), length(non_invasive_tests));
 
-    gmmres=zeros(length(testfilelist),1);
+for y=1:length(non_invasive_tests)
+
+    modelres=zeros(length(reffilelist),1);
 
     for u=1:filespersystem
-
-        % somehow get these numbers to fit all test files...
-
-        spec_and_distmethod=gauss_tests{y}.feature;
-        specmethod=spec_and_distmethod{1};
-        distmethod=spec_and_distmethod{2};   
-
-        % Again this line? Hope the feature is cached...
-        ref_feat=calculate_feas([filepath,reffilelist{u}], specmethod, distmethod,usevad, 1);
-
-        for i=1:length(systems)                               
+        ref_data_sys=0;    
+        
+        for i=1:length(systems)
 
             index=(i-1)*filespersystem+u;
+            
+            model=par_modelsets{i}{y};
 
-            %
-            % Why is this normalised with the length of test_feat?
-            %
-            %gmmres(i)= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{i}{y})+exp(-700)))/size(test_feat,1);
-            %
-            % Let's replace with:
-            gmmres(index)= -sum(log(gmmb_pdf(ref_feat.features(ref_feat.speech_frames,:), par_gaussians{i}{y})+exp(-700)))/size(ref_feat,1);
+            [result, ref_data_sys] = test_system_model( filepath,reffilelist{u}, model, test, ref_data_sys  );
 
-            if isnan(gmmres(i))
-                disp(['NaN! ', num2str(gmmb_pdf(ref_feat, par_gaussians{i}))]);
-            end
-            %disp ([gauss_tests{y}.name,': ', num2str(gmmres(i))]);
-            %gmmres(i);
-
+            modelres(index)=result;
+            
         end
-
-        %disp(['size(gmmres)=',num2str(size(gmmres))]);
-        
-        %disp(['size(gmm_results_all(:,y))',num2str(size(gmm_results_all(:,y)))]);
         
     end
 
-    gmm_results_all(:,y) =  gmm_results_all(:,y) + gmmres; % length(mapmethods)^2 + (y-1)*length(gausscomps{j0}) + j) = gmmres;
 
-end
-
-disp(gmm_results_all)
-
-
-
-%
-% Initialise the result array
-%
-distortion_results_all=zeros(length(testfilelist),length(dist_tests));
-
-
-
-tic
-
-
-
-%par
-for i=1:length(testfilelist)
-
-    % Examine the file we will test:
-    % Extract system code to save in the right place
-    % (and for reporting?)
     
-    [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
-    speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
-    systemcode=speakercode(1);
-    %disp(testfilename);
-
-    % Compute distance maps between test and ref sample;
-    % Load from disk if we have already computed it.
-    distmaps=struct('init',1);
-
-    step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
-
-    distres=zeros(length(dist_tests),1);
-
-
-    for y=1:length(invasive_tests)
-
-        test=invasive_tests{y};
-
-        mapmethod=[test.preprocessing.name,'_',test.map_feature.name];
-
-        if ~isfield(distmaps, mapmethod)
-            distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature);
-        end
-        
-        %
-        % Get DTW mapping between utterances based on the above map:
-        %
-        [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
-            dpfast(distmaps.(mapmethod),step_matrix,1);      
-        
-        fullsentpathp=pathp;
-        fullsentpathq=pathq;
-
-        %
-        % Compute the mean DTW cost along the path based on 
-        % another distance map:
-        
-        pathmethod=[test.preprocessing.name,'_',test.path_feature.name];
-        mapname=[mapdirectory,speakercode,testfilename,'_',pathmethod,'.map'];
-        
-        if ~isfield(distmaps, pathmethod)
-            distmaps.(pathmethod) = get_distmap(filepath,mapdirectory,reffilelist{i},testfilelist{i}, test.preprocessing, test.path_feature);
-        end
-
-       
-        pathmap=distmaps.(pathmethod);
-
-        % Traverse the path and sum the costs along it:
-        pathcost=0;
-        for j=1:length(fullsentpathp)
-            pathcost=pathcost+pathmap(fullsentpathp(j),fullsentpathq(j));
-        end
-        meanpathcost = pathcost/length(fullsentpathp);
-
-        distres(y)=meanpathcost;        
-        
-    end
-    
-
-    fprintf('%0.1f\t', distres);
-    disp('\n');
-
-    distortion_results_all(i,:) =  distortion_results_all(i,:) + distres';
+    model_results_all(:,y) =  model_results_all(:,y) + modelres;
     
 end
 
-disp(distortion_results_all)
+disp(model_results_all);
 
-test_results=distortion_results_all;
 
 runtime=toc;

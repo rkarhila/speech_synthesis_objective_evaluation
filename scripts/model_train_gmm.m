@@ -15,10 +15,11 @@ elseif nargin == 2
     while tries < params.gauss_retr
         try
             if params.cov_type=='diag'
-                returnable=gmmb_em_d(test_data_sys,'components',params.num_components);
+                [returnable, ~]=gmmb_em_d(test_data_sys,'components',params.num_components);
             else
-                returnable=gmmb_em(test_data_sys,'components',params.num_components);
+                [returnable, ~]=gmmb_em(test_data_sys,'components',params.num_components);
             end
+            tries= params.gauss_retr;
         catch me
             tries=tries+1;
             if tries==params.gauss_retr
@@ -27,5 +28,5 @@ elseif nargin == 2
         end
     end
 else
-    error('model_train_gmm takes 0 or 2 arguments (features and parameters)')
+    error('model_train_gmm takes 0 or 2 arguments (features and parameters)');
 end
