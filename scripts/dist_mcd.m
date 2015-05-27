@@ -1,11 +1,11 @@
-% DIST_FWSNRSEG
+% DIST_MCD
 %
 % makes distance map between two samples based on the feature hinted
 % by the name of the function
-function [returnable] = dist_fwsnrseg(varargin)
+function [returnable] = dist_mcd(varargin)
 
 if nargin == 0
-    returnable = 'fwSNRseg';
+    returnable = 'mcd';
     
 elseif nargin == 3
     local_conf;
@@ -20,8 +20,7 @@ elseif nargin == 3
     nr_frames_test=size(feas_test,1);
     nr_frames_ref=size(feas_ref,1);
 
-
-
+    
 
     % Tricky bit: Make frame-by-frame distance map that is not symmetric, but
     % satisfies the constraints of global distance maps, and the
@@ -36,26 +35,25 @@ elseif nargin == 3
     distmap=zeros(nr_frames_test,nr_frames_ref);
 
     for i=1:nr_frames_test
-        mel_norm_test=max(feas_test(i,:),exp(-700));
+        mcep_test=feas_test(i,:);
         for j=1:nr_frames_ref
-            
-            %sum(abs(feas_ref(j,:)-feas_test(i,:)))
-            
-            mel_norm_ref=max(feas_ref(j,:),exp(-700));
-            
-            W1 = power(mel_norm_ref,params.gamma1);
-            S1 = 10*log10(power(mel_norm_ref,2)./power(mel_norm_ref-mel_norm_test,2)); % min: values below zero are unlikely, max: Inf
-            S1 = max(min(S1,35),-10);
-            cur_S1 = sum(sum(W1.*S1)./sum(W1));
-            %cur_S2(windex)=-1*cur_S1;
-            distmap(i,j)=cur_S1;
-            
+
+            mcep_ref=feas_ref(j,:);
+            % This used to be from (2:min(mel_dim,cep_dim+1), but the
+            % first dimension is now removed already in calculate_feas
+            % to make GMM training easier.
+            %distmap(i,j)=sqrt(2*sum(power(mcep_test(2:min(mel_dim,cep_dim+1))-mcep_ref(2:min(mel_dim,cep_dim+1)),2)));
+            %disp(min(mel_dim,cep_dim))
+            %disp(size(mcep_test))
+            distmap(i,j)=sqrt(2*sum(power(mcep_test-mcep_ref,2)));
+
         end
-        
-        
-        
+
     end
-    returnable=35-distmap;
+
+    
+    
+    returnable=distmap;
 
 
 else

@@ -1,15 +1,13 @@
-% ANALYSIS_FFT_MELBANK
+% ANALYSIS_FFT_MFCC
 %
-% Provides features for using FFT Mel banks 
-% for training GMMs.
+% Provides FFT-based MFCC features for computing MCD distance measure 
+% in building a distance map.
 % 
-% Essentially the features are Mel-banked FFT spectra.
 %
-%
-function [returnable] = analysis_fft_melbank(varargin)
+function [returnable] = analysis_fft_mfcc(varargin)
 
 if nargin == 0
-    returnable = 'fft_melbank';
+    returnable = 'fft_mfcc';
 
 elseif nargin == 3
 
@@ -53,14 +51,20 @@ elseif nargin == 3
     spec_feas=spec_feas';
     
     %
-    % 2. Get mel-weighted spectrum:
+    % 2. Mel-bank the spec and do discrete cosine transform on the banks:
     %
     
     feas_test=zeros(nr_frames_test,params.mel_dim);
-
+    
     for frame_index=1:nr_frames_test
-        feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)+1e-20);
+        feas_test(frame_index,:)=dct(log(M*spec_feas(:,frame_index)+1e-20));
     end
+    
+    
+    % Let's not save the first channel here!
+    
+    feas_test = feas_test(:,2:params.cep_dim);
+    
     
     %
     % Return a struct with info on the (probable) speech frames:
@@ -73,5 +77,5 @@ elseif nargin == 3
     end
     
 else
-    error('analysis_fft_melbank requires 0 or 3 arguments (audio, parameters, filename).')
+    error('analysis_fft_mfcc requires 0 or 3 arguments (audio, parameters, filename).')
 end

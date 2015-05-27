@@ -2,18 +2,11 @@ function [model_results_all, runtime] = evaluate_with_non_invasive_measures(file
 
 
 local_conf
-DEBUGGING=0;
 
 % Assign some values to new variables so they will be
 % accessible in paraller for loop:
 mapdirectory=LOCAL_MAPDIR;
 gmdirectory=LOCAL_MIXTUREMODELDIR;
-gauss_retr={gauss_retries};
-gauss_tests=non_invasive_tests;
-
-dist_tests=invasive_tests;
-%gauss_types=gausstypes
-usevad=1;
 
 % So, we have list of reference files and a list of test files.
 % Let's assume that they all exist and behave well
@@ -72,7 +65,7 @@ par_modelsets=cell(length(systems),1);
 %par
 for i=1:length(systems)
       
-    par_modelsets{i}=cell(length(gauss_tests),1);
+    par_modelsets{i}=cell(length(non_invasive_tests),1);
     
     % For the Gaussian evaluation, we need to train the Gaussians for
     % The new system:

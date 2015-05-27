@@ -116,7 +116,7 @@ for i=1:length(testfilelist)
         mapname=[mapdirectory,speakercode,testfilename,'_',pathmethod,'.map'];
         
         if ~isfield(distmaps, pathmethod)
-            distmaps.(pathmethod) = get_distmap(filepath,mapdirectory,reffilelist{i},testfilelist{i}, test.preprocessing, test.path_feature);
+            distmaps.(pathmethod) = get_dist_map(filepath,mapdirectory,reffilelist{i},testfilelist{i}, test.preprocessing, test.path_feature);
         end
 
        

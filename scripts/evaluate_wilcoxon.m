@@ -1,9 +1,9 @@
+% EVALUATE_WILCOXON
 %
 % Here we evaluate the objective scores somehow...
 % 
 % The name points to Wilcoxon pairwise test, and this is indeed used to
 % establish statistical siginificance at a p=0.05 threshold.
-%
 %
 % Inputs:
 %  -objective scores for all systems of a single test
@@ -18,16 +18,22 @@ function [goodness] = evaluate_wilcoxon(objective_scores, subjective_scores, opi
 
 local_conf;
 
+goodness = 0;
+
+
+
+    
 listeningmeans=subjective_scores;
 refmat=opinion_matrix;
 refscores=objective_scores;
+
 
 invdiag=ones(size(refmat))-diag(ones(size(refmat,1),1));
 
 syscount=length(systems);
 featcount=size(refscores,2);
 
-testlen=size(objective_scores,1)/length(systems);quit
+testlen=size(objective_scores,1)/length(systems);
 
 bigp=cell(size(refscores,2),1);
 machinemeans=zeros(syscount,featcount);
@@ -36,6 +42,7 @@ labelsystems=char(length(systems),1);
 for i=1:length(systems)
    labelsystems(i)=systems(i) ;
 end
+
 
 %
 % 1. - Compute statistical significance with Wilcoxon signed rank test
@@ -350,4 +357,5 @@ for pval=[0.05]
     goodness=results;
 end
 
+end % To end if (3 === 1)
 

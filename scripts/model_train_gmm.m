@@ -11,7 +11,7 @@ elseif nargin == 2
     params = varargin{2};
 
     
-    tries=0
+    tries=0;
     while tries < params.gauss_retr
         try
             if params.cov_type=='diag'

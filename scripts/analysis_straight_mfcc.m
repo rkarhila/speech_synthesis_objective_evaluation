@@ -1,13 +1,10 @@
-%ANALYSIS_STRAIGHT_FOR_FWSNRSEG
+% ANALYSIS_STRAIGHT_MFCC
 %
-% Provides features for using fwSNRseg distance measure 
+% Provides STRAIGHT-based MFCC features for computing MCD distance measure 
 % in building a distance map.
-% 
-% Essentially the features are Mel-banked FFT spectra.
 %
-
-function [returnable] = analysis_straight_for_fwsnrseg(varargin)
-
+function [returnable] = analysis_straight_mfcc(varargin)
+%
 if nargin == 0
     returnable = 'straight_for_fwsnr';
 
@@ -57,26 +54,33 @@ elseif nargin == 3
     
     
     %
-    % 2. Get normalised and mel-weighted spectrum:
+    % 2. Mel-bank the spec and do discrete cosine transform on the banks:
     %
     
     M = melbankm(params.mel_dim, params.spectrum_dim, params.fs, 0, 0.5, 'u');
-        
+    
     feas_test=zeros(nr_frames_test,params.mel_dim);
     
-    for i=1:nr_frames_test
-        feas = spec_feas(:,i);
-        spec_norm = bsxfun(@times, feas, 1./sum(feas));
-        mel_norm=M*spec_norm;
-        feas_test(i,:)=mel_norm;
+    for frame_index=1:nr_frames_test
+        feas_test(frame_index,:)=dct(log(M*spec_feas(:,frame_index)+1e-20));
     end
+    
+    
+    % Let's not save the first channel here!
+    
+    feas_test = feas_test(:,2:params.cep_dim);
     
     
     %
     % Return a struct with info on the (probable) speech frames:
-    %
+    %   
+    
+    if params.usedelta == 1
+        returnable = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
+    else
+        returnable = struct('features',feas_test,'speech_frames',speech_frames);
+    end
 
-    returnable = struct('features',feas_test,'speech_frames',speech_frames);
 else
     error('analysis_straight_for_fwsnrseg requires 0 or 3 arguments (audio, parameters, filename).')
 end

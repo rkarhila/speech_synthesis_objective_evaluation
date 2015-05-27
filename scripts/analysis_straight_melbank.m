@@ -1,13 +1,12 @@
-%ANALYSIS_STRAIGHT_FOR_FWSNRSEG
+% ANALYSIS_STRAIGHT_MELBANK
 %
-% Provides features for using fwSNRseg distance measure 
-% in building a distance map.
+% Provides STRAIGHT Mel bank features for training GMMs.
 % 
-% Essentially the features are Mel-banked FFT spectra.
+% Essentially the features are Mel-bankeded STRAIGHT spectra.
 %
 
-function [returnable] = analysis_straight_for_fwsnrseg(varargin)
-
+function [returnable] = analysis_straight_melbank(varargin)
+%
 if nargin == 0
     returnable = 'straight_for_fwsnr';
 
@@ -55,28 +54,28 @@ elseif nargin == 3
 
     end
     
-    
     %
-    % 2. Get normalised and mel-weighted spectrum:
+    % 2. Get mel-weighted spectrum:
     %
-    
+
     M = melbankm(params.mel_dim, params.spectrum_dim, params.fs, 0, 0.5, 'u');
-        
+
     feas_test=zeros(nr_frames_test,params.mel_dim);
-    
-    for i=1:nr_frames_test
-        feas = spec_feas(:,i);
-        spec_norm = bsxfun(@times, feas, 1./sum(feas));
-        mel_norm=M*spec_norm;
-        feas_test(i,:)=mel_norm;
+
+    for frame_index=1:nr_frames_test
+        feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)+1e-20);
     end
-    
     
     %
     % Return a struct with info on the (probable) speech frames:
-    %
-
-    returnable = struct('features',feas_test,'speech_frames',speech_frames);
+    %   
+    
+    if params.usedelta == 1
+        returnable = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
+    else
+        returnable = struct('features',feas_test,'speech_frames',speech_frames);
+    end
+    
 else
-    error('analysis_straight_for_fwsnrseg requires 0 or 3 arguments (audio, parameters, filename).')
+    error('analysis_straight_melbank requires 0 or 3 arguments (audio, parameters, filename).')
 end
