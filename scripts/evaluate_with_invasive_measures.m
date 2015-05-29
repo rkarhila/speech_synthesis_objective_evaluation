@@ -46,19 +46,22 @@ filespersystem=length(reffilelist)/length(systems);
 
 
 
+
+
+%
+% Define here to make parfor happy:
+%
+tests=invasive_tests;
+
 %
 % Initialise the result array
 %
-distortion_results_all=zeros(length(testfilelist),length(dist_tests));
-
-
+distortion_results_all=zeros(length(testfilelist),length(tests));
 
 tic
 
 
-
-%par
-for i=1:length(testfilelist)
+parfor i=1:length(testfilelist)
 
     % Examine the file we will test:
     % Extract system code to save in the right place
@@ -73,14 +76,14 @@ for i=1:length(testfilelist)
     % Load from disk if we have already computed it.
     distmaps=struct('init',1);
 
-    step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
+    %step_matrix=[1 1 1/sqrt(2);1 0 1;0 1 1;1 2 sqrt(2);2 1 sqrt(2);1 3 2; 3 1 2];
 
-    distres=zeros(length(dist_tests),1);
+    distres=zeros(length(tests),1);
 
 
-    for y=1:length(invasive_tests)
+    for y=1:length(tests)
 
-        test=invasive_tests{y};
+        test=tests{y};
 
         mapmethod=[test.preprocessing.name,'_',test.map_feature.name];
 
@@ -92,7 +95,7 @@ for i=1:length(testfilelist)
         % Get DTW mapping between utterances based on the above map:
         %
         [pathp,pathq,min_cost_matrix,cost_on_best_path] = ...
-            dpfast(distmaps.(mapmethod),step_matrix,1);      
+            dpfast(distmaps.(mapmethod),test.step_matrix,1);      
         
         fullsentpathp=pathp;
         fullsentpathq=pathq;

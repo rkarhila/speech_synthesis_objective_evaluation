@@ -3,11 +3,7 @@
 %
 
 local_conf
-
-if (isempty(gcp('nocreate')))
-    %parpool;
-end
-   
+  
 
 tests_devel={ ...
     struct( ...
@@ -18,7 +14,7 @@ tests_devel={ ...
         'subjective_resultfile', 'devel/2009_EH2_sim_mean.ascii',...
         'opinionmatrix',         'devel/significancematrix_2009_EH2_sim.ascii',...
         'systems',               'BCDEHIJKLMOPQRSTUW', ...
-        'systemtypes',           'chhccccchchhcchu-h', ...
+        'systemtypes',           'chhccccchchhcchuhh', ...
         'sentencesperspeaker',    19, ...
         'testtype',               'sim', ...
         'language',               'english', ...
@@ -43,32 +39,14 @@ tests_devel={ ...
         };
 
 
-    
- 
+   
 for n=1:length(tests_devel)
-    if exist(tests_devel{n}.objective_resultfile, 'file') == 0;   
 
-        [ non_invasive_measure_result, non_inv_test_runtime] = ...
-            evaluate_with_non_invasive_measures(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);              
+    [scores,results] = run_individual_test(tests_devel{n});
 
-        [ invasive_measure_result, inv_test_runtime] = ...
-            evaluate_with_invasive_measures(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);        
-        
-        [ pesq_result, pesq_test_runtime] = ...
-            evaluate_with_pesq(BLIZZARD2009_RESULTDIR, tests_devel{n}.reffilelist,tests_devel{n}.testfilelist);        
+    tests_devel{n}.scores=scores;
+    tests_devel{n}.results=results;
 
-
-        objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
-        save(tests_devel{n}.objective_resultfile, 'objdata','-ascii');
-        tests_devel{n}.results=objdata;
-    else      
-        disp(['Loading results from ',tests_devel{n}.objective_resultfile])
-        tests_devel{n}.results=load(tests_devel{n}.objective_resultfile);
-        
-    end
-    
-    tests_devel{n}.scores=evaluate_wilcoxon(tests_devel{n}.results, load(tests_devel{n}.subjective_resultfile), load(tests_devel{n}.opinionmatrix), ...
-                               tests_devel{n}.systems, 0);
 end
 
     

@@ -5,12 +5,6 @@
 local_conf
 
 
-if (isempty(gcp('nocreate')))
-    parpool;
-end
-   
-
-
 tests2011={ ...
     struct( ...  
         'name',                  'EH1_similarity',...
@@ -45,23 +39,15 @@ tests2011={ ...
       };
 
 
-    
+   
+
 for n=1:length(tests2011)
-    if exist(tests2011{n}.objective_resultfile, 'file') == 0;   
-        [ invasive_measure_result, non_invasive_measure_result, pesq_result, test_runtime] = ...
-            obj_evaluation(BLIZZARD2011_RESULTDIR, tests2011{n}.reffilelist,tests2011{n}.testfilelist);
 
-        objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
+    [scores,results] = run_individual_test(tests2011{n});
 
-        save(tests2011{n}.objective_resultfile, 'objdata','-ascii');
-        tests2011{n}.results=objdata;
-    else      
-        disp(['Loading results from ',tests2011{n}.objective_resultfile])
-        tests2011{n}.results=load(tests2011{n}.objective_resultfile);
-        
-    end
-    
-    tests2011{n}.scores=evaluate_wilcoxon(tests2011{n}.results, load(tests2011{n}.subjective_resultfile), load(tests2011{n}.opinionmatrix), ...
-                               tests2011{n}.systems, 0);
+    tests2011{n}.scores=scores;
+    tests2011{n}.results=results;
+
 end
+
 

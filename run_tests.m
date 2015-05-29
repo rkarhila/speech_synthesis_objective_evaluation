@@ -4,7 +4,7 @@ local_conf;
 fc=100;
 
 
-    
+% First, let's make sure that we have all the tests run and results loaded:
 
 if ~exist('tests','var')
     tests=cell(6,1);
@@ -30,9 +30,12 @@ end
 
 
 %
+% Then start extracting interesting bits from the results:
+%
+
+
 %
 %   Similarity and naturalness for all test data.
-%
 %
 
 sim=tests{1}{1}.scores(:,7);
@@ -113,52 +116,97 @@ comparisontypeslist={ {'All systems', 1:3 }, ...
                       {'Unit selection systems only', 1}, ...
                       {'HMM-systems only',2}  };
 
-res = { struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ), ...
-        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ), ...
-        struct('simnons',{{}},'simsigs',{{}},'simmins',[],'simmaxs',[],'simspeakers',{{}}, 'simperformances', {{}}, 'simbest',{{}}, 'natnons',{{}},'natsigs',{{}},'natmins',[],'natmaxs',[],'natspeakers',{{}}, 'natperformances', {{}}, 'natbest',{{}} ) };
+% A complicated cell/structure-thing to store scores and statistics for the
+% different comparisons:
+            
+comptypes={'all','unitsel','hmm'}
+
+res = struct(...
+    'all', struct('simnons',{{}},...
+               'simsigs',{{}},...
+               'simmins',[],...
+               'simmaxs',[],...
+               'simspeakers',{{}},...
+               'simperformances', {{}}, ...
+               'simbest',{{}}, ...
+               'natnons',{{}},...
+               'natsigs',{{}},...
+               'natmins',[],...
+               'natmaxs',[],...
+               'natspeakers',{{}},...
+               'natperformances', {{}},...
+               'natbest',{{}} ), ...
+     'unitsel', struct('simnons',{{}},...
+               'simsigs',{{}},...
+               'simmins',[],...
+               'simmaxs',[],...
+               'simspeakers',{{}},...
+               'simperformances', {{}}, ...
+               'simbest',{{}}, ...
+               'natnons',{{}},...
+               'natsigs',{{}},...
+               'natmins',[],...
+               'natmaxs',[],...
+               'natspeakers',{{}},...
+               'natperformances', {{}},...
+               'natbest',{{}} ), ...               
+      'hmm', struct('simnons',{{}},...
+               'simsigs',{{}},...
+               'simmins',[],...
+               'simmaxs',[],...
+               'simspeakers',{{}},...
+               'simperformances', {{}}, ...
+               'simbest',{{}}, ...
+               'natnons',{{}},...
+               'natsigs',{{}},...
+               'natmins',[],...
+               'natmaxs',[],...
+               'natspeakers',{{}},...
+               'natperformances', {{}},...
+               'natbest',{{}} ) );
 
                   
-for comparisoncount=1:3                      
 
-    comparisontypes=comparisontypeslist{comparisoncount}{2};
-    comparisonname=comparisontypeslist{comparisoncount}{1};
+for p=1:length(tests) % The year
+    for r=1:length(tests{p}) % The task
+        t=tests{p}{r}; 
 
+        disp(['test ',num2str(2007+p),' ',comparisontypeslist{comparisoncount}{1}]);
+        [sigs, nons, correlations_sys, bestguesscorrect] = get_significance_distances_by_systemtype(t.name,t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
 
-    n=0;
-    m=0;
+        for comparisoncount=1:3                      
+            comptype=char(comptypes(comparisoncount));
 
-    for p=1:length(tests)
-        for r=1:length(tests{p})
-            t=tests{p}{r};
+            %comparisontypes=comparisontypeslist{comparisoncount}{2};
+            %comparisonname=comparisontypeslist{comparisoncount}{1};
 
-            disp(['test ',num2str(2007+p),' ',comparisontypeslist{comparisoncount}{1}]);
-            [sigs, nons, correlations_sys, bestguesscorrect] = get_significance_distances_by_systemtype(t.name,t.results, load(t.subjective_resultfile), load(t.opinionmatrix),t.systems, t.systemtypes);
+            n=0;
+            m=0;
 
-            
-            for comparisontype=comparisontypes
+            comparisontype=comparisoncount;    
 
-                if t.testtype == 'sim'
-                    n=n+1;
-                    res{comparisoncount}.simnons{n}=nons{comparisontype};
-                    res{comparisoncount}.simsigs{n}=sigs{comparisontype};
-                    res{comparisoncount}.simspeakers{n}=t.speaker;
-                    
-                    disp(['From sim results:'])
-                    correlations_sys{comparisontype}
-                    res{comparisoncount}.simperformances{n}=correlations_sys{comparisontype};
-                    
-                    res{comparisoncount}.simbest{n}=bestguesscorrect{comparisontype};
-                    
-                else
-                    m=m+1;
-                    res{comparisoncount}.natnons{m}=nons{comparisontype};
-                    res{comparisoncount}.natsigs{m}=sigs{comparisontype};          
-                    res{comparisoncount}.natspeakers{m}=t.speaker;
-                    
-                    res{comparisoncount}.natperformances{m}=correlations_sys{comparisontype};
+            if strcmp(t.testtype,'sim')
+                n=n+1;
 
-                    res{comparisoncount}.natbest{m}=bestguesscorrect{comparisontype};
-                end
+                res.(comptype).simnons{n}=nons{comparisontype};
+                res.(comptype).simsigs{n}=sigs{comparisontype};
+                res.(comptype).simspeakers{n}=t.speaker;
+
+                %disp(['From sim results:'])
+                %correlations_sys{comparisontype};
+                res.(comptype).simperformances{n}=correlations_sys{comparisontype};
+
+                res.(comptype).simbest{n}=bestguesscorrect{comparisontype};
+
+            else
+                m=m+1;
+                res.(comptype).natnons{m}=nons{comparisontype};
+                res.(comptype).natsigs{m}=sigs{comparisontype};          
+                res.(comptype).natspeakers{m}=t.speaker;
+
+                res.(comptype).natperformances{m}=correlations_sys{comparisontype};
+
+                res.(comptype).natbest{m}=bestguesscorrect{comparisontype};
             end
         end
     end
@@ -169,11 +217,12 @@ end
 
 
 for comparisoncount=1:3               
-    
+     comptype=char(comptypes(comparisoncount));
+   
     % Mins and maxes for similarities
     
-    simsigs=res{comparisoncount}.simsigs;
-    simnons=res{comparisoncount}.simnons;
+    simsigs=res.(comptype).simsigs;
+    simnons=res.(comptype).simnons;
 
     mins=min(abs(simsigs{1}'));
     maxs=max(abs(simsigs{1}'));
@@ -185,15 +234,15 @@ for comparisoncount=1:3
         end
     end
     
-    res{comparisoncount}.simmins=mins;
-    res{comparisoncount}.simmaxs=maxs;
+    res.(comptype).simmins=mins;
+    res.(comptype).simmaxs=maxs;
 
     
     % Mins and maxes for naturalness
     
     
-    natsigs=res{comparisoncount}.natsigs;
-    natnons=res{comparisoncount}.natnons;
+    natsigs=res.(comptype).natsigs;
+    natnons=res.(comptype).natnons;
 
     mins=min(abs(natsigs{1}'));
     maxs=max(abs(natsigs{1}'));
@@ -205,12 +254,12 @@ for comparisoncount=1:3
         end
     end
     
-    res{comparisoncount}.natmins=mins;
-    res{comparisoncount}.natmaxs=maxs;   
+    res.(comptype).natmins=mins;
+    res.(comptype).natmaxs=maxs;   
     
     
-    %res{comparisoncount}.natperformances=zeros(length(testlist),20);    
-    %res{comparisoncount}.simperformances=zeros(length(testlist),20);    
+    %res.(comptype).natperformances=zeros(length(testlist),20);    
+    %res.(comptype).simperformances=zeros(length(testlist),20);    
         
 end
 
@@ -220,23 +269,26 @@ natcorr=zeros(comparisoncount,length(testlist));
 simcorr=zeros(comparisoncount,length(testlist));
 
 for comparisoncount=1:3
-   natcorrs=zeros(ind,length(res{comparisoncount}.natperformances));
-   for i=1:length(res{comparisoncount}.natperformances)              
-       natcorrs(:,i)=res{comparisoncount}.natperformances{i};       
+   comptype=char(comptypes(comparisoncount));
+
+    
+   natcorrs=zeros(ind,length(res.(comptype).natperformances));
+   for i=1:length(res.(comptype).natperformances)              
+       natcorrs(:,i)=res.(comptype).natperformances{i};       
    end
    natcorrs(natcorrs==0)=nan;
    natcorr(comparisoncount,:)=nanmean(natcorrs,2);
 
-   simcorrs=zeros(ind,length(res{comparisoncount}.simperformances));
-   for i=1:length(res{comparisoncount}.simperformances)              
-       simcorrs(:,i)=res{comparisoncount}.simperformances{i};       
+   simcorrs=zeros(ind,length(res.(comptype).simperformances));
+   for i=1:length(res.(comptype).simperformances)              
+       simcorrs(:,i)=res.(comptype).simperformances{i};       
    end
    simcorrs(simcorrs==0)=nan;
    simcorr(comparisoncount,:)=nanmean(simcorrs,2);
 
 end
-abs(natcorr)
-abs(simcorr)
+abs(natcorr);
+abs(simcorr);
 
 
 natbest=zeros(ind,comparisoncount);
@@ -244,15 +296,17 @@ simbest=zeros(ind,comparisoncount);
 
 
 for comparisoncount=1:3
-   natbests=zeros(ind,length(res{comparisoncount}.natbest));
-   for i=1:length(res{comparisoncount}.natbest)              
-       natbests(:,i)=res{comparisoncount}.natbest{i};       
+   comptype=char(comptypes(comparisoncount));
+    
+   natbests=zeros(ind,length(res.(comptype).natbest));
+   for i=1:length(res.(comptype).natbest)              
+       natbests(:,i)=res.(comptype).natbest{i};       
    end
    natbest(:,comparisoncount)=mean(natbests,2);
    
-   simbests=zeros(ind,length(res{comparisoncount}.simbest));
-   for i=1:length(res{comparisoncount}.simbest)              
-       simbests(:,i)=res{comparisoncount}.simbest{i};       
+   simbests=zeros(ind,length(res.(comptype).simbest));
+   for i=1:length(res.(comptype).simbest)              
+       simbests(:,i)=res.(comptype).simbest{i};       
    end
    simbest(:,comparisoncount)=mean(simbests,2);
    

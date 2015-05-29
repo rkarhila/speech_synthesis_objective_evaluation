@@ -149,13 +149,20 @@ correlations_sys{3}=cor_sys;
 
 %correlations_sys{1}
 
-
+%
 % Did any of the methods make the right prediction about the winner?
+%
+% What was the position of the "winner" (yes, I know, I should not use such
+% a term for the Blizzard results) system or systems?
+%
 
 bestguesscorrect=cell(3);
 for n=1:3  
     bestguesscorrect{n}=zeros(featcount,1);
 
+    %
+    % Reduce the space we're looking at:
+    %
     if n<3
         subjective_scores_part=subjective_scores(systemtypes==types{n});
         machinemeans_part=machinemeans(systemtypes==types{n},:);
@@ -164,15 +171,24 @@ for n=1:3
         machinemeans_part=machinemeans;
     end
     
+    %
+    % Find the best system(s) in the reduced space
+    %
     bestsystem=find(subjective_scores_part==max(subjective_scores_part));
-    bestmachinesystems=cell(featcount);
     
-    for feat=1:featcount
-        bestmachinesystems{feat}=find(machinemeans_part(:, feat)==max(machinemeans_part(:, feat)));
-    end
-
-    for feat=1:featcount
-        if ismember(bestmachinesystems{feat},bestsystem) 
+    %
+    % For each test, find the 
+    %
+    disp(['bestystems for testtype ', num2str(n),': ',num2str(bestsystem),' (',num2str(subjective_scores_part(bestsystem)),')' ] );
+    
+    
+    for feat=1:featcount        
+        bestmachinesystems=find(machinemeans_part(:, feat)==max(machinemeans_part(:, feat)));
+        disp(['feat ',num2str(feat),' bestmachinesystems: ',num2str(bestmachinesystems),' (',...
+            num2str(machinemeans_part(bestsystem,feat)),', mean ',num2str(mean(machinemeans_part(:, feat))),')' ]);
+        
+        
+        if ismember(bestmachinesystems,bestsystem)
             bestguesscorrect{n}(feat)=1;
         end
     end

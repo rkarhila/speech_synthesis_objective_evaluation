@@ -1,4 +1,8 @@
 
+if ~exist('res','var')
+   error('Run run_tests.m first');
+end
+
 
 %
 %
@@ -17,7 +21,8 @@ binsteps=10;
 
 plotcounter=0;
 
-handbookplottables = cell(1,size(simsigs{1},1));
+% TODO: Remove this when appropriate:
+%handbookplottables = cell(1,size(simsigs{1},1));
 handbookcurves = cell(1,size(simsigs{1},1));
 
 
@@ -110,7 +115,8 @@ for feat=1:length(testlist)
 
             handbookcurves{feat}={z,x}; 
 
-            handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
+            % TODO: remove this when appropriate:
+            %handbookplottables{feat} = [sigsbinc;negsbinc;nonsbinc];
 
 
             srvals=sort(vals);
@@ -248,7 +254,7 @@ for feat=1:length(testlist)
             [fitresult, gof] = fit( Value_difference, Smoothed_probability, ft, opts );
 
             h = plot(fitresult,'b');
-            h(1).LineWidth =2;
+            %h(1).LineWidth =2;
 
 
             
@@ -283,15 +289,21 @@ for feat=1:length(testlist)
 
             %logbinedges=(binmax-binmin)*logbins;
 
-            labeledges=cell(size(binedges));
-            labelskip=1;
-            if binstepsize>80
-               labelskip=2;
-            end
-            for n=1:labelskip:length(binedges)
-                labeledges{n}=round(100*logbinedges(n))/100;
-            end
+            
+            
+%             TODO: remove these when appropriate:
+%             labeledges=cell(size(binedges));
+%             labelskip=1;
+%             if binstepsize>80
+%                labelskip=2;
+%             end
+%             for n=1:labelskip:length(binedges)
+%                 labeledges{n}=round(100*logbinedges(n))/100;
+%             end
 
+            
+            
+            
     %        sigsbinc=zeros(0,0);
     %        negsbinc=zeros(0,0);
     %        nonsbinc=zeros(0,0);
@@ -343,10 +355,11 @@ for feat=1:length(testlist)
 
     
     
-    h = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',testlist{feat}])
+    h = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',testlist{feat}.name])
     set(h,'FontSize',18,'FontWeight','normal')
     
     
     %waitforbuttonpress
-    export_fig('-painters','-r600','-q101',['results/figures/pair_evaluations_for_feature_',num2str(feat),'_fixed_logistics.pdf'])
+    featfilename=[num2str(feat),'_',regexprep(testlist{feat}.name,'\W+','_'),'_fixed_logistics.pdf'];
+    export_fig('-painters','-r600','-q101',['results/figures_new/',featfilename])
 end

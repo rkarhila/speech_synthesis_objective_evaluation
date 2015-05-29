@@ -48,8 +48,10 @@ filespersystem=length(reffilelist)/length(systems);
 
 testcount=length(testlist);
 
-
-
+%
+% Define here to make parfor happy:
+%
+tests=non_invasive_tests;
 
 
 %
@@ -63,9 +65,9 @@ par_modelsets=cell(length(systems),1);
 
 % (use parallel for if available)
 %par
-for i=1:length(systems)
+parfor i=1:length(systems)
       
-    par_modelsets{i}=cell(length(non_invasive_tests),1);
+    par_modelsets{i}=cell(length(tests),1);
     
     % For the Gaussian evaluation, we need to train the Gaussians for
     % The new system:
@@ -76,12 +78,12 @@ for i=1:length(systems)
     old_analysis_name=0;
     test_data_sys=0;        
     
-    for y=1:length(non_invasive_tests)
+    for y=1:length(tests)
 
         % Only construct the training feature vectors if the Gaussians
         % have not been generated yet
 
-        test=non_invasive_tests{y};
+        test=tests{y};
                
         % Some not-so-clever caching of features:
         if ( ~strcmp(old_analysis_name,[ test.preprocessing.name, test.analysis.name]) )
@@ -137,11 +139,16 @@ disp('Evaluate the GMMs')
 % (Should be the same set for all systems!)
 
 
-model_results_all=zeros(length(testfilelist), length(non_invasive_tests));
+model_results_all=zeros(length(testfilelist), length(tests));
 
-for y=1:length(non_invasive_tests)
+%
+% Define here _again_ to keep parfor happy:
+%
+tests=non_invasive_tests;
 
-    test=non_invasive_tests{y};
+parfor y=1:length(tests)
+
+    test=tests{y};
     
     modelres=zeros(length(reffilelist),1);
 

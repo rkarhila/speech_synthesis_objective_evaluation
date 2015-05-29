@@ -5,10 +5,6 @@
 local_conf
 
 
-if (matlabpool('size') == 0)
-    matlabpool
-end
-
 tests2008={ ...
     struct( ...  
         'name',                  'english_full_similarity',...
@@ -103,20 +99,12 @@ tests2008={ ...
       };
 
 
-    
 for n=1:length(tests2008)
-    if exist(tests2008{n}.objective_resultfile, 'file') == 0;   
-        [ objdata, test_runtime, testlist] = obj_evaluation(BLIZZARD2008_RESULTDIR, tests2008{n}.reffilelist,tests2008{n}.testfilelist,...
-            mapmethods,  gaussmethods, gausscomps, tests2008{n}.sentencesperspeaker);
-        save(tests2008{n}.objective_resultfile, 'objdata','-ascii');
-        tests2008{n}.results=objdata;
-    else      
-        disp(['Loading results from ',tests2008{n}.objective_resultfile])
-        tests2008{n}.results=load(tests2008{n}.objective_resultfile);
-        
-    end
-    
-    tests2008{n}.scores=evaluate_wilcoxon(tests2008{n}.results, load(tests2008{n}.subjective_resultfile), load(tests2008{n}.opinionmatrix), ...
-                               tests2008{n}.systems, 0);
+
+    [scores,results] = run_individual_test(tests2008{n});
+
+    tests2008{n}.scores=scores;
+    tests2008{n}.results=results;
+
 end
 
