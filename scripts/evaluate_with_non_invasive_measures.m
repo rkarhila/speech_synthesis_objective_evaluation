@@ -74,17 +74,19 @@ for i=1:length(systems)
     % specified in gaussmethods:
 
     old_analysis_name=0;
+    test_data_sys=0;        
     
     for y=1:length(non_invasive_tests)
 
         % Only construct the training feature vectors if the Gaussians
         % have not been generated yet
-        test_data_sys=0;
+
         test=non_invasive_tests{y};
                
         % Some not-so-clever caching of features:
-        if ( ~strcmp(old_analysis_name,test.name) )
-            test_data_sys==0;
+        if ( ~strcmp(old_analysis_name,[ test.preprocessing.name, test.analysis.name]) )
+            disp('resetting feature cache');
+            test_data_sys=0;
         end
 
         %
@@ -103,8 +105,10 @@ for i=1:length(systems)
         
         [model_set, test_data_sys] = train_system_model( filepath, modelname, testfilenames, test, test_data_sys  );
         
+        model_set.modelname=modelname;
+        
         par_modelsets{i}{y}=model_set;
-
+        old_analysis_name=[ test.preprocessing.name, test.analysis.name];
     end
     
     % Make sure not to leave the old features hanging around:
@@ -137,6 +141,8 @@ model_results_all=zeros(length(testfilelist), length(non_invasive_tests));
 
 for y=1:length(non_invasive_tests)
 
+    test=non_invasive_tests{y};
+    
     modelres=zeros(length(reffilelist),1);
 
     for u=1:filespersystem
@@ -145,10 +151,11 @@ for y=1:length(non_invasive_tests)
         for i=1:length(systems)
 
             index=(i-1)*filespersystem+u;
-            
-            model=par_modelsets{i}{y};
 
-            [result, ref_data_sys] = test_system_model( filepath,reffilelist{u}, model, test, ref_data_sys  );
+            model=par_modelsets{i}{y};
+            disp (['Using model {',num2str(i),'}{',num2str(y),'}: ',model.modelname] );
+            
+            [result, ref_data_sys] = test_system_model( filepath,reffilelist{u}, par_modelsets{i}{y}, test, ref_data_sys  );
 
             modelres(index)=result;
             

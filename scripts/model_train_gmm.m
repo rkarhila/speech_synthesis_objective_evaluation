@@ -6,27 +6,49 @@ if nargin == 0
 elseif nargin == 2
     local_conf;
     
-    test_data_sys = varargin{1};
+    x = varargin{1};
     
     params = varargin{2};
 
     
-    tries=0;
-    while tries < params.gauss_retr
-        try
-            if params.cov_type=='diag'
-                [returnable, ~]=gmmb_em_d(test_data_sys,'components',params.num_components);
-            else
-                [returnable, ~]=gmmb_em(test_data_sys,'components',params.num_components);
-            end
-            tries= params.gauss_retr;
-        catch me
-            tries=tries+1;
-            if tries==params.gauss_retr
-                error('Singular gaussian!');
-            end
-        end
+                    
+    if (isfield(params, 'init_method'))
+        v0=params.init_method;
+    else
+        v0='k';
     end
+                    
+    if (isfield(params, 'varfloor'))
+        c=v0.varfloor;
+    else
+        c=[];
+    end
+
+    if (isfield(params, 'num_components'))
+        m0=params.num_components;
+    else
+        m0=3;
+    end
+       
+    if (params.cov_type=='full')
+        v0=[v0,'v'];
+    end
+
+    if (isfield(params, 'stopping_criterion'))
+        l=params.stopping_criterion;
+    else
+        l=[];
+    end
+    
+    [m,v,w,~,f,~,~]=gaussmix(x,c,l,m0,v0);
+
+    returnable=struct(...
+     'mu',m,   ...
+     'sigma',v, ...
+     'weights',w',...
+     'fischer_discriminant',f);
+    
+    
 else
     error('model_train_gmm takes 0 or 2 arguments (features and parameters)');
 end

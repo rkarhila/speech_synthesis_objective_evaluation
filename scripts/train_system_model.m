@@ -46,6 +46,7 @@ else
          test_data_sys=cached_test_data;
     end
     
+    disp(['Training ',method.modelling.name]);
     model=method.modelling.trainfunction(test_data_sys,method.modelling);
     
     

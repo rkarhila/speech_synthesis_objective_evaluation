@@ -6,12 +6,12 @@ if nargin == 0
 elseif nargin == 3
     local_conf;
     
-    gmm_model = varargin{1};
+    gmm = varargin{1};
     
     features = varargin{2};
     
     params = varargin{3};
-
+  
     %
     % Why is this normalised with the length of test_feat?
     %
@@ -22,8 +22,23 @@ elseif nargin == 3
     
     % No, it's time to simplify:
     
-    returnable= -sum(log(gmmb_pdf(features, gmm_model)+exp(-700)))/size(features,1);
+    %returnable= -sum(log(gmmb_pdf(features, gmm)+exp(-700)))/size(features,1);
     
+    % Let's simpilfy even more by using voicebox:
+    
+    if params.cov_type=='diag'
+        sigma=diag(gmm.sigma(1,:));
+        for n=2:size(gmm.sigma,1)
+           sigma = cat(3,sigma,diag(gmm.sigma(n,:)));
+        end
+    else
+       sigma=gmm.sigma;
+    end
+    
+    
+    [lp,~,~,~] = gaussmixp(features, gmm.mu, sigma, gmm.weights);
+    
+    returnable = -mean(lp);
     
     if isnan(returnable)
         disp(['NaN while testing ', params.name]);

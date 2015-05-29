@@ -7,13 +7,7 @@ DEBUGGING=0;
 % Assign some values to new variables so they will be
 % accessible in paraller for loop:
 mapdirectory=LOCAL_MAPDIR;
-gmdirectory=LOCAL_MIXTUREMODELDIR;
-gauss_retr={gauss_retries};
-gauss_tests=non_invasive_tests;
 
-dist_tests=invasive_tests;
-%gauss_types=gausstypes
-usevad=1;
 
 % So, we have list of reference files and a list of test files.
 % Let's assume that they all exist and behave well
@@ -49,11 +43,6 @@ end
 filespersystem=length(reffilelist)/length(systems);
 
 
-
-
-% How many tests do we do?
-
-testcount=length(testlist);
 
 
 
