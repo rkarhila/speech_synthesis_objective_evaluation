@@ -31,7 +31,7 @@ for i=1:length(testfilelist)
     [testpath,testfilename,testfilext]=fileparts(testfilelist{i});
     speakercode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
     systemcode=speakercode(1);
-    % disp(testfilename);
+    %disp(testfilename);
 
     if isempty(find(systems==systemcode))
         systems=[systems;systemcode];
@@ -91,6 +91,10 @@ parfor i=1:length(testfilelist)
             distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature);
         end
         
+        
+        if ~isfield(test, 'step_matrix')
+           error([test.name,' has no step_matrix defined']) ;
+        end
         %
         % Get DTW mapping between utterances based on the above map:
         %

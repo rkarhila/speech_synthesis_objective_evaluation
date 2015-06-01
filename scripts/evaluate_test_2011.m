@@ -43,7 +43,7 @@ tests2011={ ...
 
 for n=1:length(tests2011)
 
-    [scores,results] = run_individual_test(tests2011{n});
+    [scores,results] = run_individual_test(tests2011{n}, BLIZZARD2011_RESULTDIR);
 
     tests2011{n}.scores=scores;
     tests2011{n}.results=results;

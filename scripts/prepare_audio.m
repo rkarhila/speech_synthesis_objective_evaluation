@@ -20,6 +20,13 @@ audiofile=varargin{1};
 params=varargin{2};
 filename=varargin{3};
 
+% Check the existence of the file, since audioread is not smart enough to
+% give a readable error:
+
+if ~exist(audiofile,'file')
+   error(['prepare_audio: ',audiofile, ' does not exist.'])
+end
+
 % Load audio & resample if necessary
 [ audio , fs1 ] = audioread(audiofile);
 
