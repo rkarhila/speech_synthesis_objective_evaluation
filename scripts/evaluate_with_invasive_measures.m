@@ -1,6 +1,7 @@
 function [test_results, runtime] = evaluate_with_invasive_measures(filepath, reference_sent_list, test_sent_list )
 
 
+disp('Evaluating with invasive measures:');
 local_conf
 DEBUGGING=0;
 

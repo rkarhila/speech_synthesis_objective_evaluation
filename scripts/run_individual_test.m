@@ -1,5 +1,8 @@
-function [scores,results] = run_individual_test(test_specs, path_prefix)
+function [results] = run_individual_test(test_specs, path_prefix)
     %local_conf
+    
+    disp(['Running test ', test_specs.name])
+    
     if exist(test_specs.objective_resultfile, 'file') == 0;   
 
         invasive_file=[test_specs.objective_resultfile,'.invasive'];
@@ -41,5 +44,5 @@ function [scores,results] = run_individual_test(test_specs, path_prefix)
         
     end
     
-    scores=evaluate_wilcoxon(test_specs.results, load(test_specs.subjective_resultfile), load(test_specs.opinionmatrix), ...
-                               test_specs.systems, 0);
+    %scores=evaluate_wilcoxon(test_specs.results, load(test_specs.subjective_resultfile), load(test_specs.opinionmatrix), ...
+    %                           test_specs.systems, 0);

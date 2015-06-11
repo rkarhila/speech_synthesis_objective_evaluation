@@ -63,8 +63,9 @@ disp('Train or load GMMs');
 
 par_modelsets=cell(length(systems),1);
 
+tic
 % (use parallel for if available)
-%par
+
 parfor i=1:length(systems)
       
     par_modelsets{i}=cell(length(tests),1);
