@@ -14,7 +14,7 @@
 % Tweak the lists below to leave out some tests:
 %
 
-corporalist={'cas','librivox','nancy','rjs','roger','speakit','voice_forge','wj'};
+corporalist={'cas','nancy','rjs','roger','speakit','voice_forge','wj'};
 languagelist={'english','mandarin'};
 systemtypeslist={'unit_selection','hmm'} % This is not yet implemented!
 %testtypelist={'sim', 'nat'};
@@ -286,7 +286,7 @@ for feat=plottable_feats
             % line:
             %
             
-            interpnonx=interp1(z,x,max(non2vals, min(z)),'linear');
+            interpnonx=interp1(z,x,min(max(non2vals, min(z)),max(z)),'linear');
               
  
             
