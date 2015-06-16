@@ -1,3 +1,10 @@
+%
+%
+%   OBSOLETE
+%
+%   at least I think it should be.
+%   Will be removed in a future version soon...
+%
 function [significant_distances, non_significant_distances] = get_significance_distances(objective_scores, subjective_scores, opinion_matrix, systems)
 
 listeningmeans=subjective_scores;

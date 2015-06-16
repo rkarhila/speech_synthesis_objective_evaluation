@@ -1,5 +1,5 @@
 
-function [significants_by_type, non_significants_by_type, correlations_sys, bestguesscorrect, sigs_labels_by_type, nons_labels_by_type] = get_significance_distances_with_labels(testname, objective_scores, subjective_scores, opinion_matrix, systems, systemtypes, testfilelist)
+function [significants_by_type, non_significants_by_type, correlations_sys, bestguesscorrect, sigs_labels_by_type, nons_labels_by_type, testsize] = get_significance_distances_with_labels(testname, objective_scores, subjective_scores, opinion_matrix, systems, systemtypes, testfilelist)
 
 bestguesscorrect=0;
 sigs_labels=0;
@@ -117,20 +117,30 @@ end
 % little bit of guesswork based on the short technical description.
 %
 
+testsize={0,0,0};
 typematrix=zeros(length(systemtypes));
 for n=1:length(systemtypes)
     for m=1:n
         if systemtypes(n)=='c' && systemtypes(m)=='c' 
             typematrix(m,n)=1; % Comparison between concatenative/hybrid systems
+            testsize{1}=testsize{1}+1;
+            testsize{2}=testsize{2}+1;
         elseif  systemtypes(n)=='h' && systemtypes(m)=='h' 
             typematrix(m,n)=2; % Comparison between (HMM-) model-based systems
+            testsize{1}=testsize{1}+1;
+            testsize{3}=testsize{3}+1;
         elseif  systemtypes(n)=='c' && systemtypes(m)=='h' 
             typematrix(m,n)=3; % Cross-techniqe comparison
+            testsize{1}=testsize{1}+1;
         elseif  systemtypes(n)=='h' && systemtypes(m)=='c' 
             typematrix(m,n)=3; % Cross-techniqe comparison              
+            testsize{1}=testsize{1}+1;
         end
     end
 end
+
+
+
 
 %
 % We'll be interested mostly in the comparisons of systems that have been
@@ -223,29 +233,46 @@ correlations_sys={};
 
 types = {'c','h'};
 
-
+%
+% We want to get some simple correlation data between objective and
+% subjective scores.
+%
+% So... 
+%
+% Turns out that it does not make any sense to do it based on a single
+% test. So we'll just gather the related data here and pass it on to the
+% caller function, where something will be done with it.
+%
+% So... 2.0
+%
+% Turns out that the correlations suck when taken over all the tests (as
+% they are not in the same scale) so let's revert back to the original
+% scheme.
+%
 
 for n=1:2  
     
-    
-    
-    sub_scores = subjective_scores(systemtypes==types{n});
-   
+    sub_scores = subjective_scores(systemtypes==types{n});   
     ob_scores =ob_scores_sys(find(systemtypes==types{n}),:);
-
+    
+    % Old lines to compute correlations; Let's remove these later:
     [cor_sys,p_sys]=corr(sub_scores,ob_scores);
     %abs(cor_sys)
     %cor_sys=abs(cor_sys).*(p_sys<0.05);
-    correlations_sys{n}=cor_sys;
+    correlations_sys{n+1}=cor_sys;
+    %correlations_sys{n}=[sub_scores,ob_scores];
 end   
 
+% Old lines to compute correlations; Let's remove these later:
 [cor_sys,p_sys]=corr(subjective_scores,ob_scores_sys);
+%cor_sys=abs(cor_sys).*(p_sys<0.05);
+%
+correlations_sys{1}=cor_sys;
 
-cor_sys=abs(cor_sys).*(p_sys<0.05);
+%correlations_sys{3}=[subjective_scores,ob_scores_sys];
 
-correlations_sys{3}=cor_sys;
 
-%correlations_sys{1}
+
 
 %
 % Did any of the methods make the right prediction about the winner?

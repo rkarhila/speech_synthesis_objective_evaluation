@@ -1,4 +1,10 @@
-
+%
+%
+%   OBSOLETE
+%
+%   at least I think it should be.
+%   Will be removed in a future version soon...
+%
 function [significants_by_type, non_significants_by_type, correlations_sys, bestguesscorrect] = get_significance_distances_by_systemtype(testname, objective_scores, subjective_scores, opinion_matrix, systems, systemtypes)
 
 bestguesscorrect=0;
