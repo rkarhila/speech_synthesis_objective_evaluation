@@ -43,24 +43,19 @@ elseif nargin == 3
     % 1. Do FFT:
     %
     
-    spec_feas=zeros(nr_frames_test,fft_dim);
+    spec_feas=zeros(nr_frames_test,params.spectrum_dim);
     for frame_index=1:nr_frames_test
         framestart=(frame_index-1)*step_length+1;
         audio_short = hamwin.*test_audio(framestart:framestart+frame_length-1);
-        spec_feas(frame_index,:) = sqrt(abs(fft(audio_short,fft_dim)));
+        spec_feas(frame_index,:) = sqrt(abs(fft(audio_short,params.spectrum_dim)));
     end
-    
-    spec_feas=spec_feas';
+    spec_feas=spec_feas(:,1:fft_dim);
     
     %
     % 2. Get mel-weighted spectrum:
     %
-    
-    feas_test=zeros(nr_frames_test,params.mel_dim);
-
-    for frame_index=1:nr_frames_test
-        feas_test(frame_index,:)=log(M*spec_feas(:,frame_index)+1e-20);
-    end
+        
+    feas_test=log(spec_feas*M'+1e-20);
     
     %
     % Return a struct with info on the (probable) speech frames:
