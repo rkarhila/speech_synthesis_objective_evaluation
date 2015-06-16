@@ -1,4 +1,4 @@
-%TRAIN SYSTEM MODEL Frame-based distance map between two audio files
+%TRAIN SYSTEM MODEL
 %
 % This function checks the existence of a cached model and either 
 % loads it or generates a new one, based on the specified audio 
