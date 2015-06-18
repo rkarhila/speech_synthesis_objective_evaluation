@@ -42,9 +42,9 @@ tests_devel={ ...
    
 for n=1:length(tests_devel)
 
-    [scores,results] = run_individual_test(tests_devel{n}, BLIZZARD2009_RESULTDIR);
+    results = run_individual_test(tests_devel{n}, BLIZZARD2009_RESULTDIR);
 
-    tests_devel{n}.scores=scores;
+    %tests_devel{n}.scores=scores;
     tests_devel{n}.results=results;
 
 end

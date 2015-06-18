@@ -5,7 +5,7 @@
 % preprocessing and generation method structures defined in config. Newly 
 % generated distance maps are saved on disk.
 
-function [distmap] = get_dist_map(filepath,mappath,reffilename,testfilename,preprocessing, method)
+function [distmap] = get_dist_map(filepath,mappath,reffilename,testfilename,preprocessing, method, cachedir)
 
 
     [testpath,testfilebasename,~]=fileparts( testfilename );
@@ -20,11 +20,11 @@ function [distmap] = get_dist_map(filepath,mappath,reffilename,testfilename,prep
     if exist(mapname, 'file') ||  exist([mapname,'.mat'], 'file')
         distmap=parload(mapname);
     else
-        ref_audio=preprocessing.function([filepath,reffilename], preprocessing, [systemcode,testfilename]);
-        ref_feat = method.analysisfunction(ref_audio, method, [refcode,reffilebasename]);
+        ref_audio=preprocessing.function([filepath,reffilename], preprocessing, [cachedir,systemcode,reffilename]);
+        ref_feat = method.analysisfunction(ref_audio, method, [cachedir, refcode,reffilebasename]);
      
-        test_audio=preprocessing.function([filepath,testfilename], preprocessing, [systemcode,testfilename]);
-        test_feat = method.analysisfunction(test_audio, method, [systemcode,testfilebasename]);
+        test_audio=preprocessing.function([filepath,testfilename], preprocessing, [cachedir,systemcode,testfilename]);
+        test_feat = method.analysisfunction(test_audio, method, [cachedir, systemcode,testfilebasename]);
 
         distmap = method.distancefunction(test_feat.features,ref_feat.features,method);
         % Use a separate saving function to write the map to disk 

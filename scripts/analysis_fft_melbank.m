@@ -62,7 +62,7 @@ elseif nargin == 3
     %   
     
     if params.usedelta == 1
-        returnable = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
+        returnable = struct('features',[feas_test, deltas(feas_test',3)', deltas(deltas(feas_test',3))'],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
     else
         speech_frames=speech_frames(speech_frames <= length(feas_test));
         %disp(['size: ', num2str(length(feas_test))]);

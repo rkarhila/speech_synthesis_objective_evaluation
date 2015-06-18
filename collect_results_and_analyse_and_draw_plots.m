@@ -21,7 +21,10 @@ systemtypeslist={'unit_selection','hmm'} % This is not yet implemented!
 testtypelist={'sim'};
 
 
-plots_to_be_drawn=[1:length(testlist)];
+%%%% For all feats? No, just for the selected ones:
+
+plottable_feats=1:length(testlist);
+
 
 interesting_thresholds=[50,75,90,95];
 
@@ -32,24 +35,30 @@ res=struct(...
            'mins',[],...
            'maxs',[],...
            'speakers',{{}},...
-           'performances', {{}}, ...
-           'best_shots',{{}}),...
+           'correlation_data', {{}}, ...
+           'best_shots',{{}},...
+           'test_names',{{}},...
+           'test_size',[]),...
     'only_unitsel', struct(...
            'non_significant_values',{{}},...
            'significant_values',{{}},...
            'mins',[],...
            'maxs',[],...
            'speakers',{{}},...
-           'performances', {{}}, ...
-           'best_shots',{{}}), ...      
+           'correlation_data', {{}}, ...
+           'best_shots',{{}},...
+           'test_names',{{}},...
+           'test_size',[]), ...      
     'only_hmm', struct(...
            'non_significant_values',{{}},...
            'significant_values',{{}},...
            'mins',[],...
            'maxs',[],...
            'speakers',{{}},...
-           'performances', {{}}, ...
-           'best_shots',{{}}));
+           'correlation_data', {{}}, ...
+           'best_shots',{{}},...
+           'test_names',{{}},...
+           'test_size',[]));
 
        
 
@@ -86,7 +95,7 @@ for p=1:length(tests) % The year
             end            
             
             % Get the interesting numbers:
-            [sigs, nons, correlations_sys, bestguesscorrect, siglabels1, nonlabels1] = ...
+            [sigs, nons, correlation_data, bestguesscorrect, siglabels1, nonlabels1, test_size] = ...
                 get_significance_distances_with_labels(...
                 t.name,...
                 t.results,...
@@ -129,12 +138,11 @@ for p=1:length(tests) % The year
                     
                 end
                 
-                res.(comptype).performances{n}=correlations_sys{comparisoncount};
+                res.(comptype).correlation_data{n}=correlation_data{comparisoncount};
                 res.(comptype).best_shot{n}=bestguesscorrect{comparisoncount};                    
-                    
-                
 
-
+                res.(comptype).test_names{n}=t.name;
+                res.(comptype).test_size(n)=test_size{comparisoncount};
             
             end
         end
@@ -159,20 +167,17 @@ set(hFig, 'Position', [0 0 1500 1000]);
 binsteps=10;
 
 
-%test_stats=struct('thresholds',[], 'data_over_thresh',[],...
+%method_statistics=struct('thresholds',[], 'data_over_thresh',[],...
 %                  'harsh_thresholds',[], 'harsh_data_over_thresh',[]);
 
-test_stats=struct('all',struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[]),...
+method_statistics=struct('all',struct('thresholds',[], 'data_over_thresh',[],...
+                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
                   'only_unitsel', struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[]),...
+                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
                   'only_hmm',  struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[]) );
+                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]) );
 
               
-%%%% For all feats? No, just for the selected ones:
-
-plottable_feats=[18];
 
 for feat=plottable_feats
 
@@ -206,13 +211,15 @@ for feat=plottable_feats
 
             testname=[strjoin(corpora_in_test,', '),'; ',strjoin(languages_in_test,', '),'; ',strjoin(test_types_in_test,', '),': '];
 
-            sigs=res.(comptype).significant_values;
-            
+            sigs=res.(comptype).significant_values;            
             siglabels=res.(comptype).significant_values_labels;
             
             nons=res.(comptype).non_significant_values;
-            
             nonlabels=res.(comptype).non_significant_values_labels;
+
+
+            corr_data_src=res.(comptype).correlation_data;
+            corr_data=zeros(0,0);
             
             histsigs=zeros(0,0);
             histnons=zeros(0,0);       
@@ -230,8 +237,35 @@ for feat=plottable_feats
                     histnonlabs=[histnonlabs;nonlabels{m}];
 
                 end
+                if ~isempty(corr_data_src{m})
+                    corr_data=[corr_data; corr_data_src{m}];
+                end
             end
-                
+
+            
+            % Get rid of those pesky NaNs:
+%             histsigs=histsigs(~isnan(histsigs));
+%             histsiglabels=histsiglabels(~isnan(sigs));
+% 
+%             nons=nons(~isnan(nons));
+%             nonlabels=nonlabels(~isnan(nons));
+                       
+
+            
+            
+            %corr_ref=corr_data(:,1);
+            %corr_test=corr_data(:,feat+1);
+            
+            
+            % Get rid of those pesky NaNs:
+            %corr_ref=corr_ref(~isnan(corr_test));
+            %corr_test=corr_test(~isnan(corr_test));
+            
+            %[cor_sys,p_sys]=corr(corr_data(:,1),corr_data(:,feat+1));
+            %cor_sys=abs(cor_sys).*(p_sys<0.05);
+            
+            method_statistics.(comptype).correlations(feat,:)=corr_data(:,feat);
+            
             % This is inefficient: We should loop the feats here, but it
             % goes a little against the idea of plotting each test feature
             % on its own page one at a time...
@@ -396,11 +430,11 @@ for feat=plottable_feats
             
             
             
-            test_stats.(comptype).thresholds(feat,:)=thrvals;
-            test_stats.(comptype).harsh_thresholds(feat,:)=harshthrvals;
+            method_statistics.(comptype).thresholds(feat,:)=thrvals;
+            method_statistics.(comptype).harsh_thresholds(feat,:)=harshthrvals;
             
-            test_stats.(comptype).data_over_thresh(feat,:)=goodnessvals;
-            test_stats.(comptype).harsh_data_over_thresh(feat,:)=harshgoodnessvals;
+            method_statistics.(comptype).data_over_thresh(feat,:)=goodnessvals;
+            method_statistics.(comptype).harsh_data_over_thresh(feat,:)=harshgoodnessvals;
             
             
             
@@ -576,12 +610,16 @@ for feat=plottable_feats
 
     
     
-    h3 = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',testlist{feat}.name]);
+    h3 = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',regexprep(testlist{feat}.name,'_',' ')]);
     set(h3,'FontSize',18,'FontWeight','normal')
     
     
     featfilename=[num2str(feat),'_',regexprep(testlist{feat}.name,'\W+','_'),'_fixed_logistics.pdf'];
-    export_fig('-painters','-r600','-q101',[RESULT_GRAPH_DIR,featfilename])
+    resultdir=[RESULT_GRAPH_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];
+    if ~exist(resultdir, 'dir')
+        mkdir (resultdir)
+    end
+    export_fig('-painters','-r600','-q101',[resultdir,'/',featfilename])
 end
 
 

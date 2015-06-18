@@ -6,11 +6,9 @@
 function [returnable] = analysis_straight_mfcc(varargin)
 %
 if nargin == 0
-    returnable = 'straight_for_fwsnr';
+    returnable = 'straight_for_mfcc';
 
 elseif nargin == 3
-
-    local_conf
 
     audio_struct= varargin{1};
     
@@ -20,14 +18,14 @@ elseif nargin == 3
     
     params = varargin{2};
     
-    filename = varargin{3}; % Not used for anything, as it is not judged 
-                            % worthy to cache fft results
+    filename = varargin{3}; % For caching the straight results!
+    
     itsok=0;
 
-    if (CACHE_STRAIGHT == 1)
+    if (isfield(params, 'cache_spectrum') && params.cache_spectrum == 1)
         % STRAIGHT extraction takes some time, so let's cache the
         % feature files
-        stfilename=[LOCAL_FEATDIR,filename,'.params_', params.name];
+        stfilename=[filename,'.params_', num2str(params.spectrum_dim)];
 
         if exist([stfilename,'.mat'], 'file')
             try
@@ -47,8 +45,8 @@ elseif nargin == 3
 
     else
 
-        [f0raw,~,analysisParams]=exstraightsource(test_audio,params.fs,prm);
-        [spec_feas,analysisParamsSp]=exstraightspec(test_audio,f0raw,params.fs,prm);
+        [f0raw,~,analysisParams]=exstraightsource(test_audio,params.fs,params);
+        [spec_feas,analysisParamsSp]=exstraightspec(test_audio,f0raw,params.fs,params);
 
     end
     
@@ -75,8 +73,8 @@ elseif nargin == 3
     % Return a struct with info on the (probable) speech frames:
     %   
     
-    if params.usedelta == 1
-        returnable = struct('features',[feas_test, deltas(feas_test,3), deltas(deltas(feas_test,3))],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
+    if params.usedelta == 1        
+        returnable = struct('features',[feas_test, deltas(feas_test',3)', deltas(deltas(feas_test',3))'],'speech_frames',speech_frames(3:(length(speech_frames)-2))-2 );
     else
         speech_frames=speech_frames(speech_frames <= length(feas_test));
         returnable = struct('features',feas_test,'speech_frames',speech_frames);

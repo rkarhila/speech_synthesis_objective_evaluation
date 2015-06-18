@@ -5,7 +5,7 @@
 % preprocessing and generation method structures defined in config. Newly 
 % generated models are saved on disk.
 
-function [model, test_data_sys] = train_system_model(filepath,modelname,testfilelist, method, cached_test_data)
+function [model, test_data_sys] = train_system_model(filepath,modelname,testfilelist, method, cached_test_data, cachedir)
 
 
 if exist(modelname, 'file') ||  exist([modelname,'.mat'], 'file')
@@ -23,7 +23,7 @@ else
         systemcode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
         
         audio=method.preprocessing.function([filepath,testfilelist{1}], method.preprocessing, [systemcode,testfilebasename]);       
-        featstruct = method.analysis.analysisfunction(audio, method.analysis, [systemcode,testfilebasename]);
+        featstruct = method.analysis.analysisfunction(audio, method.analysis, [cachedir, systemcode,testfilebasename]);
 
         test_data_sys=featstruct.features(featstruct.speech_frames,:);
 
@@ -35,8 +35,8 @@ else
             [testpath,testfilebasename,~]=fileparts( testfilelist{p} );
             systemcode=regexprep( testpath, '[^a-zA-Z0-9-_]', '_');
             
-            audio=method.preprocessing.function([filepath,testfilelist{1}], method.preprocessing, [systemcode,testfilebasename]);
-            featstruct = method.analysis.analysisfunction(audio, method.analysis, [ systemcode,testfilebasename ]);           
+            audio=method.preprocessing.function([filepath,testfilelist{p}], method.preprocessing, [systemcode,testfilebasename]);
+            featstruct = method.analysis.analysisfunction(audio, method.analysis, [cachedir, systemcode,testfilebasename ]);           
             
             test_data_sys=[test_data_sys; featstruct.features(featstruct.speech_frames,:)];
         end               

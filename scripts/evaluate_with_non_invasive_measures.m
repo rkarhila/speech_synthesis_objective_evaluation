@@ -52,7 +52,7 @@ testcount=length(testlist);
 % Define here to make parfor happy:
 %
 tests=non_invasive_tests;
-
+local_featdir=LOCAL_FEATDIR;
 
 %
 %
@@ -106,7 +106,7 @@ parfor i=1:length(systems)
         
         disp(['train ', modelname]);
         
-        [model_set, test_data_sys] = train_system_model( filepath, modelname, testfilenames, test, test_data_sys  );
+        [model_set, test_data_sys] = train_system_model( filepath, modelname, testfilenames, test, test_data_sys , local_featdir );
         
         model_set.modelname=modelname;
         
@@ -163,7 +163,7 @@ parfor y=1:length(tests)
             model=par_modelsets{i}{y};
             disp (['Using model {',num2str(i),'}{',num2str(y),'}: ',model.modelname] );
             
-            [result, ref_data_sys] = test_system_model( filepath,reffilelist{u}, par_modelsets{i}{y}, test, ref_data_sys  );
+            [result, ref_data_sys] = test_system_model( filepath,reffilelist{u}, par_modelsets{i}{y}, test, ref_data_sys  , local_featdir);
 
             modelres(index)=result;
             

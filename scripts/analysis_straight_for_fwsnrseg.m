@@ -13,8 +13,6 @@ if nargin == 0
 
 elseif nargin == 3
 
-    local_conf
-
     audio_struct= varargin{1};
     
     test_audio = audio_struct.audio;
@@ -27,10 +25,10 @@ elseif nargin == 3
                             % worthy to cache fft results
     itsok=0;
 
-    if (CACHE_STRAIGHT == 1)
+    if (isfield(params, 'cache_spectrum') && params.cache_spectrum == 1)
         % STRAIGHT extraction takes some time, so let's cache the
         % feature files
-        stfilename=[LOCAL_FEATDIR,filename,'.params_', params.name];
+        stfilename=[filename,'.params_', num2str(params.spectrum_dim)];
 
         if exist([stfilename,'.mat'], 'file')
             try

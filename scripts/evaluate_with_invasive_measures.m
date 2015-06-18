@@ -89,7 +89,7 @@ parfor i=1:length(testfilelist)
         mapmethod=[test.preprocessing.name,'_',test.map_feature.name];
 
         if ~isfield(distmaps, mapmethod)
-            distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature);
+            distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature, LOCAL_FEATDIR);
         end
         
         

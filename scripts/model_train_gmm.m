@@ -5,50 +5,51 @@ if nargin == 0
     
 elseif nargin == 2
     local_conf;
+
     
     x = varargin{1};
     
     params = varargin{2};
 
+    gauss_retr=5;
     
-                    
-    if (isfield(params, 'init_method'))
-        v0=params.init_method;
-    else
-        v0='k';
-    end
-                    
-    if (isfield(params, 'varfloor'))
-        c=v0.varfloor;
-    else
-        c=[];
-    end
+    tries=0;
+    num_components=params.num_components;
+    
+    while tries < gauss_retr
+        try
+            if params.cov_type=='full'
+                gmm_model_set=gmmb_em(x,'components',num_components);
+                disp(['Done in ',num2str(tries),' tries with ',num2str(num_components),' components! ',params.name]);
+                tries=gauss_retr;
+            else
+                gmm_model_set=gmmb_em_d(x,'components',num_components);
+                disp(['Done in ',num2str(tries),' tries with ',num2str(num_components),' components! ',params.name]);
+                tries=gauss_retr;
+            end
+        catch me
+            disp(me.message)
 
-    if (isfield(params, 'num_components'))
-        m0=params.num_components;
-    else
-        m0=3;
+            if (num_components>35)
+                num_components=num_components-3;
+            else
+                tries=tries+1;
+            end
+            
+            
+            disp(['Retrying ',num2str(tries),' tries', num2str(num_components),' components!',params.name]);
+            if tries==gauss_retr
+                tmpname=['/tmp/',regexprep(params.name,'\W+','_'),'_',datestr(now,'yyyy-mm-dd-HH-MM-SS-FFF'),'.dump'];
+                parsave(tmpname,x);
+                error(['Singular gaussian! ', params.name , ' data dumped to ',tmpname,'.mat' ]);
+                
+            end
+        end
     end
-       
-    if (params.cov_type=='full')
-        v0=[v0,'v'];
-    end
+    
+    returnable=gmm_model_set;
+    
 
-    if (isfield(params, 'stopping_criterion'))
-        l=params.stopping_criterion;
-    else
-        l=[];
-    end
-    
-    [m,v,w,~,f,~,~]=gaussmix(x,c,l,m0,v0);
-
-    returnable=struct(...
-     'mu',m,   ...
-     'sigma',v, ...
-     'weights',w',...
-     'fischer_discriminant',f);
-    
-    
 else
     error('model_train_gmm takes 0 or 2 arguments (features and parameters)');
 end
