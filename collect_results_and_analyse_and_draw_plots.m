@@ -15,7 +15,7 @@
 %
 
 corporalist={'cas','nancy','rjs','roger','speakit','voice_forge','wj'};
-languagelist={'english','mandarin'};
+languagelist={'mandarin'};
 systemtypeslist={'unit_selection','hmm'} % This is not yet implemented!
 %testtypelist={'sim', 'nat'};
 testtypelist={'sim'};
