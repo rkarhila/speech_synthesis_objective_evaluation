@@ -11,7 +11,7 @@ elseif nargin == 2
     
     params = varargin{2};
 
-    gauss_retr=5;
+    gauss_retr=25;
     
     tries=0;
     num_components=params.num_components;
@@ -41,7 +41,7 @@ elseif nargin == 2
             if tries==gauss_retr
                 tmpname=['/tmp/',regexprep(params.name,'\W+','_'),'_',datestr(now,'yyyy-mm-dd-HH-MM-SS-FFF'),'.dump'];
                 parsave(tmpname,x);
-                error(['Singular gaussian! ', params.name , ' data dumped to ',tmpname,'.mat' ]);
+                error([me.message, ' Singular gaussian! ', params.name , ' data dumped to ',tmpname,'.mat' ]);
                 
             end
         end

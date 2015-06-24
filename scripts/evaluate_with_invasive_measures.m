@@ -53,7 +53,8 @@ filespersystem=length(reffilelist)/length(systems);
 % Define here to make parfor happy:
 %
 tests=invasive_tests;
-
+local_featdir=LOCAL_FEATDIR;
+    
 %
 % Initialise the result array
 %
@@ -89,7 +90,7 @@ parfor i=1:length(testfilelist)
         mapmethod=[test.preprocessing.name,'_',test.map_feature.name];
 
         if ~isfield(distmaps, mapmethod)
-            distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature, LOCAL_FEATDIR);
+            distmaps.(mapmethod) = get_dist_map(filepath,mapdirectory, reffilelist{i}, testfilelist{i}, test.preprocessing, test.map_feature, local_featdir);
         end
         
         
@@ -113,7 +114,7 @@ parfor i=1:length(testfilelist)
         mapname=[mapdirectory,speakercode,testfilename,'_',pathmethod,'.map'];
         
         if ~isfield(distmaps, pathmethod)
-            distmaps.(pathmethod) = get_dist_map(filepath,mapdirectory,reffilelist{i},testfilelist{i}, test.preprocessing, test.path_feature);
+            distmaps.(pathmethod) = get_dist_map(filepath,mapdirectory,reffilelist{i},testfilelist{i}, test.preprocessing, test.path_feature, local_featdir);
         end
 
        

@@ -73,6 +73,8 @@ languages_in_test={};
 corpora_in_test={};
 test_types_in_test={};
 
+
+
 for p=1:length(tests) % The year
     for r=1:length(tests{p}) % The task
         t=tests{p}{r}; 
@@ -170,13 +172,41 @@ binsteps=10;
 %method_statistics=struct('thresholds',[], 'data_over_thresh',[],...
 %                  'harsh_thresholds',[], 'harsh_data_over_thresh',[]);
 
-method_statistics=struct('all',struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
-                  'only_unitsel', struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
-                  'only_hmm',  struct('thresholds',[], 'data_over_thresh',[],...
-                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]) );
+%method_statistics=struct('all',struct('thresholds',[], 'data_over_thresh',[],...
+%                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
+%                  'only_unitsel', struct('thresholds',[], 'data_over_thresh',[],...
+%                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]),...
+%                  'only_hmm',  struct('thresholds',[], 'data_over_thresh',[],...
+%                  'harsh_thresholds',[], 'harsh_data_over_thresh',[], 'correlations',[]) );
 
+
+              
+reports=cell(length(comparisontypeslist),2);
+
+for r=1:length(comparisontypeslist)
+   reports{r,1}= {...
+       char(strcat({'  Results for '},test_types_in_test , {' comparing '}, char(comparisontypeslist{r}{1}) )),...
+       '  ignoring the cases where listeners could not reach a decision.',...
+       '',...
+       char(strcat({'    Speakers:  '}, strjoin(corpora_in_test, ', '))),...
+       char(strcat({'   Languages:  '}, strjoin(languages_in_test, ', '))),...
+       '',...
+       '    Threshold values            |        % of data over thresholds           Median',...',...
+       ' 50%     75%     90%     95%    |        50%     75%     90%     95%    |  correlation  | Method'};
+       %0.00	0.30	0.30	0.30	|	0.55	0.01	0.01	0.01	|	0.50	| PESQ Wideband MOS LQC   
+       %0.00	0.30	0.30	0.30	|	0.55	0.01	0.01	0.01	|	0.50	| PESQ Wideband MOS LQC 
+   reports{r,2}={...
+       char(strcat({'  Results for '},test_types_in_test , {' comparing '}, char(comparisontypeslist{r}{1}) )),...
+       '  Taking into account the cases where listeners could not reach a decision.',...
+       '',...
+       char(strcat({'    Speakers:  '}, strjoin(corpora_in_test, ', '))),...
+       char(strcat({'   Languages:  '}, strjoin(languages_in_test, ', '))),...
+       '',...
+       '    Threshold values            |        % of data over thresholds           Medilsan',...
+       ' 50%     75%     90%     95%    |        50%     75%     90%     95%    |  correlation  | Method'};
+   
+end
+              
               
 
 for feat=plottable_feats
@@ -264,7 +294,7 @@ for feat=plottable_feats
             %[cor_sys,p_sys]=corr(corr_data(:,1),corr_data(:,feat+1));
             %cor_sys=abs(cor_sys).*(p_sys<0.05);
             
-            method_statistics.(comptype).correlations(feat,:)=corr_data(:,feat);
+            %method_statistics.(comptype).correlations(feat,:)=corr_data(:,feat);
             
             % This is inefficient: We should loop the feats here, but it
             % goes a little against the idea of plotting each test feature
@@ -319,8 +349,10 @@ for feat=plottable_feats
             % Interpolate the non-significant test values into the smoothed
             % line:
             %
-            
-            interpnonx=interp1(z,x,min(max(non2vals, min(z)),max(z)),'linear');
+            % (Add tiny noise to make sure that the values are unique)
+            %
+            %
+            interpnonx=interp1(z+rand(size(z))*1e-10,x,min(max(non2vals, min(z)),max(z)),'pchip');
               
  
             
@@ -346,8 +378,8 @@ for feat=plottable_feats
 
             %ct=0;
             for m=min(find(srvals>0)):length(srvals)
-                %ct=ct+1;
-                accum(m)=sum((srvals>srvals(m)))/(sum((srvals>srvals(m)))+sum((srvals<(-srvals(m)))));
+                %ct=ct+1;X
+                accum(m) = sum((srvals>srvals(m))) / (  sum((srvals>srvals(m))) + sum((srvals<(-srvals(m))))  );
                 nonsaccum(m)=sum((srvals>srvals(m)))/(  sum(srvals>srvals(m)) + sum(srvals<(-srvals(m))) + sum(srnonvals<(-srvals(m))) + sum(srnonvals>srvals(m))  );
             end
 
@@ -412,7 +444,7 @@ for feat=plottable_feats
                   end
                   harshthrvals(pointer)=harshthrval;
                   
-                  harshgoodnessval=(1-(min(find(nonsaccum> (th/100)))/length(nonsaccum)))/theoretical_best_possible;
+                  harshgoodnessval=(1-(min(find(nonsaccum> (th/100)))/length(nonsaccum)));
                   if (isempty(harshgoodnessval))
                     harshgoodnessval=0;
                   end              
@@ -421,20 +453,25 @@ for feat=plottable_feats
                   
              end
              
-             
+            % For fancy and nice reporting:
                  
-            disp([testname, comparisonname, '  thresholds 50/75/90/95:']);
-            disp([thrvals; goodnessvals]);
-            disp([testname, comparisonname, '  thresholds 50/75/90/95, including undecided: ']);
-            disp([harshthrvals; harshgoodnessvals]);
+            corr_vals=corr_data(:,feat);
+            corr_val=median(corr_vals);
             
+            rep1={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
+                testlist{feat}.name],[thrvals(1:4) goodnessvals, corr_val])};
             
+            rep2={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
+                testlist{feat}.name],[harshthrvals(1:4) harshgoodnessvals, corr_val])};
             
-            method_statistics.(comptype).thresholds(feat,:)=thrvals;
-            method_statistics.(comptype).harsh_thresholds(feat,:)=harshthrvals;
+            reports{ comparisoncount,1} = [reports{ comparisoncount,1}, rep1];
+            reports{ comparisoncount,2} = [reports{ comparisoncount,2}, rep2];
             
-            method_statistics.(comptype).data_over_thresh(feat,:)=goodnessvals;
-            method_statistics.(comptype).harsh_data_over_thresh(feat,:)=harshgoodnessvals;
+            %method_statistics.(comptype).thresholds(feat,:)=thrvals;
+            %method_statistics.(comptype).harsh_thresholds(feat,:)=harshthrvals;
+            
+            %method_statistics.(comptype).data_over_thresh(feat,:)=goodnessvals;
+            %method_statistics.(comptype).harsh_data_over_thresh(feat,:)=harshgoodnessvals;
             
             
             
@@ -585,7 +622,7 @@ for feat=plottable_feats
                 if bincs(2,h) > 0
                     rectangle('Position', [binedges(h), upedge-ycoords(2,h), binedges(h+1)-binedges(h), bincs(2,h)], 'FaceColor','y')
                 end
-                if bincs(3,h)
+                if bincs(3,h) > 0
                     rectangle('Position', [binedges(h), upedge-ycoords(3,h), binedges(h+1)-binedges(h), bincs(3,h)], 'FaceColor','r')
                 end
             end
@@ -619,11 +656,29 @@ for feat=plottable_feats
     if ~exist(resultdir, 'dir')
         mkdir (resultdir)
     end
+    %disp(['Writing (or at least trying) to ', resultdir,'/',featfilename]);
     export_fig('-painters','-r600','-q101',[resultdir,'/',featfilename])
 end
 
 
 
+reporttypes={'_only_significant', '_include_nonsignificant'};
+
+resultdir=[RESULT_REPORT_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];   
+if ~exist(resultdir, 'dir')
+    mkdir (resultdir)
+end    
+
+
+for r=1:length(comparisontypeslist)
+    for p=1:2
+        fid = fopen([resultdir, '/report_',regexprep([comparisontypeslist{r}{1},reporttypes{p}],'\W+','_') ],'w');
+        for i=1:length(reports{r,p})
+            fprintf(fid,'%s\n',reports{r,p}{i});
+        end
+        fclose(fid);
+    end    
+end    
 
 disp('This last bit should activate a little helper function that ')
 disp('allows you to look for outliers in the plot that you have just ')

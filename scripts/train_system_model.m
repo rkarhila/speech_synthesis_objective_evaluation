@@ -47,8 +47,12 @@ else
     % Call the training function specified in the test config:
     
     disp(['Training ',method.modelling.name]);
-    model=method.modelling.trainfunction(test_data_sys,method.modelling);
-    
+    try
+      model=method.modelling.trainfunction(test_data_sys,method.modelling);
+    catch me
+      disp(['Error while training', modelname]);      
+      error(me.message);
+    end    
     % Use a separate saving function to write the model to disk
     % inside a parallel loop
     parsave(modelname, model);
