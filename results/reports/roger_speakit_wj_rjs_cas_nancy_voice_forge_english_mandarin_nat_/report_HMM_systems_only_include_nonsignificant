@@ -4,7 +4,7 @@
     Speakers:  roger, speakit, wj, rjs, cas, nancy, voice_forge
    Languages:  english, mandarin
 
-    Threshold values            |        % of data over thresholds           Median
+    Threshold values            |        % of data over thresholds           Medilsan
  50%     75%     90%     95%    |        50%     75%     90%     95%    |  correlation  | Method
 0.00	0.66	1.42	2.14	|	0.69	0.40	0.12	0.03	|	-0.59	| Distortion: dtw with fft fws , path cost with fft fws 
 0.01	0.25	0.69	0.69	|	0.64	0.28	0.01	0.01	|	-0.29	| Distortion: dtw with fft fws , path cost with fft mcd 

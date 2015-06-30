@@ -15,15 +15,20 @@
 %
 
 corporalist={'cas','nancy','rjs','roger','speakit','voice_forge','wj'};
-languagelist={'mandarin'};
+languagelist={'english','mandarin'};
 systemtypeslist={'unit_selection','hmm'} % This is not yet implemented!
 %testtypelist={'sim', 'nat'};
-testtypelist={'sim'};
+testtypelist={'nat'};
 
 
 %%%% For all feats? No, just for the selected ones:
 
 plottable_feats=1:length(testlist);
+
+%
+
+binsteps=10;
+plottable_bins=10;
 
 
 interesting_thresholds=[50,75,90,95];
@@ -166,7 +171,7 @@ hFig = figure(600);
 
 set(hFig, 'Position', [0 0 1500 1000]);
 
-binsteps=10;
+
 
 
 %method_statistics=struct('thresholds',[], 'data_over_thresh',[],...
@@ -207,7 +212,7 @@ for r=1:length(comparisontypeslist)
    
 end
               
-              
+outliers_for_analysis=cell(length(testlist),3);              
 
 for feat=plottable_feats
 
@@ -229,8 +234,8 @@ for feat=plottable_feats
     xmaxval=-inf;
     HA=cell(3,1);
     
-    smoothed_vals=cell(3,1);
-    labs_for_smoothed_vals=cell(3,1);
+    plot_positions=cell(3,1);
+    labs_for_plot_positions=cell(3,1);
     
     for comparisoncount=1:3                    
         comptype=comptypes{comparisoncount};
@@ -272,30 +277,7 @@ for feat=plottable_feats
                 end
             end
 
-            
-            % Get rid of those pesky NaNs:
-%             histsigs=histsigs(~isnan(histsigs));
-%             histsiglabels=histsiglabels(~isnan(sigs));
-% 
-%             nons=nons(~isnan(nons));
-%             nonlabels=nonlabels(~isnan(nons));
-                       
 
-            
-            
-            %corr_ref=corr_data(:,1);
-            %corr_test=corr_data(:,feat+1);
-            
-            
-            % Get rid of those pesky NaNs:
-            %corr_ref=corr_ref(~isnan(corr_test));
-            %corr_test=corr_test(~isnan(corr_test));
-            
-            %[cor_sys,p_sys]=corr(corr_data(:,1),corr_data(:,feat+1));
-            %cor_sys=abs(cor_sys).*(p_sys<0.05);
-            
-            %method_statistics.(comptype).correlations(feat,:)=corr_data(:,feat);
-            
             % This is inefficient: We should loop the feats here, but it
             % goes a little against the idea of plotting each test feature
             % on its own page one at a time...
@@ -339,12 +321,15 @@ for feat=plottable_feats
             alllabs=alllabs(indexing);
             
             z=alltable(:,1);
-            x=zeros(size(z));
 
-            for i=1:length(z)
-                x(i)=sum(alltable(max(1,i-nn):min(i+nn,length(z)),2)==1)/( min(i+nn,length(z))-max(1,i-nn)+1 );
-            end
+            % Remove soon:
+%            x=zeros(size(z));
+%            for i=1:length(z)
+%                x(i)=sum(alltable(max(1,i-nn):min(i+nn,length(z)),2)==1)/( min(i+nn,length(z))-max(1,i-nn)+1 );
+%            end
 
+            
+           
             %
             % Interpolate the non-significant test values into the smoothed
             % line:
@@ -352,7 +337,7 @@ for feat=plottable_feats
             % (Add tiny noise to make sure that the values are unique)
             %
             %
-            interpnonx=interp1(z+rand(size(z))*1e-10,x,min(max(non2vals, min(z)),max(z)),'pchip');
+            %interpnonx=interp1(z+rand(size(z))*1e-10,x,min(max(non2vals, min(z)),max(z)),'pchip');
               
  
             
@@ -363,11 +348,16 @@ for feat=plottable_feats
             alllabs=alllabs(indexing);
  
             z=alltable(:,1);
-            x=[x;interpnonx'];
-            x=x(indexing);
             
-            smoothed_vals{comparisoncount}={z,x};
-            labs_for_smoothed_vals{comparisoncount}=alllabs;
+            % Wait, how about not smoothing?
+            x=(alltable(:,2));
+            x(x==0)=0.375+0.25*rand(size(x(x==0)));
+            x(x==-1)=0.0+0.25*rand(size(x(x==-1)));
+            x(x==1)=0.75+0.25*rand(size(x(x==1)));
+            
+            
+            plot_positions{comparisoncount}={z,x};
+            labs_for_plot_positions{comparisoncount}=alllabs;
             goodorbad=alltable(:,2);
             
             srvals=sort(vals);            
@@ -383,7 +373,10 @@ for feat=plottable_feats
                 nonsaccum(m)=sum((srvals>srvals(m)))/(  sum(srvals>srvals(m)) + sum(srvals<(-srvals(m))) + sum(srnonvals<(-srvals(m))) + sum(srnonvals>srvals(m))  );
             end
 
-            theoretical_best_possible=length(vals)/(length(vals)+length(nonvals));
+            % Remove the next line someday:
+            %theoretical_best_possible=length(vals)/(length(vals)+length(nonvals));
+
+            
 %            
 %     Inverse accumulation of scores, for what reason???
 %
@@ -466,12 +459,7 @@ for feat=plottable_feats
             
             reports{ comparisoncount,1} = [reports{ comparisoncount,1}, rep1];
             reports{ comparisoncount,2} = [reports{ comparisoncount,2}, rep2];
-            
-            %method_statistics.(comptype).thresholds(feat,:)=thrvals;
-            %method_statistics.(comptype).harsh_thresholds(feat,:)=harshthrvals;
-            
-            %method_statistics.(comptype).data_over_thresh(feat,:)=goodnessvals;
-            %method_statistics.(comptype).harsh_data_over_thresh(feat,:)=harshgoodnessvals;
+
             
             
             
@@ -479,8 +467,8 @@ for feat=plottable_feats
             
             
 
-            Value_difference=smoothed_vals{comparisoncount}{1};
-            Smoothed_probability=smoothed_vals{comparisoncount}{2};
+            Value_difference=plot_positions{comparisoncount}{1};
+            plot_pos=plot_positions{comparisoncount}{2};
             % Add miniscule noise to make values unique:
             %if feat>37
             Value_difference=Value_difference+10^-12*rand(size(Value_difference));
@@ -491,10 +479,10 @@ for feat=plottable_feats
             % Plot the smoothed windowed values:
             %
             %
-            plot(Value_difference(goodorbad==0),Smoothed_probability(goodorbad==0),'s','MarkerEdgeColor',[1.0, 0.7, 0.1]);
+            plot(Value_difference(goodorbad==0),plot_pos(goodorbad==0),'s','MarkerEdgeColor',[1.0, 0.7, 0.1]);
             hold on             
-            plot(Value_difference(goodorbad==1),Smoothed_probability(goodorbad==1),'d','MarkerEdgeColor',[0.2, 0.6, 0.2]);
-            plot(Value_difference(goodorbad==-1),Smoothed_probability(goodorbad==-1),'ro');
+            plot(Value_difference(goodorbad==1),plot_pos(goodorbad==1)  ,'d','MarkerEdgeColor',[0.2, 0.6, 0.2]);
+            plot(Value_difference(goodorbad==-1),plot_pos(goodorbad==-1),'ro');
 
             
 
@@ -512,13 +500,19 @@ for feat=plottable_feats
             opts.Normalize = 'on';
             opts.SmoothingParam = 0.95;
 
-            [fitresult, gof] = fit( Value_difference, Smoothed_probability, ft, opts );
+            [fitresult, gof] = fit( Value_difference(abs(goodorbad)==1), (goodorbad(abs(goodorbad)==1)+1)/2, ft, opts );
 
             h1 = plot(fitresult,'b');
             set(h1,'LineWidth',2);
 
 
-                        
+            
+            % Fit another line, this one looks at the undecided pair
+            % comparisons and considers them failures:
+            [fitresult2, gof] = fit( Value_difference, floor((goodorbad+1)/2), ft, opts );
+
+            h1 = plot(fitresult2,'b--');
+            set(h1,'LineWidth',2);           
 
             
             %
@@ -528,7 +522,7 @@ for feat=plottable_feats
             %
             % First for the case where we neglect the "undecided" tests:
             %
-            linecolors={'b', 'g', 'r', 'm', 'b', 'g', 'r', 'm'};
+            linecolors={'b', [0.2, 0.6, 0.2], 'r', 'm', 'b', [0.2, 0.6, 0.2], 'r', 'm'};
             colorpointer=0;
             pointer=0;
 
@@ -544,9 +538,11 @@ for feat=plottable_feats
                 colorpointer = colorpointer+1;
                 
                 if thrvals(pointer) < inf && thrvals(pointer) ~= thrvals(pointer + 1)
-                    line([thrvals(pointer),thrvals(pointer)],[0,1],'color',char(linecolors{colorpointer}),'LineWidth',2);
+                    line([thrvals(pointer),thrvals(pointer)],[0,1],'color',linecolors{colorpointer},'LineWidth',2);
                     rounded=roundn(thrvals(pointer),round(log10(thrvals(pointer))-2));
-                    text(thrvals(pointer),0.07*colorpointer,[num2str(th),'% ', num2str(rounded)]);
+                    text(thrvals(pointer),0.07*colorpointer,[num2str(th),'% ', num2str(rounded)], 'fontsize', 14, 'fontweight', 'bold');
+                    
+                    %annotation('textbox', [thrvals(pointer),0.07*colorpointer,0,0], 'String', [num2str(th),'% ', num2str(rounded)],'BackgroundColor',[1.0,0.95,0.95], 'EdgeColor','blue');
                 end
                 
             end
@@ -566,7 +562,7 @@ for feat=plottable_feats
                 if harshthrvals(pointer) < inf && harshthrvals(pointer) ~= harshthrvals(pointer + 1)
                     line([harshthrvals(pointer),harshthrvals(pointer)],[0,1],'color',linecolors{colorpointer},'LineWidth',2,'LineStyle','--');
                     rounded=roundn(harshthrvals(pointer),round(log10(harshthrvals(pointer))-2));
-                    text(harshthrvals(pointer),0.07*colorpointer,[num2str(th),'% ', num2str(rounded)]);
+                    text(harshthrvals(pointer),0.07*colorpointer,[num2str(th),'% ', num2str(rounded)], 'fontsize', 14, 'fontweight', 'bold');
                 end
             end         
 
@@ -588,7 +584,7 @@ for feat=plottable_feats
             ylabel('% correct significant evaluations','FontSize',12);
 
             grid minor
-            title([testname,', ',comparisonname],'FontSize',15); 
+            title(regexprep([testname,comparisonname],'_',' '),'FontSize',15); 
 
             %
             % Plot top row histograms. Each histogram box represents 10% of
@@ -626,12 +622,26 @@ for feat=plottable_feats
                     rectangle('Position', [binedges(h), upedge-ycoords(3,h), binedges(h+1)-binedges(h), bincs(3,h)], 'FaceColor','r')
                 end
             end
-
-            xmaxval=max(xmaxval,max(allvals));
             
-
+            if (comparisoncount==1)
+                xmaxval=max(xmaxval,binedges(plottable_bins+1));
+            end
+            
+            %
+            % Some outlier analysis:
+            
+            mu=mean(Value_difference);
+            sdev=std(Value_difference);
+            
+            % These are the outlier values:
+            outliers=find(Value_difference>mu+2*sdev);
+            %
+            outliervals=(alltable(outliers,1)-mu)/sdev;
+            outlierclass=alltable(outliers,2);
+            outlierlabs=labs_for_plot_positions{comparisoncount}(outliers);
+                        
+            outliers_for_analysis{feat,comparisoncount}=struct('vals',outliervals, 'class', outlierclass, 'labs', outlierlabs);
     end
-
     %
     % Set all subplot axis to have the same scale
     %
@@ -656,7 +666,7 @@ for feat=plottable_feats
     if ~exist(resultdir, 'dir')
         mkdir (resultdir)
     end
-    %disp(['Writing (or at least trying) to ', resultdir,'/',featfilename]);
+    disp(['Writing (or at least trying) to ', resultdir,'/',featfilename]);
     export_fig('-painters','-r600','-q101',[resultdir,'/',featfilename])
 end
 
@@ -688,5 +698,5 @@ disp('lines of the file into the matlab console.')
 
 annot=annotation('textbox', [1,1,0,0], 'String', '','BackgroundColor',[1.0,0.95,0.95], 'EdgeColor','blue');
 
-set(hFig,'WindowButtonMotionFcn', {@display_data_label,hFig, HA, annot, smoothed_vals, labs_for_smoothed_vals});
+set(hFig,'WindowButtonMotionFcn', {@display_data_label,hFig, HA, annot, plot_positions, labs_for_plot_positions});
 

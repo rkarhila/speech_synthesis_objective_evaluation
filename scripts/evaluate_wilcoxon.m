@@ -1,3 +1,9 @@
+%
+%  OBSOLETE?
+%  Will be removed soon I guess... 
+%  ( It is now 25/06/2015, wonder when "soon" will be... )
+%
+
 % EVALUATE_WILCOXON
 %
 % Here we evaluate the objective scores somehow...
