@@ -56,7 +56,7 @@ tests2012={ ...
 
 for n=1:length(tests2012)
 
-    tests2012{n}.results = run_individual_test(tests2012{n}, BLIZZARD2012_RESULTDIR);
+    tests2012{n}.results = run_individual_test(tests2012{n}, conf.BLIZZARD2012_RESULTDIR);
 
 end
 

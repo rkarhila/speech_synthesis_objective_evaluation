@@ -18,12 +18,12 @@ corporalist={'cas','nancy','rjs','roger','speakit','voice_forge','wj'};
 languagelist={'english','mandarin'};
 systemtypeslist={'unit_selection','hmm'} % This is not yet implemented!
 %testtypelist={'sim', 'nat'};
-testtypelist={'nat'};
+testtypelist={'sim'};
 
 
 %%%% For all feats? No, just for the selected ones:
 
-plottable_feats=1:length(testlist);
+plottable_feats=1:length(conf.methodlist);
 
 %
 
@@ -31,7 +31,7 @@ binsteps=10;
 plottable_bins=10;
 
 
-interesting_thresholds=[50,75,90,95];
+interesting_thresholds=[75,90,95];
 
 res=struct(...
     'all', struct(...
@@ -189,30 +189,20 @@ set(hFig, 'Position', [0 0 1500 1000]);
 reports=cell(length(comparisontypeslist),2);
 
 for r=1:length(comparisontypeslist)
-   reports{r,1}= {...
+   reports{r}= {...
        char(strcat({'  Results for '},test_types_in_test , {' comparing '}, char(comparisontypeslist{r}{1}) )),...
        '  ignoring the cases where listeners could not reach a decision.',...
        '',...
        char(strcat({'    Speakers:  '}, strjoin(corpora_in_test, ', '))),...
        char(strcat({'   Languages:  '}, strjoin(languages_in_test, ', '))),...
        '',...
-       '    Threshold values            |        % of data over thresholds           Median',...',...
-       ' 50%     75%     90%     95%    |        50%     75%     90%     95%    |  correlation  | Method'};
-       %0.00	0.30	0.30	0.30	|	0.55	0.01	0.01	0.01	|	0.50	| PESQ Wideband MOS LQC   
-       %0.00	0.30	0.30	0.30	|	0.55	0.01	0.01	0.01	|	0.50	| PESQ Wideband MOS LQC 
-   reports{r,2}={...
-       char(strcat({'  Results for '},test_types_in_test , {' comparing '}, char(comparisontypeslist{r}{1}) )),...
-       '  Taking into account the cases where listeners could not reach a decision.',...
-       '',...
-       char(strcat({'    Speakers:  '}, strjoin(corpora_in_test, ', '))),...
-       char(strcat({'   Languages:  '}, strjoin(languages_in_test, ', '))),...
-       '',...
-       '    Threshold values            |        % of data over thresholds           Medilsan',...
-       ' 50%     75%     90%     95%    |        50%     75%     90%     95%    |  correlation  | Method'};
-   
+       ' --- Not including insignificant subj. diff. -- |     ---- including subj. diff. ------         |',...
+       '    Threshold values    | % of data over thresh.|    Threshold values   |% of data over thresh  |     Median',...',...
+       ' 75%     90%     95%    | 75%     90%     95%   |  75%   90%     95%    |  75%   90%     95%    |  correlation  | Method'};
+       %0.00    0.46    5.85    | 0.80  0.47    0.00    | 0.34  5.85    5.85    | 0.54  0.00    0.00    |       -0.76   | 18 Distortion: dtw with straight mcd , path cost with straight fws 
 end
               
-outliers_for_analysis=cell(length(testlist),3);              
+outliers_for_analysis=cell(length(conf.methodlist),3);              
 
 for feat=plottable_feats
 
@@ -451,16 +441,24 @@ for feat=plottable_feats
             corr_vals=corr_data(:,feat);
             corr_val=median(corr_vals);
             
-            rep1={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
-                testlist{feat}.name],[thrvals(1:4) goodnessvals, corr_val])};
-            
-            rep2={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
-                testlist{feat}.name],[harshthrvals(1:4) harshgoodnessvals, corr_val])};
-            
-            reports{ comparisoncount,1} = [reports{ comparisoncount,1}, rep1];
-            reports{ comparisoncount,2} = [reports{ comparisoncount,2}, rep2];
+%             rep1={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
+%                 conf.methodlist{feat}.name],[thrvals(1:4) goodnessvals, corr_val])};
+%             
+%             rep2={sprintf(['%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t|\t%0.2f\t| ',...
+%                 conf.methodlist{feat}.name],[harshthrvals(1:4) harshgoodnessvals, corr_val])};
+%             
+%             reports{ comparisoncount,1} = [reports{ comparisoncount,1}, rep1];
+%             reports{ comparisoncount,2} = [reports{ comparisoncount,2}, rep2];
 
+            rep1={sprintf(['%0.2f\t%0.2f\t%0.2f\t|',...
+                           ' %0.2f\t%0.2f\t%0.2f\t|',...
+                           ' %0.2f\t%0.2f\t%0.2f\t|',...
+                           ' %0.2f\t%0.2f\t%0.2f\t|',...
+                           '\t%0.2f\t| ', num2str(feat), ' ', conf.methodlist{feat}.name],...
+                           [thrvals(1:3) goodnessvals, harshthrvals(1:3) harshgoodnessvals ,corr_val])};        
             
+            
+            reports{ comparisoncount}  = [reports{ comparisoncount}, rep1];
             
             
             HA{comparisoncount} = subplot(3,1,comparisoncount);
@@ -657,12 +655,12 @@ for feat=plottable_feats
 
     
     
-    h3 = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',regexprep(testlist{feat}.name,'_',' ')]);
+    h3 = suptitle(['Proportion of correct evaluations for feat ',num2str(feat), ': ',regexprep(conf.methodlist{feat}.name,'_',' ')]);
     set(h3,'FontSize',18,'FontWeight','normal')
     
     
-    featfilename=[num2str(feat),'_',regexprep(testlist{feat}.name,'\W+','_'),'_fixed_logistics.pdf'];
-    resultdir=[RESULT_GRAPH_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];
+    featfilename=[num2str(feat),'_',regexprep(conf.methodlist{feat}.name,'\W+','_'),'_fixed_logistics.pdf'];
+    resultdir=[conf.RESULT_GRAPH_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];
     if ~exist(resultdir, 'dir')
         mkdir (resultdir)
     end
@@ -672,22 +670,20 @@ end
 
 
 
-reporttypes={'_only_significant', '_include_nonsignificant'};
+%reporttypes={'_only_significant', '_include_nonsignificant'};
 
-resultdir=[RESULT_REPORT_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];   
+resultdir=[conf.RESULT_REPORT_DIR, regexprep(regexprep(testname,'\W+','_'),'_+','_')];   
 if ~exist(resultdir, 'dir')
     mkdir (resultdir)
 end    
 
 
 for r=1:length(comparisontypeslist)
-    for p=1:2
-        fid = fopen([resultdir, '/report_',regexprep([comparisontypeslist{r}{1},reporttypes{p}],'\W+','_') ],'w');
-        for i=1:length(reports{r,p})
-            fprintf(fid,'%s\n',reports{r,p}{i});
-        end
-        fclose(fid);
-    end    
+    fid = fopen([resultdir, '/report_',regexprep([comparisontypeslist{r}{1}],'\W+','_') ],'w');
+    for i=1:length(reports{r})
+        fprintf(fid,'%s\n',reports{r}{i});
+    end
+    fclose(fid);
 end    
 
 disp('This last bit should activate a little helper function that ')
@@ -700,3 +696,31 @@ annot=annotation('textbox', [1,1,0,0], 'String', '','BackgroundColor',[1.0,0.95,
 
 set(hFig,'WindowButtonMotionFcn', {@display_data_label,hFig, HA, annot, plot_positions, labs_for_plot_positions});
 
+
+% Keep the workspace clean! 
+
+clear accum alllabs alltable allvals ans bad2labs bad2vals badtable bincs
+clear binedges binsteps binwidth colorpointer comparisoncount 
+clear comparisonname comparisontypes comptype comptypes corporalist
+clear corr_data corr_data_src corr_val corr_vals correlation_data
+clear fc feat featfilename fitresult fitresult2  ft gof good2lab good2vals
+clear goodnessval goodnessvals goodorbad goodtable h h1 h3 
+clear harshgoodnessval harshgoodnessthresh goodnessval goodnessthresh
+clear histnonlabs histnons histsiglabs histsigs indexing
+clear interesting_thresholds
+
+clear labs %labs_for_plot_positions 
+clear languagelist languages_in_test 
+clear linecolors m maxs methods mins mu n negsbinc nn non2labs 
+clear non2vals nonlabels nonlabels1 nonlabs nons nonsaccum nonsbinc 
+clear nonvals opts outlierclass outlierlabs outliers 
+clear outliers_for_analysis outliervals p plot_pos %plot_positions 
+clear plottable_bins plottable_feats pointer r rep1 rep2 reports 
+clear res rounded sdev siglabels siglabels1 sigs sigsbinc srnonvals
+clear srvals systemtypeslist t test_size test_types_in_test testname
+
+clear testtypelist th thrval thrvals upedge vals Value_difference x
+clear xmaxval y ycoords z
+
+clear harshthrvals harshthrval harshgoodnessvals good2labs corpora_in_test
+clear comparisontypeslist bestguesscorrect

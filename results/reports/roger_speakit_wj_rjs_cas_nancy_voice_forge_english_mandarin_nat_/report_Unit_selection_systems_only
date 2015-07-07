@@ -1,0 +1,121 @@
+  Results for nat comparing Unit selection systems only
+  ignoring the cases where listeners could not reach a decision.
+
+    Speakers:  roger, speakit, wj, rjs, cas, nancy, voice_forge
+   Languages:  english, mandarin
+
+ --- Not including insignificant subj. diff. -- |     ---- including subj. diff. ------         |
+    Threshold values    | % of data over thresh.|    Threshold values   |% of data over thresh  |     Median
+ 75%     90%     95%    | 75%     90%     95%   |  75%   90%     95%    |  75%   90%     95%    |  correlation  | Method
+0.00	0.05	0.30	| 0.88	0.84	0.57	| 0.14	0.72	0.89	| 0.75	0.26	0.22	|	NaN	| 1 Distortion: dtw with fft fws , path cost with fft fws 
+0.00	0.04	0.20	| 0.85	0.72	0.28	| 0.06	0.26	Inf	| 0.64	0.16	0.00	|	NaN	| 2 Distortion: dtw with fft fws , path cost with fft mcd 
+0.00	0.06	0.34	| 0.88	0.84	0.59	| 0.12	0.60	Inf	| 0.81	0.34	0.00	|	NaN	| 3 Distortion: dtw with fft fws , path cost with straight fws 
+0.00	0.16	Inf	| 0.82	0.53	0.00	| 0.16	Inf	Inf	| 0.53	0.00	0.00	|	NaN	| 4 Distortion: dtw with fft fws , path cost with straight mcd 
+0.00	0.05	0.12	| 0.75	0.43	0.29	| 0.05	Inf	Inf	| 0.47	0.00	0.00	|	NaN	| 5 Distortion: dtw with fft fws , path cost with llr 
+0.00	0.10	0.50	| 0.88	0.77	0.33	| 0.16	0.72	Inf	| 0.71	0.20	0.00	|	NaN	| 6 Distortion: dtw with fft mcd , path cost with fft fws 
+0.00	0.05	0.12	| 0.83	0.61	0.32	| 0.05	Inf	Inf	| 0.61	0.00	0.00	|	NaN	| 7 Distortion: dtw with fft mcd , path cost with fft mcd 
+0.00	0.12	0.71	| 0.87	0.80	0.24	| 0.13	0.60	Inf	| 0.80	0.30	0.00	|	NaN	| 8 Distortion: dtw with fft mcd , path cost with straight fws 
+0.00	0.24	Inf	| 0.78	0.37	0.00	| 0.14	Inf	Inf	| 0.52	0.00	0.00	|	NaN	| 9 Distortion: dtw with fft mcd , path cost with straight mcd 
+0.01	0.05	Inf	| 0.63	0.37	0.00	| 0.04	Inf	Inf	| 0.41	0.00	0.00	|	NaN	| 10 Distortion: dtw with fft mcd , path cost with llr 
+0.01	0.07	0.36	| 0.89	0.85	0.59	| 0.14	0.83	Inf	| 0.80	0.23	0.00	|	NaN	| 11 Distortion: dtw with straight fws , path cost with fft fws 
+0.00	0.05	0.12	| 0.87	0.72	0.51	| 0.06	0.30	Inf	| 0.69	0.15	0.00	|	NaN	| 12 Distortion: dtw with straight fws , path cost with fft mcd 
+0.00	0.06	0.42	| 0.89	0.85	0.52	| 0.12	0.58	Inf	| 0.81	0.39	0.00	|	NaN	| 13 Distortion: dtw with straight fws , path cost with straight fws 
+0.01	0.14	Inf	| 0.83	0.59	0.00	| 0.15	Inf	Inf	| 0.59	0.00	0.00	|	NaN	| 14 Distortion: dtw with straight fws , path cost with straight mcd 
+0.00	0.05	0.14	| 0.79	0.56	0.28	| 0.05	Inf	Inf	| 0.54	0.00	0.00	|	NaN	| 15 Distortion: dtw with straight fws , path cost with llr 
+0.01	0.08	0.40	| 0.88	0.79	0.46	| 0.13	0.62	Inf	| 0.76	0.28	0.00	|	NaN	| 16 Distortion: dtw with straight mcd , path cost with fft fws 
+0.00	0.04	0.14	| 0.85	0.69	0.32	| 0.05	0.20	Inf	| 0.66	0.22	0.00	|	NaN	| 17 Distortion: dtw with straight mcd , path cost with fft mcd 
+0.00	0.10	Inf	| 0.87	0.78	0.00	| 0.12	0.69	Inf	| 0.76	0.24	0.00	|	NaN	| 18 Distortion: dtw with straight mcd , path cost with straight fws 
+0.01	Inf	Inf	| 0.72	0.00	0.00	| 0.18	Inf	Inf	| 0.41	0.00	0.00	|	NaN	| 19 Distortion: dtw with straight mcd , path cost with straight mcd 
+0.00	0.05	0.12	| 0.72	0.41	0.24	| 0.07	Inf	Inf	| 0.33	0.00	0.00	|	NaN	| 20 Distortion: dtw with straight mcd , path cost with llr 
+0.00	0.14	0.48	| 0.85	0.71	0.32	| 0.16	Inf	Inf	| 0.69	0.00	0.00	|	NaN	| 21 Distortion: dtw with llr , path cost with fft fws 
+0.00	0.04	0.08	| 0.82	0.65	0.45	| 0.04	0.14	Inf	| 0.64	0.29	0.00	|	NaN	| 22 Distortion: dtw with llr , path cost with fft mcd 
+0.00	0.18	Inf	| 0.83	0.68	0.00	| 0.17	Inf	Inf	| 0.70	0.00	0.00	|	NaN	| 23 Distortion: dtw with llr , path cost with straight fws 
+0.01	0.18	Inf	| 0.75	0.46	0.00	| 0.17	Inf	Inf	| 0.48	0.00	0.00	|	NaN	| 24 Distortion: dtw with llr , path cost with straight mcd 
+0.01	0.04	Inf	| 0.62	0.36	0.00	| 0.04	Inf	Inf	| 0.37	0.00	0.00	|	NaN	| 25 Distortion: dtw with llr , path cost with llr 
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 26 gmm diag_10 comp of straight_mfcc1_nodelta
+1.98	Inf	Inf	| 0.02	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 27 gmm diag_30 comp of straight_mfcc1_nodelta
+2.20	Inf	Inf	| 0.03	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 28 gmm diag_50 comp of straight_mfcc1_nodelta
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 29 gmm full_1 comp of straight_mfcc1_nodelta
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 30 gmm full_3 comp of straight_mfcc1_nodelta
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 31 gmm full_5 comp of straight_mfcc1_nodelta
+3.34	Inf	Inf	| 0.03	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 32 gmm full_10 comp of straight_mfcc1_nodelta
+0.80	Inf	Inf	| 0.05	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 33 gmm diag_10 comp of fft_mfcc1_nodelta
+1.06	1.85	Inf	| 0.06	0.04	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 34 gmm diag_30 comp of fft_mfcc1_nodelta
+1.13	Inf	Inf	| 0.06	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 35 gmm diag_50 comp of fft_mfcc1_nodelta
+0.76	Inf	Inf	| 0.07	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 36 gmm full_1 comp of fft_mfcc1_nodelta
+1.58	Inf	Inf	| 0.06	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 37 gmm full_3 comp of fft_mfcc1_nodelta
+1.34	Inf	Inf	| 0.07	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 38 gmm full_5 comp of fft_mfcc1_nodelta
+2.10	Inf	Inf	| 0.06	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 39 gmm full_10 comp of fft_mfcc1_nodelta
+2.59	2.73	Inf	| 0.08	0.07	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 40 gmm diag_10 comp of straight_melbank1_nodelta
+3.05	3.26	Inf	| 0.11	0.11	0.00	| 3.26	Inf	Inf	| 0.11	0.00	0.00	|	NaN	| 41 gmm diag_30 comp of straight_melbank1_nodelta
+3.77	3.77	4.59	| 0.11	0.11	0.07	| 3.77	Inf	Inf	| 0.11	0.00	0.00	|	NaN	| 42 gmm diag_50 comp of straight_melbank1_nodelta
+2.90	2.95	Inf	| 0.05	0.04	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 43 gmm full_1 comp of straight_melbank1_nodelta
+4.01	Inf	Inf	| 0.10	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 44 gmm full_3 comp of straight_melbank1_nodelta
+4.79	Inf	Inf	| 0.07	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 45 gmm full_5 comp of straight_melbank1_nodelta
+4.93	4.98	Inf	| 0.11	0.11	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 46 gmm full_10 comp of straight_melbank1_nodelta
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 47 gmm diag_10 comp of fft_melbank1_nodelta
+2.82	Inf	Inf	| 0.03	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 48 gmm diag_30 comp of fft_melbank1_nodelta
+3.39	Inf	Inf	| 0.03	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 49 gmm diag_50 comp of fft_melbank1_nodelta
+1.70	3.68	5.28	| 0.07	0.05	0.03	| 4.80	4.80	5.28	| 0.04	0.04	0.03	|	NaN	| 50 gmm full_1 comp of fft_melbank1_nodelta
+2.55	4.71	4.91	| 0.07	0.04	0.04	| 4.31	4.71	4.91	| 0.05	0.04	0.04	|	NaN	| 51 gmm full_3 comp of fft_melbank1_nodelta
+3.15	5.60	6.18	| 0.06	0.04	0.03	| 6.18	6.18	6.18	| 0.03	0.03	0.03	|	NaN	| 52 gmm full_5 comp of fft_melbank1_nodelta
+4.28	7.94	7.94	| 0.05	0.02	0.02	| 6.95	7.94	7.94	| 0.03	0.02	0.02	|	NaN	| 53 gmm full_10 comp of fft_melbank1_nodelta
+1.72	3.50	3.50	| 0.03	0.01	0.01	| 3.33	3.50	3.50	| 0.02	0.01	0.01	|	NaN	| 54 gmm diag_10 comp of straight_mfcc1
+3.49	4.60	4.60	| 0.03	0.02	0.02	| 4.60	4.60	4.60	| 0.02	0.02	0.02	|	NaN	| 55 gmm diag_30 comp of straight_mfcc1
+2.28	5.48	5.48	| 0.03	0.01	0.01	| 5.48	Inf	Inf	| 0.01	0.00	0.00	|	NaN	| 56 gmm diag_50 comp of straight_mfcc1
+7.61	7.61	7.61	| 0.03	0.03	0.03	| 7.61	8.38	8.38	| 0.03	0.02	0.02	|	NaN	| 57 gmm full_1 comp of straight_mfcc1
+3.28	3.34	8.54	| 0.10	0.09	0.02	| 3.34	Inf	Inf	| 0.09	0.00	0.00	|	NaN	| 58 gmm full_3 comp of straight_mfcc1
+3.34	3.69	9.82	| 0.11	0.11	0.02	| 3.69	Inf	Inf	| 0.11	0.00	0.00	|	NaN	| 59 gmm full_5 comp of straight_mfcc1
+4.17	4.40	12.05	| 0.10	0.07	0.01	| 4.40	12.16	12.16	| 0.07	0.00	0.00	|	NaN	| 60 gmm full_10 comp of straight_mfcc1
+0.87	1.35	2.93	| 0.06	0.05	0.02	| 1.35	2.93	2.93	| 0.05	0.02	0.02	|	NaN	| 61 gmm diag_10 comp of fft_mfcc1
+1.63	1.64	3.26	| 0.05	0.04	0.03	| 2.73	3.26	3.26	| 0.03	0.03	0.03	|	NaN	| 62 gmm diag_30 comp of fft_mfcc1
+1.71	1.96	3.82	| 0.05	0.04	0.03	| 2.99	3.82	3.82	| 0.03	0.03	0.03	|	NaN	| 63 gmm diag_50 comp of fft_mfcc1
+1.41	2.67	6.74	| 0.06	0.04	0.01	| 6.52	6.74	6.74	| 0.02	0.01	0.01	|	NaN	| 64 gmm full_1 comp of fft_mfcc1
+2.33	3.09	6.70	| 0.05	0.04	0.02	| 6.47	6.70	6.70	| 0.02	0.02	0.02	|	NaN	| 65 gmm full_3 comp of fft_mfcc1
+3.10	3.32	7.62	| 0.04	0.04	0.03	| 7.62	7.62	7.62	| 0.03	0.03	0.03	|	NaN	| 66 gmm full_5 comp of fft_mfcc1
+3.90	9.32	9.32	| 0.04	0.03	0.03	| 9.32	9.32	9.32	| 0.03	0.03	0.03	|	NaN	| 67 gmm full_10 comp of fft_mfcc1
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 68 gmm diag_10 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 69 gmm diag_30 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 70 gmm diag_50 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 71 gmm full_1 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 72 gmm full_3 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 73 gmm full_5 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 74 gmm full_10 comp of straight_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 75 gmm diag_10 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 76 gmm diag_30 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 77 gmm diag_50 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 78 gmm full_1 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 79 gmm full_3 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 80 gmm full_5 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 81 gmm full_10 comp of fft_mfcc1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 82 gmm diag_10 comp of straight_melbank1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 83 gmm diag_30 comp of straight_melbank1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 84 gmm diag_50 comp of straight_melbank1_nodelta traditional
+3.28	Inf	Inf	| 0.07	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 85 gmm full_1 comp of straight_melbank1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 86 gmm full_3 comp of straight_melbank1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 87 gmm full_5 comp of straight_melbank1_nodelta traditional
+5.82	Inf	Inf	| 0.05	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 88 gmm full_10 comp of straight_melbank1_nodelta traditional
+0.54	Inf	Inf	| 0.36	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 89 gmm diag_10 comp of fft_melbank1_nodelta traditional
+0.76	Inf	Inf	| 0.30	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 90 gmm diag_30 comp of fft_melbank1_nodelta traditional
+0.89	Inf	Inf	| 0.28	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 91 gmm diag_50 comp of fft_melbank1_nodelta traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 92 gmm full_1 comp of fft_melbank1_nodelta traditional
+1.68	Inf	Inf	| 0.08	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 93 gmm full_3 comp of fft_melbank1_nodelta traditional
+2.14	Inf	Inf	| 0.05	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 94 gmm full_5 comp of fft_melbank1_nodelta traditional
+2.03	Inf	Inf	| 0.09	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 95 gmm full_10 comp of fft_melbank1_nodelta traditional
+14.23	Inf	Inf	| 0.03	0.00	0.00	| 14.23	Inf	Inf	| 0.03	0.00	0.00	|	NaN	| 96 gmm diag_10 comp of straight_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 97 gmm diag_30 comp of straight_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 98 gmm diag_50 comp of straight_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 99 gmm full_1 comp of straight_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 100 gmm full_3 comp of straight_mfcc1 traditional
+25.88	25.88	25.88	| 0.03	0.03	0.03	| 25.88	31.12	31.12	| 0.03	0.01	0.01	|	NaN	| 101 gmm full_5 comp of straight_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 102 gmm full_10 comp of straight_mfcc1 traditional
+1.55	Inf	Inf	| 0.18	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 103 gmm diag_10 comp of fft_mfcc1 traditional
+1.53	Inf	Inf	| 0.20	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 104 gmm diag_30 comp of fft_mfcc1 traditional
+1.45	Inf	Inf	| 0.24	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 105 gmm diag_50 comp of fft_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 106 gmm full_1 comp of fft_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 107 gmm full_3 comp of fft_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 108 gmm full_5 comp of fft_mfcc1 traditional
+Inf	Inf	Inf	| 0.00	0.00	0.00	| Inf	Inf	Inf	| 0.00	0.00	0.00	|	NaN	| 109 gmm full_10 comp of fft_mfcc1 traditional
+0.28	1.02	1.02	| 0.24	0.00	0.00	| 0.41	1.02	1.02	| 0.13	0.00	0.00	|	NaN	| 110 PESQ Narrowband MOS
+0.11	0.28	0.34	| 0.33	0.09	0.07	| 0.24	0.34	0.34	| 0.13	0.07	0.07	|	NaN	| 111 PESQ Narrowband MOS LQC
+0.11	0.24	0.31	| 0.25	0.07	0.04	| 0.18	0.31	0.34	| 0.14	0.04	0.03	|	NaN	| 112 PESQ Wideband MOS LQC

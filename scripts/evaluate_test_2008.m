@@ -2,7 +2,7 @@
 % Evaluate our tests sets for 2008 
 %
 
-local_conf
+%local_conf
 
 
 tests2008={ ...
@@ -101,7 +101,7 @@ tests2008={ ...
 
 for n=1:length(tests2008)
 
-    tests2008{n}.results = run_individual_test(tests2008{n}, BLIZZARD2008_RESULTDIR );
+    tests2008{n}.results = run_individual_test(tests2008{n}, conf.BLIZZARD2008_RESULTDIR );
 
 end
 

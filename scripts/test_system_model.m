@@ -23,8 +23,14 @@ function [result, ref_data_sys] = test_system_model(filepath, reffile,model, met
          ref_data_sys=cached_ref_data;
     end
 
-    
-    result=method.modelling.testfunction(model,ref_data_sys,method.modelling);
+    try
+        result=method.modelling.testfunction(model,ref_data_sys,method.modelling);
+    catch ME
+        parsave('/tmp/data_dump', ref_data_sys);
+        parsave('/tmp/model_dump', model);
+        disp('saved model and data to /tmp/model_dump and /tmp/data_dump');
+        rethrow(ME)
+    end
     
     
 end

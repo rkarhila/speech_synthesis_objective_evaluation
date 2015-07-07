@@ -14,17 +14,32 @@ function [results] = run_individual_test(test_specs, path_prefix)
             invasive_measure_result=load(invasive_file);
         end
         
+         
+        non_invasive_traditional_file=[test_specs.objective_resultfile,'.non_invasive_trad'];
+        if exist(non_invasive_traditional_file, 'file') == 0;         
         
-        non_invasive_file=[test_specs.objective_resultfile,'.non_invasive'];
-        if exist(non_invasive_file, 'file') == 0;         
-        
-            [ non_invasive_measure_result, non_inv_test_runtime] = ...
-                evaluate_with_non_invasive_measures(path_prefix, test_specs.reffilelist,test_specs.testfilelist);              
-            save(non_invasive_file, 'non_invasive_measure_result','-ascii');       
+            [ non_invasive_traditional_measure_result, non_inv_test_runtime] = ...
+                evaluate_with_non_invasive_measures_trad_order(path_prefix, test_specs.reffilelist,test_specs.testfilelist);              
+            save(non_invasive_traditional_file, 'non_invasive_traditional_measure_result','-ascii');       
         else
-            non_invasive_measure_result=load(non_invasive_file);
+            non_invasive_traditional_measure_result=load(non_invasive_traditional_file);
+        end
+       
+
+        
+        
+        non_invasive_reverse_file=[test_specs.objective_resultfile,'.non_invasive'];
+        if exist(non_invasive_reverse_file, 'file') == 0;         
+        
+            [ non_invasive_reverse_measure_result, non_inv_test_runtime] = ...
+                evaluate_with_non_invasive_measures_rev_order(path_prefix, test_specs.reffilelist,test_specs.testfilelist);              
+            save(non_invasive_reverse_file, 'non_invasive_measure_result','-ascii');       
+        else
+            non_invasive_reverse_measure_result=load(non_invasive_reverse_file);
         end
 
+        
+        
         
         pesq_file=[test_specs.objective_resultfile,'.pesq'];
         if exist(pesq_file, 'file') == 0;         
@@ -35,7 +50,7 @@ function [results] = run_individual_test(test_specs, path_prefix)
             pesq_result=load(pesq_file);
         end
         
-        objdata=[ invasive_measure_result, non_invasive_measure_result, pesq_result ];
+        objdata=[ invasive_measure_result, non_invasive_reverse_measure_result, non_invasive_traditional_measure_result', pesq_result ];
         save(test_specs.objective_resultfile, 'objdata','-ascii');
         results=objdata;
     else      

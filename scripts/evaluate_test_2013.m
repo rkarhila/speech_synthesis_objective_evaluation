@@ -73,7 +73,7 @@ tests2013={ ...
 
 for n=1:length(tests2013)
 
-    tests2013{n}.results= run_individual_test(tests2013{n}, BLIZZARD2013_RESULTDIR);
+    tests2013{n}.results= run_individual_test(tests2013{n}, conf.BLIZZARD2013_RESULTDIR);
    
 end
 
