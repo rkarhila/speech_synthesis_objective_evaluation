@@ -90,5 +90,11 @@ echo "Cloning export_fig from https://github.com/ojwoodford/export_fig"
 git clone https://github.com/ojwoodford/export_fig
 
 
+echo "Getting strjoin"
+rm -rf strjoin
+wget https://www.mathworks.com/matlabcentral/fileexchange/submissions/31862/v/2/download/zip
+unzip zip
+rm -rf zip
+
 cd ..
 
